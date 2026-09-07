@@ -9,6 +9,11 @@ Which parts of the design sit in which evidence class, as of 2026-09-07. See
 | Operating contract loaded in every session | measured | kvart, legacy core | eval suite on contract changes: proposed |
 | Context standard L0 + team-context repo | measured | kvart | L1 ADRs bootstrapped; L2 docs-lint disabled on the plan |
 | Spec retro-generation and findings file | measured | kvart | skills run by hand; sister spec PRs hand-edited |
+| Day 1 onboarding runbook (team repo, standard adoption, memory move, specs, ADRs, PM workspace) | measured | kvart | one session for ~250 features; see 17-onboarding |
+| ADR candidate table and rejected list | measured | kvart | 30 candidates, 13 + 8 written, 1 unconfirmed |
+| PM workspace and skill catalogue | measured (workspace) / designed (most skills) | kvart | only the ticket and readiness skills exercised in the cycles; see 14-pm-surface |
+| Design system as a knowledge-plane layer | designed | kvart | repo built on Day 1; not yet read by a BUILD or QA pass in a measured cycle; see 15-design-system |
+| Concept-to-tool inventory | reference | | see 16-inventory |
 | Memory store bound read-only; promote PR | measured / designed | kvart | store moved; promote PR never exercised in the cycles |
 | Cross-vendor review, three axes | measured | kvart, legacy core | two backends; hard-fail proven |
 | Blind security side-pass | measured | kvart | |

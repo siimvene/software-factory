@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0 (2026-09-07)
+
+Coverage of the surfaces the first cut only named.
+
+- `docs/14-pm-surface.md`: the PM workspace, a catalogue of its skills, the readiness rubric,
+  the intake-to-ticket pipeline and the proposed/implemented/released boundary.
+- `docs/15-design-system.md`: the design-standards repo as a knowledge-plane layer.
+- `docs/16-inventory.md`: every mechanism mapped to what provides it today and what an adopter
+  without an organisational standard must build.
+- `docs/17-onboarding.md`: the Day 1 runbook (team-context repo, standard adoption, instruction
+  split, memory move, three-mode spec retro-generation with owner review, ADR candidate table
+  and mining, PM workspace, design system), with the kvart numbers.
+- `templates/pm-skill.md`: a generic skill skeleton.
+- `STATUS.md` and the README reading order extended.
+
 ## 0.1.1 (2026-09-07)
 
 Visuals. The design had none: every mechanism was prose and tables only.

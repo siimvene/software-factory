@@ -18,6 +18,9 @@ you skip.
 
 ## Turn 0: adopt (one day for a healthy repo)
 
+The full runbook, with the kvart numbers, is [17-onboarding](17-onboarding.md). The table
+below is the checklist form.
+
 | Step | Check |
 |---|---|
 | Operating contract vendored into the repo; lean root instructions; path-scoped rule files with honest paths | the sentinel is present; every rule file's globs match at least one file |
