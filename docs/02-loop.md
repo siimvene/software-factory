@@ -4,17 +4,36 @@ SPEC → BUILD → VERIFY → SHIP → LEARN. One turn per ticket. The loop is t
 an agentic SDLC; what this design adds is where the gates sit, who decides what, and the two
 write-backs that make it a flywheel.
 
+```mermaid
+flowchart LR
+    SPEC["SPEC<br/>ticket as the delta<br/>numbered examples<br/>a person approves"]
+    BUILD["BUILD<br/>worktree per turn<br/>plan first, tests red first<br/>disjoint parallel lanes"]
+    VERIFY["VERIFY<br/>sensors, then consort<br/>scanners, browser QA<br/>findings dispositioned"]
+    SHIP["SHIP<br/>PR arrives reviewed<br/>the owner merges<br/>release is separate"]
+    LEARN["LEARN<br/>two write-backs<br/>cycle report: wall-clock,<br/>tokens, every shortcut"]
+    HUB[("team-context<br/>specs/<br/>decision records<br/>.memspec/")]
+
+    SPEC --> BUILD --> VERIFY --> SHIP --> LEARN
+    LEARN == "specs regenerate<br/>sister PR" ==> HUB
+    LEARN -. "memory promotes<br/>promote PR" .-> HUB
+    HUB -. "read at session start" .-> SPEC
+    HUB -. "read at session start" .-> BUILD
+
+    classDef stage fill:#f2f4f4,stroke:#14181b,stroke-width:1.5px,color:#14181b;
+    classDef hub fill:#e9eded,stroke:#0d5f68,stroke-width:2px,color:#14181b;
+    class SPEC,BUILD,VERIFY,SHIP,LEARN stage;
+    class HUB hub;
 ```
-   ┌──────────────────────────────────────────────────────────────────────────┐
-   │                                                                          │
-   ▼                                                                          │
- SPEC ──► BUILD ──► VERIFY ──► SHIP ──► LEARN ─────────────────────────────────┘
- ticket   sandbox   sensors    PR      specs regenerated (sister PR)
- examples worktree  consort    owner   memory promoted (promote PR)
- approve  agents    security   merge   report: wall-clock, tokens, shortcuts
-          plan      scanners   release
-          first     QA
-```
+
+The rim is delivery. The hub is the knowledge plane, and it is what makes the line a flywheel
+rather than a pipeline: every turn ends by writing back what the next turn reads. Both
+write-backs are pull requests a person reviews, never a direct write.
+
+The dashed memory arrow is drawn dashed on purpose. Across the two measured kvart cycles the
+specs arrow fired twice, both times hand-edited because the generating skill was not installed,
+and the memory arrow fired zero times: both cycles' facts went to a local scratch store and
+nothing was promoted into the team plane `[measured 2026-09-07]`. A loop missing that arrow
+still ships; it just stops compounding.
 
 ## SPEC
 

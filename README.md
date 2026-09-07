@@ -21,6 +21,65 @@ plane and the gates: every feature that lands makes the next one cheaper and saf
 the flywheel. The humans that remain do three things: approve intent, accept behaviour on
 evidence, and press release.
 
+## The line, end to end
+
+Nine layers sit between an agent writing a line of code and a person pressing merge. Two are
+builder ergonomics and stay off the critical path. Five are gates inside the agent's own loop,
+before a pull request exists. Two run after it. The order is an economic argument, not a taste:
+the reviewer is the most expensive resource on the line, so a review of code that a ratchet
+would have failed is waste.
+
+```mermaid
+flowchart TB
+    subgraph ERGO["off the critical path: ergonomics, not gates"]
+        direction TB
+        L1["1 · Orientation map<br/>ripwire · pre-write<br/>rank symbols before opening a file"]
+        L2["2 · YAGNI ladder<br/>ponytail · during write<br/>7 rungs before code exists"]
+    end
+    subgraph GATES["gates: each refuses with a file, a line and a reason"]
+        direction TB
+        L3["3 · The net<br/>tests, aggregate coverage, mutation<br/>refuses silent behaviour change"]
+        L4["4 · Quality ratchets<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
+        L5["5 · Architecture diff<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
+        L6["6 · Adversarial review<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
+        L7["7 · Scanners<br/>dependencies, secrets, static analysis<br/>refuses known-bad"]
+    end
+    subgraph AFTER["after the pull request exists"]
+        direction TB
+        L8["8 · CI<br/>mechanical only, no review<br/>refuses a local pass nobody can reproduce"]
+        L9["9 · Human gate<br/>named outcome sign-off<br/>refuses an outcome nobody accepted"]
+    end
+    L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8 --> L9
+
+    classDef measured fill:#e8f3ec,stroke:#2f6b3f,stroke-width:1.5px,color:#14181b;
+    classDef designed fill:#fdf1e3,stroke:#c2610c,stroke-width:1.5px,color:#14181b;
+    classDef frame fill:#00000000,stroke:#aab6b8,stroke-width:1px,color:#5d686d;
+    class L3,L4,L6,L7,L8,L9 measured;
+    class L1,L2,L5 designed;
+    class ERGO,GATES,AFTER frame;
+```
+
+Fill is the evidence class, never the severity: green is **measured**, amber is **designed**
+(wired, not yet exercised end to end). `STATUS.md` is the ledger and wins any disagreement with
+this picture.
+
+| # | Layer | Tool | When | Refuses | Class |
+|---|---|---|---|---|---|
+| 1 | Orientation map | ripwire | pre-write | nothing, it is not a gate | `designed` |
+| 2 | YAGNI ladder | ponytail | during write | over-building, advisory only | `designed` |
+| 3 | The net | tests, coverage, mutation | post-write | silent behaviour change | `measured` |
+| 4 | Quality ratchets | cleat | Stop hook | decay against a pinned baseline | `measured` |
+| 5 | Architecture diff | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
+| 6 | Adversarial review | consort | pre-push | judgement failures | `measured` |
+| 7 | Scanners | dependency, secret, static analysis | pre-push | known-bad | `measured` |
+| 8 | CI | the project's workflows | post-PR | a local pass nobody can reproduce | `measured` |
+| 9 | Human gate | a named person | pre-merge | an outcome nobody accepted | `measured` |
+
+Two of CI's checks, lint and tests, are a deliberate re-run of checks that already passed in
+the agent's loop. They repeat because the first run happened on the author's machine under the
+author's hooks, and the guard protecting those hooks is a speed bump rather than a wall. The
+only real control is branch protection. See [06-verify-gate](docs/06-verify-gate.md).
+
 ## Measured, in brief
 
 | What | Number | Where |
