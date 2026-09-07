@@ -23,7 +23,8 @@ evidence, and press release.
 
 ## The line, end to end
 
-Nine layers sit between an agent writing a line of code and a person pressing merge. Two are
+Nine layers sit between an agent writing a line of code and a person pressing merge. Five of
+them are the sensors of [05-sensor-stack](docs/05-sensor-stack.md). Two are
 builder ergonomics and stay off the critical path. Five are gates inside the agent's own loop,
 before a pull request exists. Two run after it. The order is an economic argument, not a taste:
 the reviewer is the most expensive resource on the line, so a review of code that a ratchet
@@ -33,21 +34,21 @@ would have failed is waste.
 flowchart TB
     subgraph ERGO["off the critical path: ergonomics, not gates"]
         direction TB
-        L1["1 · Orientation map<br/>ripwire · pre-write<br/>rank symbols before opening a file"]
-        L2["2 · YAGNI ladder<br/>ponytail · during write<br/>7 rungs before code exists"]
+        L1["Orientation map · sensor 1<br/>ripwire · pre-write<br/>rank symbols before opening a file"]
+        L2["YAGNI ladder · sensor 2<br/>ponytail · during write<br/>7 rungs before code exists"]
     end
     subgraph GATES["gates: each refuses with a file, a line and a reason"]
         direction TB
-        L3["3 · The net<br/>tests, aggregate coverage, mutation<br/>refuses silent behaviour change"]
-        L4["4 · Quality ratchets<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
-        L5["5 · Architecture diff<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
-        L6["6 · Adversarial review<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
-        L7["7 · Scanners<br/>dependencies, secrets, static analysis<br/>refuses known-bad"]
+        L3["The net<br/>tests, aggregate coverage, mutation<br/>refuses silent behaviour change"]
+        L4["Quality ratchets · sensor 3<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
+        L5["Architecture diff · sensor 4<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
+        L6["Adversarial review · sensor 5<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
+        L7["Scanners<br/>dependencies, secrets, static analysis<br/>refuses known-bad"]
     end
     subgraph AFTER["after the pull request exists"]
         direction TB
-        L8["8 · CI<br/>mechanical only, no review<br/>refuses a local pass nobody can reproduce"]
-        L9["9 · Human gate<br/>named outcome sign-off<br/>refuses an outcome nobody accepted"]
+        L8["CI<br/>mechanical only, no review<br/>refuses a local pass nobody can reproduce"]
+        L9["Human gate<br/>named outcome sign-off<br/>refuses an outcome nobody accepted"]
     end
     L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8 --> L9
 
@@ -63,17 +64,21 @@ Fill is the evidence class, never the severity: green is **measured**, amber is 
 (wired, not yet exercised end to end). `STATUS.md` is the ledger and wins any disagreement with
 this picture.
 
-| # | Layer | Tool | When | Refuses | Class |
-|---|---|---|---|---|---|
-| 1 | Orientation map | ripwire | pre-write | nothing, it is not a gate | `designed` |
-| 2 | YAGNI ladder | ponytail | during write | over-building, advisory only | `designed` |
-| 3 | The net | tests, coverage, mutation | post-write | silent behaviour change | `measured` |
-| 4 | Quality ratchets | cleat | Stop hook | decay against a pinned baseline | `measured` |
-| 5 | Architecture diff | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
-| 6 | Adversarial review | consort | pre-push | judgement failures | `measured` |
-| 7 | Scanners | dependency, secret, static analysis | pre-push | known-bad | `measured` |
-| 8 | CI | the project's workflows | post-PR | a local pass nobody can reproduce | `measured` |
-| 9 | Human gate | a named person | pre-merge | an outcome nobody accepted | `measured` |
+| Layer | Tool | When | Refuses | Class |
+|---|---|---|---|---|
+| Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
+| YAGNI ladder (sensor 2) | ponytail | during write | over-building, advisory only | `designed` |
+| The net | tests, coverage, mutation | post-write | silent behaviour change | `measured` |
+| Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
+| Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
+| Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |
+| Scanners | dependency, secret, static analysis | pre-push | known-bad | `measured` |
+| CI | the project's workflows | post-PR | a local pass nobody can reproduce | `measured` |
+| Human gate | a named person | pre-merge | an outcome nobody accepted | `measured` |
+
+The five sensors keep the numbering they carry in [05-sensor-stack](docs/05-sensor-stack.md);
+the other four layers are not sensors and are deliberately unnumbered, so there is one
+numbering scheme in the repository rather than two.
 
 Two of CI's checks, lint and tests, are a deliberate re-run of checks that already passed in
 the agent's loop. They repeat because the first run happened on the author's machine under the
