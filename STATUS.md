@@ -19,18 +19,18 @@ Which parts of the design sit in which evidence class, as of 2026-09-07. See
 | Blind security side-pass | measured | kvart | |
 | Scanner tier | measured | kvart | static analysis scope excludes the gate code itself |
 | Browser QA pass | measured | kvart | headless fallback, not the browser extension |
-| Quality ratchets (cleat) in the agent loop | measured | kvart, legacy core | guard held against its operator; 11 upstream defects deferred |
-| Architecture diff (enola) with layer declaration | designed | kvart | wired; not yet the cause of a caught regression |
+| Quality ratchets (cleat) in the agent loop | measured | kvart, legacy core | guard held against its operator; 11 upstream defects deferred; Stop-hook re-send and formatter-pass false positives fixed in the operator's fork and vendored back (kvart #23); upstream `svetdev/cleat#6` carries the first batch, the second has no PR yet |
+| Architecture diff (enola) with layer declaration | measured (gate) / designed (catch) | kvart | the shipped Stop hook could not fail; replaced by a check on the three provable explainers that blocks once, 7 planted cases (kvart #24); not yet the cause of a caught regression |
 | Orientation map (ripwire) | designed | kvart | worktree-index behaviour unverified |
 | YAGNI ladder (ponytail) | designed | kvart | no real pin possible via marketplace; trial on a complex task pending |
 | Head-and-hands delegation | measured | kvart trial | works when the head verifies; fails when it waits |
-| Worktree isolation and shared-checkout discipline | measured | kvart | incident-derived |
+| Worktree isolation and shared-checkout discipline | measured | kvart | incident-derived; 55 worktrees and 103 merged or superseded branches (72 local, 31 remote) piled up because no step owned the delete, now the orchestrator's after merge |
 | Sandbox: egress, toolchain | measured | legacy core | |
 | Sandbox: scoped bot identity | blocked | legacy core | no autonomy in the box until it exists |
 | Verification net: aggregate coverage ratchet, characterization + mutation, database self-provisioning | measured | legacy core | message broker container blocked |
 | Money tiering per class with self-testing predicate | measured | legacy core | |
 | Layering as lint over declared dependencies | measured | legacy core | 0 violations, no exemptions |
-| Local-only phase enforced by pre-push hook | measured | legacy core | |
+| Local-only phase enforced by pre-push hook | measured | legacy core, kvart | kvart's hook ignores the ref list and gates a pure branch delete; open |
 | Provenance trailer | measured (trailer) / proposed (rejection check) | kvart | |
 | Branch protection as the merge gate | measured where the plan allows; habit where it refuses | kvart (habit), legacy core (org plan) | |
 | Per-stage wall-clock and tokens | measured | kvart | principal session tokens not instrumented |

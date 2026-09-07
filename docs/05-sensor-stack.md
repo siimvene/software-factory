@@ -74,7 +74,7 @@ What is wired where, as of 2026-09-07:
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired, index unverified across worktrees | not wired |
 | 2 | ponytail | plugin at project scope, marketplace source pinned | wired, no trial on a complex task yet | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
-| 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned | not wired |
+| 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass, rule packs | 3 runs, 4 real defects | measured |
 
 The provable and heuristic split in layer 4 matters for gating. Only `layers`, `cycles` and
@@ -154,6 +154,27 @@ Rules that are not obvious until you have been bitten:
 - **The right tool must answer to the right name.** A package manager installed a compressor
   under the complexity analyzer's binary name; the gate would have read nonsense instead of
   erroring. Verify with `--help`; pin the analyzer in a venv `[measured 2026-09-05]`.
+- **A Stop hook reports a failure set once.** The gate re-sent its whole report on every stop,
+  so a failure the agent could not fix (a policy question for a person) cost the agent its
+  context every turn. Fixed at source: the report that blocked is fingerprinted, an identical
+  report on a later stop gets one line and exit 0, and a stop that is already a continuation
+  reads the same way. Any change in any gate's output is a new report and blocks again
+  `[measured 2026-09-07]` (fork `3dc0569`, vendored back in kvart #23).
+- **A formatter pass is not a change.** Two commits of pure formatter output tripped the
+  duplication gate with 25 clone pairs and the scoped complexity gate with 80 test functions,
+  none of them new. The fix judges a clone under changed lines new only when the base lacks a
+  copy (whitespace, brackets, commas and colons removed; occurrences counted per file), and a
+  scoped run keeps its exclude globs. 25 pairs to 0 with the 25 real ones held; 80 functions to 0.
+  `--ignore-all-space` was tried and dropped: it hid indentation-only edits, which are semantic
+  in Python, and bought 8 % `[measured 2026-09-07]` (fork `6585f44`..`006043b`).
+- **A gate that cannot fail is not a gate.** Running the whole local wheel on main found three:
+  the architecture Stop hook carried no policy and exited 0 on a planted layering violation,
+  the container scanner exited 0 by default, the static-analysis upload never waited for its
+  quality gate. All three now fail; the wheel prints PASS, FAIL or SKIP with a reason for each
+  of its 12 gates `[measured 2026-09-07]` (kvart #22).
+- **A pre-push gate must read the ref list.** kvart's hook runs the full gate on a pure
+  `--delete` push, so a branch cleanup was blocked by a complexity gate that had nothing to
+  measure. Open `[measured 2026-09-07]`.
 
 What it caught for real: 2 new escape comments and a function over 60 lines in a hands
 implementer's first pass `[measured 2026-09-05]`; 6 genuine copy-paste blocks in a
@@ -164,6 +185,14 @@ Consort review of the vendored ratchet source itself produced 17 findings in 20 
 real in the adopter's config (an argv injection via a changed path beginning with `-`, a
 `MULTILINE` anchor baselining an empty-text site), 11 product defects deferred upstream
 `[measured 2026-09-07]`. A gate is code too and gets the same review.
+
+The tool is a third party's MIT repository, so the fixes travel as fork and pull request, and
+the project refreshes its vendored copy only from a fork branch. Same day: upstream
+`svetdev/cleat#6` (the flag-shaped path refusal, the analyzer's working directory, attach's
+hook detection); a second fork batch of 5 commits (the once-per-failure-set report, the
+formatter-pass judgment, an option injection via a `-`-shaped base ref from the config,
+found by the blind security pass) gated by both review legs plus a second Gemini leg, vendored
+into kvart (#23), no upstream PR yet `[measured 2026-09-07]`.
 
 ## Layer 4: architecture diff (post-write)
 
@@ -192,10 +221,20 @@ pass. The other layers do not cross repo boundaries `[designed]`.
 Hooks: session-start snapshot, Stop diff, a doctor command that verifies the hooks actually
 fired. Config is not execution; the doctor closes that gap.
 
+The shipped Stop hook carries no policy: it exited 0 on a planted layering violation. kvart
+replaced it with a script that runs `check --fail-on=layers,cycles,intent` from the project
+root (the invocation directory is wrong from a subdirectory, where the gate silently disabled
+itself), blocks the stop with the report on stderr, releases on the retry with one line, and
+treats a check that did not run (no baseline, tool exit 2) as a block, not a pass. Seven
+planted cases, clean tree 11 s. The first cut was a one-liner; the cross-vendor panel found
+three real problems in that one line (no continuation handling, so an infinite block; tool
+exit codes swallowed; the directory bug) `[measured 2026-09-07]` (kvart #24).
+
 ## Wiring, as measured on kvart
 
 - Hooks live in the tracked agent settings file: PreToolUse guard, Stop (ratchet gate on changed
-  files, then architecture diff), SessionStart (architecture snapshot). Every entry is
+  files, then the architecture check on layers, cycles and intent), SessionStart (architecture
+  snapshot). Every entry is
   PATH-guarded so it is a no-op where the binary is absent; nothing here runs in production
   images.
 - Binaries per machine, pinned, in the user's local bin; the analyzer in its own venv.
