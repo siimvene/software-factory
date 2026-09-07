@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.1 (2026-09-07)
+
+Downstream fixes referenced. The design named the sensors; this records what broke in them on
+the first full day and where each fix landed.
+
+- `docs/05-sensor-stack.md`: four new layer-3 rules (a Stop hook reports a failure set once, a
+  formatter pass is not a change, a gate that cannot fail is not a gate, a pre-push gate must
+  read the ref list), the fork-and-PR path for a third party's tool, and the layer-4 Stop hook
+  replaced by a check that blocks once, with its planted cases.
+- `case-studies/kvart-reference-implementation.md`: the afternoon section, kvart #22 to #24,
+  the worktree and branch pile with its root cause.
+- `STATUS.md`: the ratchet and architecture rows carry the fix references; the pre-push and
+  worktree rows carry the open defect and the pile.
+
 ## 0.2.0 (2026-09-07)
 
 Coverage of the surfaces the first cut only named.
