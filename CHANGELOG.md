@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.1 (2026-09-07)
+
+Visuals. The design had none: every mechanism was prose and tables only.
+
+- `README.md`: the delivery line end to end, 9 layers in 3 frames (ergonomics, gates,
+  after the PR), with an index table naming what each layer refuses and its evidence class.
+- `docs/02-loop.md`: the loop redrawn with the knowledge plane at the centre, replacing the
+  ASCII sketch that showed LEARN returning straight to SPEC without the hub. Both write-backs
+  are now edges, and the memory arrow is drawn dashed because it fired zero times in two
+  measured cycles.
+- `docs/05-sensor-stack.md`: where each sensor fires inside one agent turn, plus a table of
+  which checks are wired on kvart and on the legacy core.
+
+Diagrams are mermaid so they render on the forge, diff as text and can be adapted by a reader.
+Fill encodes the evidence class from `WRITING.md`, never severity. `STATUS.md` stays the ledger.
+
 ## 0.1.0 (2026-09-07)
 
 First consolidation. Derived from:

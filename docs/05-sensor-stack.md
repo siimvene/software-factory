@@ -22,6 +22,65 @@ Every tool here is third-party and open source. The decision is the composition 
 placement, not the tools. Swap any of them for an equivalent that has the same property:
 deterministic, baselined, fails with file and line, refuses to explain how to loosen itself.
 
+Where each layer fires inside a single agent turn:
+
+```mermaid
+flowchart TB
+    START(["turn starts"])
+    subgraph PRE["before a line is written"]
+        M1["1 · orientation map<br/>ripwire"]
+    end
+    subgraph WRITE["while writing"]
+        M2["2 · YAGNI ladder<br/>ponytail"]
+    end
+    subgraph STOP["Stop hook: the agent cannot call it done"]
+        direction TB
+        M3["3 · quality ratchets<br/>cleat"]
+        M4["4 · architecture diff<br/>enola"]
+    end
+    subgraph PUSH["before the push"]
+        M5["5 · cross-vendor review<br/>consort"]
+    end
+    DONE(["PR opens"])
+
+    START --> M1 --> M2 --> M3 --> M4 --> M5 --> DONE
+
+    classDef mech fill:#e8f3ec,stroke:#2f6b3f,stroke-width:1.5px,color:#14181b;
+    classDef inferential fill:#e9f2f3,stroke:#0d5f68,stroke-width:2px,color:#14181b;
+    classDef ergo fill:#fdf1e3,stroke:#c2610c,stroke-width:1.5px,color:#14181b;
+    classDef ends fill:#f2f4f4,stroke:#5d686d,stroke-width:1px,color:#14181b;
+    classDef frame fill:#00000000,stroke:#aab6b8,stroke-width:1px,color:#5d686d;
+    class M3,M4 mech;
+    class M5 inferential;
+    class M1,M2 ergo;
+    class START,DONE ends;
+    class PRE,WRITE,STOP,PUSH frame;
+```
+
+Layers 1 and 2 are amber because they are ergonomics: they change what the agent reads and
+writes, they never refuse. Layers 3 and 4 are the mechanical gates. Layer 5 is the only
+inferential one.
+
+The chain is drawn straight, but layers 3 and 4 do not return to the caller on failure: a red
+Stop-hook gate is not a report a person reads later, it is handed straight back to the agent as
+the next thing to fix, and the turn does not end until it is green or a person has accepted the
+site into a baseline. That hand-back is the whole reason a ratchet in the agent loop is worth
+more than the same check in CI.
+
+What is wired where, as of 2026-09-07:
+
+| # | Layer | Checks in use | kvart | The legacy core |
+|---|---|---|---|---|
+| 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired, index unverified across worktrees | not wired |
+| 2 | ponytail | plugin at project scope, marketplace source pinned | wired, no trial on a complex task yet | not wired |
+| 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
+| 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned | not wired |
+| 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass, rule packs | 3 runs, 4 real defects | measured |
+
+The provable and heuristic split in layer 4 matters for gating. Only `layers`, `cycles` and
+`intent` report at confidence 1.00, so those three are the recommended starting gate; the rest
+need a confidence floor before they can refuse anything.
+
 ## Layer 1: orientation map (pre-write)
 
 A deterministic index of the codebase (symbols, call graph, co-change, ownership) that answers
