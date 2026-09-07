@@ -117,6 +117,10 @@ catches drift eventually but late.
 
 ## The PM workspace
 
+(In full: [14-pm-surface](14-pm-surface.md). The design system as a further layer of the
+plane: [15-design-system](15-design-system.md). How the plane is built on Day 1:
+[17-onboarding](17-onboarding.md).)
+
 A separate local repository per PM, from a template: intake inbox, discovery notes, features,
 ticket drafts, meeting and stakeholder notes, outputs. Its skills read the team-context specs
 first and produce tickets scored for readiness. No git operations by the PM; review of specs
