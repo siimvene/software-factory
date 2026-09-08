@@ -26,14 +26,16 @@ Which parts of the design sit in which evidence class, as of 2026-09-07. See
 | Head-and-hands delegation | measured | kvart trial | works when the head verifies; fails when it waits |
 | Worktree isolation and shared-checkout discipline | measured | kvart | incident-derived; 55 worktrees and 103 merged or superseded branches (72 local, 31 remote) piled up because no step owned the delete, now the orchestrator's after merge |
 | Sandbox: egress, toolchain | measured | legacy core | |
-| Sandbox: scoped bot identity | blocked | legacy core | no autonomy in the box until it exists |
+| Sandbox: scoped bot identity | measured (kvart) / blocked (legacy core) | kvart, legacy core | kvart: a GitHub App with contents + pull-requests write and no admin; cannot merge past the ruleset, cannot edit workflows |
 | Verification net: aggregate coverage ratchet, characterization + mutation, database self-provisioning | measured | legacy core | message broker container blocked |
 | Money tiering per class with self-testing predicate | measured | legacy core | |
 | Layering as lint over declared dependencies | measured | legacy core | 0 violations, no exemptions |
 | Local-only phase enforced by pre-push hook | measured | legacy core, kvart | kvart's hook ignores the ref list and gates a pure branch delete; open |
 | Provenance trailer | measured (trailer) / proposed (rejection check) | kvart | |
-| Branch protection as the merge gate | measured where the plan allows; habit where it refuses | kvart (habit), legacy core (org plan) | |
+| Branch protection as the merge gate | measured | kvart (ruleset, 2026-09-08), legacy core (org plan) | kvart moved to a paid plan; ruleset = PR + five required checks, empty bypass list, refused a direct push from owner and bot |
 | Per-stage wall-clock and tokens | measured | kvart | principal session tokens not instrumented |
+| CI as a required check on a real product | measured | kvart | first full run 40 min backend (serial suite); tiering + parallel run designed the same day |
+| Escalation channel (agent asks, named human decides in-thread, decision written back) | measured (round trip) / designed (Jira write-back) | kvart | 49 s decision latency on the synthetic test; responder allowlist and timeout-as-state proven |
 | Cost per feature, per commit, per tree-hour | measured | kvart | list-price equivalents |
 | Revert rate, defect escape, lead time baselines | proposed | | must precede agent dominance |
 | Reviewer F1 benchmark set | proposed | | |
