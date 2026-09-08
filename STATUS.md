@@ -37,7 +37,7 @@ Which parts of the design sit in which evidence class, as of 2026-09-07. See
 | CI as a required check on a real product | measured | kvart | first full run 40 min backend (serial suite); tiering + parallel run designed the same day |
 | Escalation channel (agent asks, named human decides in-thread, decision written back) | measured (round trip) / designed (Jira write-back) | kvart | 49 s decision latency on the synthetic test; responder allowlist and timeout-as-state proven |
 | Cost per feature, per commit, per tree-hour | measured | kvart | list-price equivalents |
-| Revert rate, defect escape, lead time baselines | proposed | | must precede agent dominance |
+| Revert rate, defect escape, lead time baselines | measured (kvart, Jun to Sep 2026) | kvart | 0 reverts in 920 commits, 84.7 % direct-to-main, PR lead time median 6 min on 22 PRs, 46.5 % of fixes review-attributed; deploy tags missing, so escape stays a proxy |
 | Reviewer F1 benchmark set | proposed | | |
 | Recommendation acceptance rate | field | Pipedrive | |
 | PM acceptance with acceptance identity | proposed, critic-reviewed | | manual trial first |
