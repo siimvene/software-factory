@@ -77,6 +77,17 @@ implementation instructions.>
      a new approval. Regenerating a spec from shipped code must never be treated as
      approval of that code. -->
 
+## Design artifacts
+
+<!-- UI tickets only; delete the section otherwise. The agreed prototype is attached to
+     the ticket in the ledger (throwaway banner and fake data intact), never copied into
+     the team layer. It is a load-bearing input for the builder: arrangement, states,
+     copy. It is not an implementation instruction. Decided 2026-09-09, not yet measured. -->
+
+- Prototype: <attachment name on the ticket>
+- Patterns expected: <numbered patterns from the design standards>
+- Components expected: <components from the design standards; anything not listed is invention and the reviewer treats it as such>
+
 ## Links
 
 - Build branch or PR: <fill in during In Progress>
