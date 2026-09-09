@@ -27,6 +27,15 @@ onto a newer main is one deliberate re-cut by a person, recording main's real da
   bootstrap failures must be reported separately from feature failures so they are neither
   hidden nor dismissed.
 - Follow-ups: an accept path for clones in changed lines that are import blocks (upstream).
+- Follow-up (2026-09-09, measured on kvart #33 and #36): the CI gate runs the ratchets in
+  strict mode, which requires the baseline to be tightened in the same PR whenever a diff
+  improves the number, and the agent guard refuses that write by design. Every improving PR
+  from an agent therefore needs a person's commit; two were made by hand in one day. The
+  decision this ADR does not yet make: (a) CI tightens the baseline on merge to the default
+  branch and strict mode checks "not looser than the default branch"; (b) the guard permits
+  writes that only lower a number and keeps refusing the rest; (c) keep one human commit per
+  improving PR as the cost of the rule. (b) keeps the human at every loosening and removes the
+  deadlock; it is the recommended option pending the operator's word.
 
 ## Alternatives rejected
 

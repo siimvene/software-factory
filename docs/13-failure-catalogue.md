@@ -14,6 +14,10 @@ table; the entries here are the ones that apply to any adoption.
 | a plugin or MCP server works in one session type and not another | two config directories on one machine | register in both |
 | review agent posts "done" without posting the review (field) | a runtime update changed behaviour | a hook that verifies the effect, not the self-report |
 | top-tier model spend is half the bill | simple work routed to the top tier | explicit model per subagent; audit a week of usage per project |
+| a canvas station never starts; the card sits "queued" (2026-09-09) | the desktop canvas starts a node only while its project is on screen; nobody was looking | run stations in-process when nobody watches the canvas; close the queued node so two builders never share a worktree |
+| a worktree appears in `git worktree list` under a path with a space in it, and a second one is missing (2026-09-09) | a shell loop that word-splits in one shell and not in another; a stray local branch named like the remote ref (`origin/main`) shadowed the real one, so "ahead by 12" meant nothing | provision worktrees one explicit command each, verify `git worktree list` and `rev-parse` before opening a station, `git show-ref` when a ref name warns "ambiguous" |
+| a station's gate ran without the complexity analyzer although the venv had it (2026-09-09) | the station recreated its worktree and wiped the provisioned venv | the brief says "do not create worktrees"; the principal reruns the gate with the analyzer before trusting a station's gate log |
+| both review vendors flag a field that does not exist on the API (2026-09-09) | the brief stated the field name from a frontend type that was itself wrong | briefs cite the backend schema, not a consumer's type; the panel catching a brief's error is the panel working |
 
 ## Gates and ratchets
 
@@ -31,6 +35,9 @@ table; the entries here are the ones that apply to any adoption.
 | 7 layering violations on day one, all legitimate (2026-09-04) | pattern matched test-scope dependencies | anchor the pattern on production scopes only; 10-case validation |
 | a hook configured is a hook that never fired | config is not execution | a doctor command that verifies the hook ran; `source` tags on entries it must recognise |
 | the guard refuses a PR body | the body quoted the baseline flag | write long texts with the editor tool and reference them by path; the refusal is the guard working |
+| strict ratchet red on every PR that improves the number (2026-09-09) | `--strict` demands the baseline be tightened in the same PR; the agent guard refuses the write; the ruleset has no bypass | a person commits the tightening (twice on one day), or a policy change: CI tightens on merge, or the guard permits tightening only; see ADR 0004 follow-up |
+| impact-selected PR run fails on a repo-wide coverage floor (2026-09-09) | pytest inherits `fail_under` from the project config; a two-target slice reaches 28 % | no coverage floor on the slice; the floor applies to the full run and to the post-merge full suite |
+| two PRs both tighten the same baseline file | each improving branch records its own number | tighten after rebase, one PR at a time; merge order is the fix, not a merge tool |
 
 ## Review gate
 
@@ -38,6 +45,8 @@ table; the entries here are the ones that apply to any adoption.
 |---|---|---|
 | zero findings in seconds on a large diff (2026-09-04) | the reviewer never ran; the wrapper reported the failure as a clean pass | reachability probe first; wall-clock sanity; the wrapper fixed to distinguish the two |
 | a CRITICAL that is false in one line (2026-09-04) | diff-only transport, no repo access; a framework claim | verify against code; use a repo-reading transport when the finding class needs a sweep |
+| "the existing unit suite is red" (2026-09-09) | the reviewer read the test file on the base, not the branch, where the station had updated it | run the named test file before believing a suite claim; one command, thirty seconds |
+| a review finding contradicts the spec's role table (2026-09-09) | the reviewer widened scope from the code's shape, not the product's | dismiss with the spec cited, and escalate the dismissal (§11) so a PM can overrule |
 | the author's scoping accepted by the author's model | same-vendor, inheriting review | cross-vendor, non-inheriting; the cycle-2 HIGH is the proof |
 | a probe succeeds, the real call trips a spend cap | reachability is not budget | a second backend; hard-fail, never degrade |
 
