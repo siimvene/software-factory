@@ -12,3 +12,4 @@ The design's own decisions, in the format it asks adopters to use
 | [0005](0005-humans-approve-never-author.md) | Humans approve and merge; they never author | accepted / proposed for organisations |
 | [0006](0006-pr-gated-output-human-release.md) | PR-gated output; production release stays human; delegation is earned | accepted / proposed |
 | [0007](0007-specs-are-derived-memory-promotes-by-pr.md) | Specs are derived; memory promotes by PR | accepted |
+| [0008](0008-browser-qa-drives-a-cli-not-a-protocol-server.md) | The browser QA pass drives a CLI, not a protocol server or a browser extension | accepted |
