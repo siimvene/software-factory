@@ -188,6 +188,51 @@ Three PRs, no production behaviour changed.
 - Merges on request by the owner, as before. The tool defects are recorded in the operator
   memory store with their measurements.
 
+## Cycle 4: a batch of four stories through the loop (2026-09-09, 11:02 to 14:59)
+
+The first batch: one epic (a personal-data access trail: record views of resident data and
+every rights change, a management-console view with a per-subject filter and export, owner
+names off the apartment list) as four stories, from a PM-hat run in a desktop workspace, with
+the spec and a design handoff in the team-context repo.
+
+- **Contract-first, three stations.** One scout (Sonnet) produced a code map of the audit
+  table, the handlers that expose resident data, the rights paths and the console. The
+  principal wrote an API contract (storage columns, two endpoints, CSV shape, recording rules)
+  and three briefs; a backend station (Opus 4.8, 69 min, three commits incl. a migration that
+  widens a FORCE-RLS policy's WITH CHECK), a web station (Sonnet 5, 44 min, built against the
+  contract with MSW) and a UI station (Sonnet 5, 8 min) ran in parallel on disjoint
+  worktrees. The web station's e2e spec waited for the merged backend by design.
+- **Review per branch, adjudication by evidence.** Each branch got the two-vendor panel, the
+  scanner tier and a blind security pass. The backend panel returned 16 + 3 findings; twelve
+  were fixed by a top-tier fix station in 27 min with a test each, two were dismissed (one by
+  running the claimed-red suite, green; one by the spec's role table) and two deferred, and
+  all four non-fixes went to the escalation thread. The security pass found the console page
+  dumping the raw event record (a future field would leak into the DOM) before the panel
+  named it. Both vendors caught a field name the brief itself had planted from a wrong
+  frontend type.
+- **What the stations missed and CI caught.** Six mock-based tests outside the hand-named
+  related set failed in the full suite (a source-text assertion moved by the fix, mocked
+  statement sequences predating the new events). Rule recorded: the related set is derived
+  from touched symbols by grep, never hand-named.
+- **The ratchet and the guard.** Strict cleat demanded a baseline tightening on every improving
+  PR, three times in one afternoon, each written by the operator's standing word through the
+  checker's write path because the agent guard refuses the flag; a parallel session's PR
+  landed first and the baseline file conflicted exactly as predicted, resolved by
+  regeneration on the merged tree. ADR 0004 carries the open policy.
+- **Escalation.** Two product questions and two agent dismissals first went to the ticket
+  ledger only; the operator asked how a PM would ever see them. They moved to a thread in the
+  escalation channel with default and deadline per item, the tickets got `needs-decision` /
+  `agent-decided` labels, and the rule entered the operating contract (§11). No human replied
+  within the listener's window; the defaults stood and became final at merge.
+- **Numbers.** Pickup → first PR 22 min (the UI story); pickup → backend PR 2 h 08 min;
+  → backend live 3 h 57 min, of which two human merges and one extra CI round were ~75 min.
+  Deploy itself: 1 min (pull, sync, migration 187→188, timer install, frontend build, restart),
+  health 200/200, prod verified on routes, schema, policy and the alembic head. The console
+  page (#38) was green and awaiting its merge at the end of the window.
+- **Found on the way.** A form that silently drops a field because two consumers spell it
+  differently (filed); the new Jira write-back closing a story whose second PR was still open,
+  with Done terminal in the workflow (filed).
+
 ## What the dogfood established
 
 1. The loop runs end to end on a real product with real money paths at 12 to 19 minutes from
