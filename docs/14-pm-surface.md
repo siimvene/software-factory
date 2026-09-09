@@ -259,7 +259,12 @@ Findings about the surface itself, each one a defect in the template rather than
   LIVE on green CI or merge, and back to In Progress on red; a deploy write-back closes every ticket
   in the deployed range. Keys come from titles, never bodies, and events never move epics. The first
   write-back closed 6 tickets, and the merge leg moved a ticket 13 s after the merge. Still by hand:
-  the "decision needed" post from tracker comments to the escalation channel.
+  the "decision needed" post from tracker comments to the escalation channel. One rule the tracker
+  taught the same evening: a status is not a resolution. The workflow, created over the API with
+  statuses and transitions only, left every Done ticket Unresolved (`resolution = Unresolved`
+  matched all of them, `resolvedDate` stayed empty, reports counted nothing as resolved). The
+  terminal transition needs a post-function that sets Resolution, and the reopen transitions one
+  that clears it; a list view with the Resolution column is the check `[measured 2026-09-09]`.
 - **Readiness was self-scored** `[measured 2026-09-07]`. The same session that wrote the ticket
   applied the rubric to it, so the number is a self-assessment, and the improver loop, whose whole
   design is a second party asking one question at a time, never ran.
