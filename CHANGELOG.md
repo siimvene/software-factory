@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.2 (2026-09-09)
+
+Cycle 4 on kvart: first batch (an epic with four stories) through the loop with three parallel
+stations against a written contract. What it exposed, and where it landed:
+
+- `docs/03-operating-contract.md` §11: agent-surfaced decisions (questions, dismissals,
+  deviations) go to the escalation channel and the ledger, with default and deadline; labels
+  on the ticket; write-back by hand until automated. Recorded after a measured lapse.
+- `docs/13-failure-catalogue.md`: nine rows (queued canvas station, worktree provisioning
+  drift, station wiped its venv, brief-planted field name, strict ratchet vs guard deadlock,
+  impact-slice coverage floor, two PRs tightening one baseline, a false "suite is red", a
+  review finding that contradicts the spec).
+- `adr/0004`: follow-up on strict mode versus the agent guard, three options, one recommended.
+- `STATUS.md`: escalation row updated; two new measured rows (contract-first parallel
+  stations; fix station after the panel).
+
 ## 0.2.1 (2026-09-07)
 
 Downstream fixes referenced. The design named the sensors; this records what broke in them on
