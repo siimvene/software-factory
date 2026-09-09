@@ -234,7 +234,9 @@ the spec and a design handoff in the team-context repo.
   the shipped rule exactly.
 - **Found on the way.** A form that silently drops a field because two consumers spell it
   differently (filed); the new Jira write-back closing a story whose second PR was still open,
-  with Done terminal in the workflow (filed).
+  with Done terminal in the workflow (filed); the tracker's Done status setting no Resolution,
+  so twelve of twelve tickets read Unresolved in the list view until post-functions were added and
+  the Done tickets backfilled (fixed, 2026-09-09).
 
 ## What the dogfood established
 
