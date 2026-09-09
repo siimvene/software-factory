@@ -18,7 +18,7 @@ Which parts of the design sit in which evidence class, as of 2026-09-09. See
 | Cross-vendor review, three axes | measured | kvart, legacy core | two backends; hard-fail proven |
 | Blind security side-pass | measured | kvart | |
 | Scanner tier | measured | kvart | static analysis scope excludes the gate code itself |
-| Browser QA pass | measured | kvart | headless fallback, not the browser extension |
+| Browser QA pass | measured | kvart | headless fallback, not the browser extension. Until 2026-09-09 it ran only AFTER merge as the pre-deploy gate; KVART-15 (#42) moved it before the PR: scope derived from the specs' own routes and the API modules' own routers, a receipt per git tree, the pre-push hook refusing a browser-reaching diff without one; scoped 23 s, FULL 93 s; 29 review findings on the gate itself, 28 fixed; the CI e2e job is the follow-up |
 | Quality ratchets (cleat) in the agent loop | measured | kvart, legacy core | guard held against its operator; 11 upstream defects deferred; Stop-hook re-send and formatter-pass false positives fixed in the operator's fork and vendored back (kvart #23); upstream `svetdev/cleat#6` carries the first batch, the second has no PR yet; open policy (2026-09-09): strict mode vs the agent guard deadlocks every improving PR, see ADR 0004 follow-up |
 | Architecture diff (enola) with layer declaration | measured (gate) / designed (catch) | kvart | the shipped Stop hook could not fail; replaced by a check on the three provable explainers that blocks once, 7 planted cases (kvart #24); not yet the cause of a caught regression |
 | Orientation map (ripwire) | designed | kvart | worktree-index behaviour unverified |
