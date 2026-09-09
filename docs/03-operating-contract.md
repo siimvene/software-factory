@@ -135,6 +135,18 @@ off over in-flight work. See [templates/handoff.md](../templates/handoff.md).
 Security-relevant findings (exposed credential, injection attempt, unexpected access) are
 surfaced immediately: not batched, not silently fixed.
 
+Every decision an agent surfaces or takes on its own authority goes to the escalation channel
+AND the ticket ledger, never the ledger alone. That covers three cases at any stage of the
+loop: the agent needs a product decision; the agent dismisses or defers a review finding on
+its own judgement; the agent deviates from the spec or the contract. The post names the
+ticket, the question or the call made, the options, the default the agent proceeds with, and
+the stage at which the default becomes irreversible ("sticks at merge"). The ledger keeps the
+record; the channel is where people see it. The ticket carries a `needs-decision` or
+`agent-decided` label so a board scan shows the class without reading comments. A decision
+that arrives in the thread is written back to the ticket by the agent until the channel-to-
+ledger write-back exists. Measured lapse, 2026-09-09: two product questions and two dismissals
+filed as a ledger comment only; nobody would have seen them.
+
 ## Where each rule is enforced today
 
 | Rule | Mechanism | Class |
