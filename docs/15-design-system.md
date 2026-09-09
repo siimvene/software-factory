@@ -137,7 +137,7 @@ the difference, a person decides what it means.
 | SPEC | a ticket touching UI names the patterns and components it expects to use, so the reviewer can tell invention from reuse, and carries the agreed prototype as an attachment so the builder reads arrangement, states and copy from it rather than inventing them (decided 2026-09-09) | `designed` |
 | BUILD | the builder reads `patterns.md` before planning a screen and `components.md` before writing one; the token files supply exact values | `measured 2026-09-07` |
 | BUILD (prototype) | a PM workspace prototype skill includes `demo/demo.css`, reads `patterns.md` for arrangement and `components.md` for naming, and produces a throwaway page that looks like the product with no build step | `measured 2026-09-07` |
-| VERIFY | the browser QA pass checks the walked surfaces against the patterns, not only against crashes and console errors | `designed` |
+| VERIFY | the browser QA pass checks the walked surfaces against the patterns, not only against crashes and console errors; the page tree the CLI runtime writes per surface (roles, names, heading order) is the input for that check (adr/0008) | `designed` |
 | VERIFY (mechanical) | the card-primitive gate fails the build when the hand-rolled pattern regrows | `measured 2026-08-11` |
 | LEARN | a UI-changing pull request carries the token mirror in the same diff; pattern and component text may follow after | `designed` |
 
