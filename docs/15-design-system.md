@@ -134,7 +134,7 @@ the difference, a person decides what it means.
 
 | Stage | What happens | Class |
 |---|---|---|
-| SPEC | a ticket touching UI names the patterns and components it expects to use, so the reviewer can tell invention from reuse | `designed` |
+| SPEC | a ticket touching UI names the patterns and components it expects to use, so the reviewer can tell invention from reuse, and carries the agreed prototype as an attachment so the builder reads arrangement, states and copy from it rather than inventing them (decided 2026-09-09) | `designed` |
 | BUILD | the builder reads `patterns.md` before planning a screen and `components.md` before writing one; the token files supply exact values | `measured 2026-09-07` |
 | BUILD (prototype) | a PM workspace prototype skill includes `demo/demo.css`, reads `patterns.md` for arrangement and `components.md` for naming, and produces a throwaway page that looks like the product with no build step | `measured 2026-09-07` |
 | VERIFY | the browser QA pass checks the walked surfaces against the patterns, not only against crashes and console errors | `designed` |

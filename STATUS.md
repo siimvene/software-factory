@@ -12,7 +12,7 @@ Which parts of the design sit in which evidence class, as of 2026-09-09. See
 | Day 1 onboarding runbook (team repo, standard adoption, memory move, specs, ADRs, PM workspace) | measured | kvart | one session for ~250 features; see 17-onboarding |
 | ADR candidate table and rejected list | measured | kvart | 30 candidates, 13 + 8 written, 1 unconfirmed |
 | PM workspace and skill catalogue | measured (workspace) / designed (most skills) | kvart | only the ticket and readiness skills exercised in the cycles; see 14-pm-surface |
-| Design system as a knowledge-plane layer | designed | kvart | repo built on Day 1; not yet read by a BUILD or QA pass in a measured cycle; see 15-design-system |
+| Design system as a knowledge-plane layer | designed | kvart | repo built on Day 1; not yet read by a BUILD or QA pass in a measured cycle; prototype-on-the-ticket decided 2026-09-09, first UI cycle will measure it; see 15-design-system |
 | Concept-to-tool inventory | reference | | see 16-inventory |
 | Memory store bound read-only; promote PR | measured | kvart | store moved; first promote PR opened by the bot identity in cycle 3 (2026-09-09), code owner reviews |
 | Cross-vendor review, three axes | measured | kvart, legacy core | two backends; hard-fail proven |
