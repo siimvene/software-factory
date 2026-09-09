@@ -13,7 +13,8 @@ The browser QA runtime, after evaluating the Playwright CLI against the kvart st
   writes is the input for the still-designed patterns check.
 - `docs/13-failure-catalogue.md`: three rows (a gitignored skill is absent from every worktree;
   browser state saved during the SPA callback; the 0-byte auto-named page tree).
-- `STATUS.md`: Browser QA pass row carries the runtime, the shakedown and the cold rehearsal.
+- `STATUS.md`: Browser QA pass row carries the runtime, the shakedown, the cold rehearsal and the
+  gate on the skill itself (security pass, two-vendor panel, dispositions).
 
 ## 0.2.3 (2026-09-09, evening)
 
