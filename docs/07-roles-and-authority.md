@@ -35,11 +35,24 @@ SERIOUS performance regression via the reviewer in round 3 `[measured 2026-09-05
 holds when the head actually verifies; it fails when the head waits (the 2 h 08 m idle stall in
 the same trial).
 
-Model routing inside the hands tier: mid-tier for bounded edits, pattern mirroring, boilerplate;
-top tier only for subtle cross-cutting semantics (transactions, authorisation, concurrency,
-data-integrity invariants) and for adversarial verification, which always runs at a tier at or
-above the builder's. Remediation of CRITICAL and SERIOUS findings is top-tier work: a fixer below
-the reviewer's depth closes the reported hole and opens an adjacent one.
+Model routing inside the hands tier is measured, not assumed. BUILD stations default to the mid
+tier. The top tier is reserved for debugging with an unknown root cause, for security side-agents,
+and for adversarial verification, which always runs at a tier at or above the builder's. Escalation
+is by re-brief: a fresh station gets the failed attempt's evidence, never a retry of the same brief
+on a bigger model. Six mid-tier build cycles landed by 2026-09-09 with no regression attributed to
+the tier `[measured 2026-09-08..09]`, and cycle 4 ran a top-tier backend station beside a mid-tier
+web station and a mid-tier UI station from one contract. The rejected alternative, the top tier at
+every station, buys nothing measurable: the mid-tier default was recorded at half the bill with no
+quality signal to separate the two.
+
+Remediation of CRITICAL and SERIOUS findings is top-tier work regardless: a fixer below the
+reviewer's depth closes the reported hole and opens an adjacent one.
+
+The routing rule needs a check, because the tier a station runs on is not always the tier it was
+asked for. A model alias is a per-config-directory setting, and on 2026-09-08 two of three Claude
+Code config directories lacked the override, so about 11,000 subagent calls since 2026-08-13 had
+run on the wrong tier `[measured 2026-09-08]`. The weekly routing audit in
+[10-measurement](10-measurement.md) therefore reads the served model, not the requested alias.
 
 ## What agents never do
 

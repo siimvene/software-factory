@@ -18,6 +18,10 @@ table; the entries here are the ones that apply to any adoption.
 | a worktree appears in `git worktree list` under a path with a space in it, and a second one is missing (2026-09-09) | a shell loop that word-splits in one shell and not in another; a stray local branch named like the remote ref (`origin/main`) shadowed the real one, so "ahead by 12" meant nothing | provision worktrees one explicit command each, verify `git worktree list` and `rev-parse` before opening a station, `git show-ref` when a ref name warns "ambiguous" |
 | a station's gate ran without the complexity analyzer although the venv had it (2026-09-09) | the station recreated its worktree and wiped the provisioned venv | the brief says "do not create worktrees"; the principal reruns the gate with the analyzer before trusting a station's gate log |
 | both review vendors flag a field that does not exist on the API (2026-09-09) | the brief stated the field name from a frontend type that was itself wrong | briefs cite the backend schema, not a consumer's type; the panel catching a brief's error is the panel working |
+| two sessions fix the same red required check within 10 minutes (2026-09-09) | shared-checkout discipline covers the tree and the branch pointer, not the claim on a fix | claim a red shared gate in the team memory store or the escalation channel before fixing; check for a claim first, so the claim record exists before the branch does |
+| a throwaway `git commit -am` probe swallows the uncommitted real fix; `git reset --hard` drops it and the rehearsal runs the old script (twice, 2026-09-09) | staging everything swept unrelated work into the probe commit | commit the real change before any throwaway commit in the same tree; recover with `git checkout <probe-sha> -- <paths>` |
+| a shared checkout sits 12 commits behind with a 4-hour-old `.git/index.lock`, then 5 behind while the handoff says current (2026-09-09) | nobody fast-forwarded the shared tree; a stale lock from a dead git process | verify-on-arrival fast-forwards the shared checkout and lists the worktrees; remove the lock only after `ps` shows no git process |
+| about 11,000 "opus" subagent calls ran on the wrong tier since 2026-08-13 (2026-09-08) | two of three config directories lacked the `claude-opus-5 -> claude-opus-4-8` alias override | a model alias is a per-config-dir setting; the routing audit checks the served model, not the requested alias (10-measurement) |
 
 ## Gates and ratchets
 
@@ -35,9 +39,13 @@ table; the entries here are the ones that apply to any adoption.
 | 7 layering violations on day one, all legitimate (2026-09-04) | pattern matched test-scope dependencies | anchor the pattern on production scopes only; 10-case validation |
 | a hook configured is a hook that never fired | config is not execution | a doctor command that verifies the hook ran; `source` tags on entries it must recognise |
 | the guard refuses a PR body | the body quoted the baseline flag | write long texts with the editor tool and reference them by path; the refusal is the guard working |
-| strict ratchet red on every PR that improves the number (2026-09-09) | `--strict` demands the baseline be tightened in the same PR; the agent guard refuses the write; the ruleset has no bypass | a person commits the tightening (twice on one day), or a policy change: CI tightens on merge, or the guard permits tightening only; see ADR 0004 follow-up |
+| strict ratchet red on every PR that improves the number (2026-09-09) | `--strict` demands the baseline be tightened in the same PR; the agent guard refuses the write; the ruleset has no bypass | decided 2026-09-09 evening (ADR 0004, option b): the guard permits a write that only lowers a number; five of the day's seven collisions were the merge-base diff bug (#41), two the real deadlock, the last on #43 |
 | impact-selected PR run fails on a repo-wide coverage floor (2026-09-09) | pytest inherits `fail_under` from the project config; a two-target slice reaches 28 % | no coverage floor on the slice; the floor applies to the full run and to the post-merge full suite |
 | two PRs both tighten the same baseline file | each improving branch records its own number | tighten after rebase, one PR at a time; merge order is the fix, not a merge tool |
+| the introducing PR cannot exercise itself; three instances in one day (2026-09-09) | the workflow runs the default branch's copy of the script (`pull_request_target`, the sync legs, the wake-runner call), never the PR's own change | prove a CI-plumbing PR with the NEXT PR and name it in the handoff, or ship the change behind a flag the PR flips after merge |
+| a merge commit lands red on cleat with the regenerated baseline missing (2026-09-09, #40) | `git checkout --theirs` plus regenerate plus `git add` plus `commit --no-edit` left the baseline staged but out of the merge commit | `git status --short` after every merge commit |
+| a scoped gate cannot fail and the FULL run aborts in 0 s (2026-09-09) | macOS bash 3.2 has no `mapfile`, so scope came back empty; `"${arr[@]}"` on an empty array under `set -u` aborted | rehearse the blocked direction, not only the pass; a gate that cannot fail is not a passing gate |
+| a repo-set `base_ref` of HEAD blanks every ratchet under strict CI (2026-09-09) | the diff against itself is empty | under `--strict`, ignore a repo-set `base_ref` and resolve the merge base with the default branch yourself |
 
 ## Review gate
 
@@ -76,6 +84,7 @@ table; the entries here are the ones that apply to any adoption.
 | the message-broker container waits forever with empty logs | a starter script the container library injects never arrives on this Docker provider | open item; non-fatal skip so database tests still run |
 | `timeout` missing on macOS; `git stash` refuses intent-to-add files (2026-09-07) | platform gaps | tool's own cap or coreutils; copy the file for a negative run |
 | browser tests from a worktree cannot reach the database | compose project name differs; runtime key not copied | pin the project name; copy the key; document it |
+| a worktree starts a second database container (2026-09-09) | the compose project name defaulted to the worktree directory | pin the compose project name; rehearse the blocked direction so the collision shows |
 | a health check compares against the wrong body | `{"status":"UP"}` vs "ok" | read the real response before asserting on it |
 | the primary checkout is suddenly bare (2026-09-07) | a gate branch's pre-commit fixture run set `core.bare=true` | reset; fixtures must not touch the parent repo's config |
 

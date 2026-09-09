@@ -43,7 +43,10 @@ most expensive wrong assumption a cold reader can make is about where the work a
 
 <!-- Things an agent must not decide: money, external commitments, credentials, authority
      boundaries, anything that changes what a person is accountable for. Each entry says
-     what is blocked until the decision lands. -->
+     what is blocked until the decision lands.
+     A handoff may instruct a verify, never a merge. "Check the PR is green, then merge" is
+     the line that had an agent merge under the owner's login on 2026-09-09; write "green,
+     merge waiting on the owner" and leave the merge here. -->
 
 1. **<decision>:** <what is blocked by it>, <what the options are>.
 
