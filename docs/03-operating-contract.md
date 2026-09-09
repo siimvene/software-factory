@@ -30,6 +30,12 @@ replays past incidents against the changed contract.
 - Isolate before mutating git state. Branch switching, `commit --amend`, `rebase`,
   `reset --hard` are banned in a shared checkout. If committing in a shared tree at all, verify
   branch and HEAD in the same tool call as the commit.
+- Claim a broken shared gate before fixing it. Two sessions fixing the same red required check
+  is wasted work and a race on the branch. Check: the claim record exists in the team memory
+  store or the escalation channel before the branch does.
+- Commit the real change before any throwaway commit in the same tree. A `git commit -am` probe
+  swallows an uncommitted fix and the next `git reset --hard` drops it. Recovery:
+  `git checkout <probe-sha> -- <paths>`.
 
 ## 3. Verification
 
@@ -129,6 +135,10 @@ When the task arc is complete and verified, nothing is in flight, and the sessio
 heavy context: write the handoff (state table, done-and-verified, gotchas, decisions waiting,
 verify-on-arrival commands, memory hints), commit it, and say it is safe to clear. Never hand
 off over in-flight work. See [templates/handoff.md](../templates/handoff.md).
+
+A handoff may instruct a verify, never a merge. Merge authority is the owner's (see ADR 0006);
+a handoff note that says "merge after green" launders a machine decision through the owner's
+identity.
 
 ## 11. Escalation
 
