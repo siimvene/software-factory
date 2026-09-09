@@ -17,11 +17,43 @@ Before any push containing code changes:
    vendor as the author is allowed here because it is additive; it never satisfies axis (a).
 4. **Browser QA pass** on every UI surface the diff touches, as the right persona, in a real
    browser, checking rendering, console, interactions and locales; findings with screenshots.
+   Now a receipt-checked pre-push gate (see below), scoped to the routes the diff can reach.
 5. **Adjudication.** Spot-verify every CRITICAL and SERIOUS claim against code. Fix those before
    push. Log MINOR with a disposition. Disbelieve at least one rejected finding per panel.
 
 Exempt: docs-only and memory-only commits. A docs commit that encodes a security rule or a data
 model decision is reviewed anyway.
+
+## Receipt-checked pre-push gates
+
+Two of these checks are too slow to run on the Stop hook but must run before the push. Each runs
+once, writes a receipt keyed by the git tree id, and the pre-push hook checks the receipt for the
+pushed commit's tree.
+
+**Browser QA.** The browser pass now runs before the PR, not after the merge `[measured 2026-09-09]`.
+Scope is derived from the specs' own routes and the API routers' own paths (`scripts/ci/e2e-scope.py`,
+48 unit tests), so a diff pulls in only the Playwright specs it can affect. `scripts/e2e-gate.sh`
+runs those specs through the existing harness and writes one receipt per git tree, and its
+`--check` mode is what the pre-push hook calls. The hook refuses any pushed ref whose diff reaches
+the browser without a receipt for that commit's tree. A scoped run is 23 s; the FULL run is 93 to
+103 s over 27 specs and 42 tests. The receipt is bound to the exact tree, so any later commit or
+baseline tighten voids it. The gate refuses to run while the app or API dev port is served by
+another checkout and never attaches to a foreign stack (`E2E_GATE=1` disables the server-reuse that
+would let it bind to whatever is already listening). One finding on this gate was acknowledged, not
+fixed: the receipt is a local discipline file, never an authorisation token.
+
+**Static analysis.** The same shape wraps a local static-analysis scan `[designed 2026-09-09]`.
+`scripts/sonar-gate.sh` runs a SonarQube scan scoped to the changed sources, computes the verdict
+repo-side (CI has no Sonar server), and binds its receipt to the git tree plus the project set; the
+same pre-push hook checks it next to the browser receipt. Limitation, already measured: in a worktree
+without the Sonar properties file the scanner tier silently degrades to dependency scanning only, so
+the gate report must say SKIPPED, not clean.
+
+Why a receipt and not a CI job: until 2026-09-09 the browser pass ran only after the merge, as the
+pre-deploy gate, so a browser regression could land on the default branch and be found only before
+deploy; a receipt is what makes the pre-push hook able to refuse an unproven diff. The
+rejected alternative is a CI end-to-end job on its own: it runs after the push, so the PR arrives
+unproven. That job stays as the follow-up, not the gate.
 
 ## The three axes
 

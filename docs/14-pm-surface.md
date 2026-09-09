@@ -248,11 +248,18 @@ Findings about the surface itself, each one a defect in the template rather than
   ships with its own lookups broken fails silently, because a missing reference reads as a skipped
   step rather than an error. The check is mechanical and belongs in the template's own test: for
   every path a skill names, assert it exists.
-- **No ticket tracker, so the stage is a status line in a file** `[measured 2026-09-07]`. Tickets
-  live as files in the workspace and move Ready, In Progress, In Test, Ready for LIVE by editing
-  one line. This costs the evaluator's write-back, the improver's write-back, the tracker skill and
-  the splitter's write sequence: four of seventeen skills had nothing to talk to. It was recorded
-  as a cycle-1 shortcut in a decision record rather than papered over.
+- **A ticket tracker, which closed a cycle-1 shortcut.** On 2026-09-07 there was no tracker, so the
+  stage was a status line in a file `[measured 2026-09-07]`: tickets lived as files in the workspace
+  and moved Ready, In Progress, In Test, Ready for LIVE by editing one line, and four of seventeen
+  skills (the evaluator's write-back, the improver's write-back, the tracker skill and the splitter's
+  write sequence) had nothing to talk to. It was recorded as a cycle-1 shortcut in a decision record
+  rather than papered over. That shortcut is now closed: since 2026-09-09 the reference implementation
+  runs a real tracker (Jira) `[measured 2026-09-09]`. Pickup assigns the ticket to the loop's account
+  and moves it to In Progress; a workflow moves it In Test on PR open with a remote link, Ready for
+  LIVE on green CI or merge, and back to In Progress on red; a deploy write-back closes every ticket
+  in the deployed range. Keys come from titles, never bodies, and events never move epics. The first
+  write-back closed 6 tickets, and the merge leg moved a ticket 13 s after the merge. Still by hand:
+  the "decision needed" post from tracker comments to the escalation channel.
 - **Readiness was self-scored** `[measured 2026-09-07]`. The same session that wrote the ticket
   applied the rubric to it, so the number is a self-assessment, and the improver loop, whose whole
   design is a second party asking one question at a time, never ran.
@@ -279,8 +286,11 @@ short and specific.
    and is not acceptance.
 3. **A real tracker, so the stage is not a line in a file.** Everything the tracker skill, the
    write-backs and the split sequence do assumes an addressable ticket with its own history. The
-   file-based shortcut works for one person and stops working the moment two people disagree about
-   what is in test.
+   file-based shortcut worked for one person and stopped working the moment two people disagreed
+   about what was in test, so the reference implementation closed it: since 2026-09-09 it runs Jira,
+   with pickup, the PR and CI transitions, and a deploy write-back all driven from the loop
+   `[measured 2026-09-09]`. What is still by hand is the "decision needed" post from tracker comments
+   to the escalation channel.
 4. **The improver loop actually running.** One question at a time, against the criterion with the
    most points on the table, with the session log written. The logs are the input to the skill that
    improves the skill, and a workspace with no session logs cannot run that write-back at all.

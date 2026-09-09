@@ -76,6 +76,8 @@ What is wired where, as of 2026-09-07:
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass, rule packs | 3 runs, 4 real defects | measured |
+| 5a | e2e receipt gate | scoped browser QA, receipt per git tree, pre-push check | wired `[measured 2026-09-09]` | not wired |
+| 5b | sonar receipt gate | local SonarQube scoped by changed sources, receipt per tree plus project set | built, not yet exercised end to end `[designed 2026-09-09]` | not wired |
 
 The provable and heuristic split in layer 4 matters for gating. Only `layers`, `cycles` and
 `intent` report at confidence 1.00, so those three are the recommended starting gate; the rest
@@ -138,6 +140,11 @@ Rules that are not obvious until you have been bitten:
 - **`base_ref` must be the real default branch.** Pointed at a branch 81 commits behind, the
   duplication gate judged 19,431 lines as changed and reported 557 clone pairs; pointed at the
   right one, 6, all real `[measured 2026-09-04]`.
+- **A repo-supplied `base_ref` can blank every ratchet.** A base_ref set to HEAD makes the diff
+  against itself empty, so under strict CI every ratchet passes on nothing. Rule: in CI under
+  `--strict`, ignore a repo-set base_ref and resolve the merge base against the default branch
+  yourself. Check: the diff the ratchet measures is non-empty when the change is non-empty. Found
+  by the blind security side-pass, open upstream `[measured 2026-09-09]`.
 - **Exclude vendored static assets and, on an un-netted core, test trees.** 267 of 407 raw
   complexity findings were vendored JavaScript; a gate that fails new tests fights the turn whose
   purpose is to grow tests `[measured 2026-09-05]`.
@@ -193,6 +200,27 @@ hook detection); a second fork batch of 5 commits (the once-per-failure-set repo
 formatter-pass judgment, an option injection via a `-`-shaped base ref from the config,
 found by the blind security pass) gated by both review legs plus a second Gemini leg, vendored
 into kvart (#23), no upstream PR yet `[measured 2026-09-07]`.
+
+### Receipt-checked pre-push gates
+
+A general rule for a check too slow to sit on the Stop hook: run it once before the push, write a
+receipt keyed by the git tree id, and have the pre-push hook check the receipt. The receipt records
+that the gate ran green on this exact tree, and any later commit voids it. The receipt is never an
+authorisation token: it cannot be hand-written to satisfy the hook, because it is bound to a tree the
+gate actually produced. Check: the pre-push hook reads the receipt and the tree id it names before
+letting the push proceed `[measured 2026-09-09]`. Two of these run on kvart, the browser QA gate and
+the static-analysis gate, both detailed in [06-verify-gate](06-verify-gate.md).
+
+### Rehearse the blocked direction
+
+Rehearse the BLOCKED path of a gate, not only the pass: a gate that cannot fail is not a gate. Check:
+a deliberately failing case must actually block before the gate is trusted. Three defects surfaced
+only this way `[measured 2026-09-09]`:
+
+- macOS bash 3.2 has no `mapfile`, so the scope came back empty and the gate could not fail.
+- an empty array expanded under `set -u` aborted the FULL run in 0 s.
+- the Compose project name defaulted to the worktree directory, so a worktree tried to start a
+  second database container.
 
 ## Layer 4: architecture diff (post-write)
 

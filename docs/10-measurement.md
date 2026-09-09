@@ -111,6 +111,20 @@ rework. In a deliberate pre-launch hardening phase fix > feat is the intended sh
 there is the weekly non-review fix count peaking and turning down (a finite backlog being
 drained). It was still rising (8 → 21 → 40).
 
+## The factory-on-itself share
+
+The share of merges that are the line fixing its own machinery, not shipping product:
+loop-infrastructure merges divided by all merges, cut weekly. It is the number that says
+whether the line has settled or is still being built.
+
+kvart, 2026-09-09 `[measured 2026-09-09]`: 8 of 13 merges were loop infrastructure. Loop:
+runner routing (#31, #32), coverage floor and concurrency (#34), Jira ledger (#39, #40), test
+selection and merge base (#41), browser gate (#42, #44). Product: #30, #33, #36, #37, #38.
+
+Proposed settle threshold: the share below one in five for two consecutive weeks `[proposed]`.
+A line that spends most of its merges on itself is still under construction; when the machinery
+holds, the merges go back to being product.
+
 ## The payoff bar
 
 "Methods maturing" is a plan until a measurement lands. Agreed bar for the reference
@@ -120,7 +134,10 @@ implementation `[measured 2026-09-07, re-measure at check-by]`:
 - cost per commit < $8 list price.
 
 Secondary check: audit top-tier model usage per project for a week; if half is mechanical, the
-routing rule is not being obeyed (≈ $4k/month waste at list price).
+routing rule is not being obeyed (≈ $4k/month waste at list price). The audit reads the served
+model, not the requested alias: an alias that resolves to the wrong tier in one config
+directory routes silently, so a per-alias count would report clean while the served count shows
+the leak (2026-09-08, about 11,000 calls on the wrong tier since 2026-08-13).
 
 ## Instruments, one per constraint
 

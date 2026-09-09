@@ -93,6 +93,13 @@ Order matters and is the subject of two documents:
    blind security side-pass, the scanner tier (secrets, dependency CVEs, static analysis), the
    browser QA pass on every UI surface the diff touches. See
    [06-verify-gate](06-verify-gate.md).
+3. Receipt-checked gates, before any push: the passes too slow for a Stop hook (the browser
+   suite, static analysis) run once on the final tree, write a receipt keyed by the git tree
+   id, and the pre-push hook refuses a ref whose diff reaches that surface without a receipt
+   for its tree. On kvart the browser pass moved from after merge to here on 2026-09-09:
+   scope derived from the specs' own routes and the API modules' own routers, 23 s scoped,
+   93 to 103 s full `[measured 2026-09-09]`; static analysis follows the same shape
+   `[designed 2026-09-09]`. A receipt is a discipline file, never an authorisation token.
 
 Findings are classified (CRITICAL, SERIOUS, MINOR), spot-verified against code, and given a
 disposition (ACCEPT-FIX, ACCEPT-DEFER, ACKNOWLEDGE, DISMISS). CRITICAL and SERIOUS are fixed
@@ -107,7 +114,10 @@ from feature failures and never "fixed" by editing a baseline.
 - The PR arrives already reviewed. CI is mechanical (lint, tests, version, docs-lint) and does
   not duplicate the consort review.
 - The owner merges. Agents propose; humans merge. Never push to a default branch, never
-  merge your own proposal, never approve a PR.
+  merge your own proposal, never approve a PR. A handoff may instruct a verify, never a
+  merge: on 2026-09-09 an agent merged a green infrastructure PR under the owner's login on a
+  handoff's instruction, and the ledger cannot tell that merge from a human decision
+  `[measured 2026-09-09]`. See ADR 0006 for what that decided.
 - Provenance: every commit carries an agent attribution trailer and a session link. See
   [07-roles-and-authority](07-roles-and-authority.md).
 - Money, tenant, identity and migration changes require named-human outcome sign-off, always.
@@ -156,5 +166,9 @@ stops; it does not improvise.
 | cycle 1, public-route fix | +47 / −1 | 12 min 11 s | 7 min 06 s | ~28 min incl. human merge |
 | cycle 2, retire a payment path | +121 / −679 | 18 min 58 s | 9 min 48 s | ~27 min excl. a 5 h owner wait |
 | trial, stream an export | +112 / −11 | (3 h run, 24 min real work) | 2 review rounds | not merged by design |
+| cycle 3, one ticket, five required CI checks | | 18 min 33 s | | 40 min 56 s excl. a 15 min 54 s merge wait; CI 49 % of it |
+| cycle 4, a batch of four stories, three parallel stations | | 2 h 08 min to the backend PR | | backend 3 h 57 min; whole batch 4 h 57 min, of which three human merges and one CI round of about 2 h |
 
-All `[measured 2026-09-05..07]`. Details in the [case studies](../case-studies/).
+All `[measured 2026-09-05..09]`. Of the 13 PRs merged on kvart on 2026-09-09, 8 were the
+factory fixing its own line and 5 were product; see [10-measurement](10-measurement.md) for
+the metric. Details in the [case studies](../case-studies/).

@@ -30,12 +30,19 @@ onto a newer main is one deliberate re-cut by a person, recording main's real da
 - Follow-up (2026-09-09, measured on kvart #33 and #36): the CI gate runs the ratchets in
   strict mode, which requires the baseline to be tightened in the same PR whenever a diff
   improves the number, and the agent guard refuses that write by design. Every improving PR
-  from an agent therefore needs a person's commit; two were made by hand in one day. The
-  decision this ADR does not yet make: (a) CI tightens the baseline on merge to the default
-  branch and strict mode checks "not looser than the default branch"; (b) the guard permits
-  writes that only lower a number and keeps refusing the rest; (c) keep one human commit per
-  improving PR as the cost of the rule. (b) keeps the human at every loosening and removes the
-  deadlock; it is the recommended option pending the operator's word.
+  from an agent therefore needs a person's commit; two were made by hand in one day.
+- Decided (2026-09-09 evening, the operator): option (b). The guard permits a baseline write
+  that only lowers a number and keeps refusing every other write to the policy, the baselines
+  and the hooks. Loosening stays a person's reviewed commit. Rejected: (a) CI tightens the
+  baseline on merge and strict mode checks "not looser than the default branch", which moves
+  the number out of the PR that earned it; (c) one human commit per improving PR, measured as
+  four hand commits in one day on kvart. What the day's evidence separated first: of the seven
+  baseline collisions on 2026-09-09, five were a diff bug (the ratchet diffed against the tip of
+  the default branch instead of the merge base, fixed in kvart #41) and two were the real
+  deadlock, the last one at 18:25Z on kvart #43 (baseline 11.93 % recorded, 11.92 % measured
+  after #42 merged, strict mode wants an exact match) `[measured 2026-09-09]`. The check for
+  (b): the guard's own planted cases, one lowering write that passes and one raising write that
+  is refused, run in CI on the gate's repository.
 
 ## Alternatives rejected
 

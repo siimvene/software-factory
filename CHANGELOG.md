@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.2.3 (2026-09-09, evening)
+
+The evening's eight loop-infrastructure PRs on kvart, and two decisions the day forced.
+
+- `adr/0004`: decided, option (b): the guard permits a baseline write that only lowers a
+  number. The day's seven collisions split into five from a merge-base diff bug and two real
+  deadlocks.
+- `adr/0006`: incident recorded, an agent merged a green PR under the owner's login on a
+  handoff's instruction; decided that the loop does not merge and a handoff never instructs
+  one; the qualified class waits for the bot identity to merge as itself.
+- `docs/02-loop.md`: receipt-checked pre-push gates as a VERIFY step (browser pass measured,
+  static analysis designed); the merge line; cycle 3 and cycle 4 rows in the cost table.
+- `docs/05-sensor-stack.md`, `docs/06-verify-gate.md`: the receipt pattern, the rehearse-the-
+  blocked-direction rule with its three defects, the strict-mode base_ref hardening, the
+  worktree scanner degradation.
+- `docs/07-roles-and-authority.md`: the measured worker-tier routing rule and the served-model
+  audit (alias leak).
+- `docs/14-pm-surface.md`: the tracker is real; the status-line shortcut is a dated past state.
+- `docs/03-operating-contract.md`: claim a broken shared gate before fixing it; commit the real
+  change before a throwaway commit; a handoff instructs a verify, never a merge.
+- `docs/10-measurement.md`: factory-on-itself share (8 of 13 merges on 2026-09-09).
+- `docs/13-failure-catalogue.md`: eight rows (introducing PR cannot exercise itself, two
+  sessions on one red gate, the probe that swept an uncommitted fix, stale lock and a stale
+  shared checkout, a baseline staged but not committed, a gate that cannot fail on bash 3.2,
+  base_ref = HEAD, the alias leak).
+- `templates/handoff.md`: the merge line.
+- `STATUS.md`: static-analysis receipt gate (designed), worker-tier routing, the merge
+  incident on the ruleset row, the factory-on-itself metric, the scanner caveat.
+
 ## 0.2.2 (2026-09-09)
 
 Cycle 4 on kvart: first batch (an epic with four stories) through the loop with three parallel
