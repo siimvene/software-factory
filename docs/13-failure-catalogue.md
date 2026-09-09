@@ -23,6 +23,13 @@ table; the entries here are the ones that apply to any adoption.
 | a shared checkout sits 12 commits behind with a 4-hour-old `.git/index.lock`, then 5 behind while the handoff says current (2026-09-09) | nobody fast-forwarded the shared tree; a stale lock from a dead git process | verify-on-arrival fast-forwards the shared checkout and lists the worktrees; remove the lock only after `ps` shows no git process |
 | about 11,000 "opus" subagent calls ran on the wrong tier since 2026-08-13 (2026-09-08) | two of three config directories lacked the `claude-opus-5 -> claude-opus-4-8` alias override | a model alias is a per-config-dir setting; the routing audit checks the served model, not the requested alias (10-measurement) |
 
+## Tracker and ledger
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| every Done ticket shows Resolution "Unresolved"; `resolvedDate` empty; resolved-vs-created reports flat (2026-09-09) | the workflow was created over the API with statuses and transitions only; in Jira a status is not a resolution, and Resolution was on no screen | an update-field post-function on the terminal transition (Resolution = Done) and a clearing one on each reopen transition; backfill the already-Done tickets through a temporarily added screen field; the list view with the Resolution column is the check |
+| a workflow probe ticket cannot be removed afterwards (2026-09-09) | the automation token has no Delete issues permission | prove a transition on a ticket the token may delete, or label the probe for a human; never leave it unlabelled in the ledger |
+
 ## Gates and ratchets
 
 | Symptom | Cause | Fix |
@@ -39,7 +46,7 @@ table; the entries here are the ones that apply to any adoption.
 | 7 layering violations on day one, all legitimate (2026-09-04) | pattern matched test-scope dependencies | anchor the pattern on production scopes only; 10-case validation |
 | a hook configured is a hook that never fired | config is not execution | a doctor command that verifies the hook ran; `source` tags on entries it must recognise |
 | the guard refuses a PR body | the body quoted the baseline flag | write long texts with the editor tool and reference them by path; the refusal is the guard working |
-| strict ratchet red on every PR that improves the number (2026-09-09) | `--strict` demands the baseline be tightened in the same PR; the agent guard refuses the write; the ruleset has no bypass | decided 2026-09-09 evening (ADR 0004, option b): the guard permits a write that only lowers a number; five of the day's seven collisions were the merge-base diff bug (#41), two the real deadlock, the last on #43 |
+| strict ratchet red on every PR that improves the number (2026-09-09) | `--strict` demands the baseline be tightened in the same PR; the agent guard refuses the write; the ruleset has no bypass | decided 2026-09-09 evening (ADR 0004, option b): the guard permits a write that only lowers a number; five of the day's seven collisions were the merge-base diff bug (#41), two the real deadlock, the last on #43 Closed 2026-09-09: cleat gained `--tighten`, the same rewrite refused whenever it would accept anything new or worse (or a target it did not write, or drift, or a scoped run); the guard lets it through, the agent answers the NOTE itself |
 | impact-selected PR run fails on a repo-wide coverage floor (2026-09-09) | pytest inherits `fail_under` from the project config; a two-target slice reaches 28 % | no coverage floor on the slice; the floor applies to the full run and to the post-merge full suite |
 | two PRs both tighten the same baseline file | each improving branch records its own number | tighten after rebase, one PR at a time; merge order is the fix, not a merge tool |
 | the introducing PR cannot exercise itself; three instances in one day (2026-09-09) | the workflow runs the default branch's copy of the script (`pull_request_target`, the sync legs, the wake-runner call), never the PR's own change | prove a CI-plumbing PR with the NEXT PR and name it in the handoff, or ship the change behind a flag the PR flips after merge |
