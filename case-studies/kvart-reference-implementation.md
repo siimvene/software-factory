@@ -228,7 +228,10 @@ the spec and a design handoff in the team-context repo.
   → backend live 3 h 57 min, of which two human merges and one extra CI round were ~75 min.
   Deploy itself: 1 min (pull, sync, migration 187→188, timer install, frontend build, restart),
   health 200/200, prod verified on routes, schema, policy and the alembic head. The console
-  page (#38) was green and awaiting its merge at the end of the window.
+  page (#38) merged and deployed at 15:59Z after a 3/3 Playwright gate that ran its two e2e
+  specs against the real backend; whole batch pickup → live 4 h 57 min. A live probe with
+  the demo persona (an owner) recorded its own occupant-details view and not its own balance,
+  the shipped rule exactly.
 - **Found on the way.** A form that silently drops a field because two consumers spell it
   differently (filed); the new Jira write-back closing a story whose second PR was still open,
   with Done terminal in the workflow (filed).
