@@ -75,7 +75,7 @@ What is wired where, as of 2026-09-07:
 | 2 | ponytail | plugin at project scope, marketplace source pinned | wired, no trial on a complex task yet | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
-| 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass, rule packs | 3 runs, 4 real defects | measured |
+| 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
 | 5a | e2e receipt gate | scoped browser QA, receipt per git tree, pre-push check | wired `[measured 2026-09-09]` | not wired |
 | 5b | sonar receipt gate | local SonarQube scoped by changed sources, receipt per tree plus project set | built, not yet exercised end to end `[designed 2026-09-09]` | not wired |
 

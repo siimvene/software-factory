@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.4 (2026-09-10)
+
+The browser QA runtime, after evaluating the Playwright CLI against the kvart stack.
+
+- `adr/0008`: the browser QA pass drives a CLI, not a protocol server or a browser extension;
+  one session per persona, state saved once and restored; evidence on disk, a few lines in
+  context; a missing runtime stops the pass instead of a hand-written script; the skill is
+  tracked so a station worktree has it.
+- `docs/06-verify-gate.md`: the runtime paragraph under the receipt gates, with the shakedown.
+- `docs/05-sensor-stack.md`, `docs/15-design-system.md`: the row notes; the page tree the runtime
+  writes is the input for the still-designed patterns check.
+- `docs/13-failure-catalogue.md`: three rows (a gitignored skill is absent from every worktree;
+  browser state saved during the SPA callback; the 0-byte auto-named page tree).
+- `STATUS.md`: Browser QA pass row carries the runtime, the shakedown and the cold rehearsal.
+
 ## 0.2.3 (2026-09-09, evening)
 
 The evening's eight loop-infrastructure PRs on kvart, and two decisions the day forced.

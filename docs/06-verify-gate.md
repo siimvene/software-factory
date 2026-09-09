@@ -42,6 +42,21 @@ another checkout and never attaches to a foreign stack (`E2E_GATE=1` disables th
 would let it bind to whatever is already listening). One finding on this gate was acknowledged, not
 fixed: the receipt is a local discipline file, never an authorisation token.
 
+**Browser QA runtime.** The exploratory pass (step 4) is driven through the Playwright command-line
+tool, one shell command per browser action, headless, one named session per persona
+([adr/0008](../adr/0008-browser-qa-drives-a-cli-not-a-protocol-server.md)) `[designed 2026-09-10]`.
+Login happens once per persona and the storage state is saved and restored, never logged in twice.
+Each surface leaves a page tree, a console extract, a network extract and a screenshot on disk;
+each exercised interaction is wrapped in a recording and a trace, and the recorded code travels with
+the codify candidate in the report. The agent's context carries a few lines per action; the evidence
+is read from disk when a finding needs it. Until 2026-09-10 the pass ran either through a headed
+browser extension or through a script the agent wrote for the occasion, and the skill that describes
+it was gitignored, so a station worktree could not run it at all. Check: the skill is tracked, and
+the pass refuses to start when the runtime is missing instead of writing a script. Shakedown against
+the running kvart stack `[measured 2026-09-10]`: persona login through the dev-login redirect chain,
+state saved after the callback restores a logged-in session in a fresh browser, console and network
+extracts as text, recording and trace per surface, teardown leaves no process.
+
 **Static analysis.** The same shape wraps a local static-analysis scan `[designed 2026-09-09]`.
 `scripts/sonar-gate.sh` runs a SonarQube scan scoped to the changed sources, computes the verdict
 repo-side (CI has no Sonar server), and binds its receipt to the git tree plus the project set; the
