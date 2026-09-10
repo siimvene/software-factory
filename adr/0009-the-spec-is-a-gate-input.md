@@ -58,8 +58,8 @@ Scope: behaviour-changing diffs. A pure refactor carries a delta that says "none
   already names. Cross-repo: the station's tree needs the team-context checkout, or a fetched
   copy at the pinned commit.
 - **Follow-ups:** the review tool: spec pack injection and the scope-drift instruction (owner:
-  the tool's maintainer); the reference implementation: delta receipt in the pre-push hook and
-  REFINE-SPEC in the report templates (owner: the operator); measurement: the class is tested
+  the tool's maintainer; kvart KVART-24); the reference implementation: delta receipt in the
+  pre-push hook and REFINE-SPEC in the report templates (owner: the operator; kvart KVART-23); measurement: the class is tested
   against a planted drift and a known-conformant diff before it is trusted, and demoted to
   advisory if more than half of its findings on the first live cycle are dismissed.
 
