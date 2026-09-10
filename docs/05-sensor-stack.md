@@ -8,7 +8,7 @@ dashboard can read.
 | # | Layer | When | Catches | Tool used here |
 |---|---|---|---|---|
 | 1 | Orientation map | pre-write | the agent not knowing what it is touching: call graph, blast radius, existing exemplars | ripwire |
-| 2 | YAGNI ladder | during write | over-building: code that should be a stdlib call, a platform feature, one line, or nothing | ponytail |
+| 2 | YAGNI ladder | during write | over-building: code that should be a stdlib call, a platform feature, one line, or nothing | Chisle |
 | 3 | Quality ratchets | post-write, Stop hook | complexity growth, escapes, duplication, dead symbols, layering, changed-line coverage, public API loss | cleat |
 | 4 | Architecture diff | post-write, Stop hook | layer violations, cycles, scope spillover, cross-repo seams: what THIS change did to structure | enola |
 | 5 | Cross-vendor review | pre-push | intent, security, design, novel risk: the only inferential layer | consort, see [06](06-verify-gate.md) |
@@ -31,7 +31,7 @@ flowchart TB
         M1["1 · orientation map<br/>ripwire"]
     end
     subgraph WRITE["while writing"]
-        M2["2 · YAGNI ladder<br/>ponytail"]
+        M2["2 · YAGNI ladder<br/>Chisle"]
     end
     subgraph STOP["Stop hook: the agent cannot call it done"]
         direction TB
@@ -72,7 +72,7 @@ What is wired where, as of 2026-09-07:
 | # | Layer | Checks in use | kvart | The legacy core |
 |---|---|---|---|---|
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired, index unverified across worktrees | not wired |
-| 2 | ponytail | plugin at project scope, marketplace source pinned | wired, no trial on a complex task yet | not wired |
+| 2 | Chisle | npm zero-dep install, PostToolUse compression + YAGNI ladder | wired, no trial on a complex PLG domain task yet | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass, rule packs | 3 runs, 4 real defects | measured |
@@ -106,14 +106,29 @@ already in this codebase; does the stdlib do it; does the platform do it; does a
 dependency do it; is it one line; only then, the minimum that works. Security, validation, error
 handling and accessibility are never on the chopping block.
 
-Published benchmark on a generic web stack: −54 % lines of code mean, −20 % cost, −27 % time,
-with near-zero reduction on already-minimal code `[field: ponytail README, n=4]`. Under a
-subscription model less code compounds: less future agent work per feature.
+**Tool used here: Chisle** (replaces ponytail, 2026-09-10). Chisle contains the same 7-rung
+ladder plus prose compression and a `PostToolUse` hook that compresses tool output before the
+model reads it. Tool output is 67.5 % of context content and is re-billed on every subsequent
+request; compressing it once saves limit budget on every later turn, not just the current one.
 
-Caveats: the top public reply to the tool's launch was "made my agent lazy", a real risk on
-complex domain tasks; the plugin ships lifecycle hooks, so inspect them before trusting; it
-cannot be revision-pinned through the marketplace format, so a real pin means a fork or the
-organisation's vetted catalog `[designed; trial on one complex multi-file task before rollout]`.
+Head-to-head benchmark against ponytail (20 live tasks, 59+ model runs, same-correct-answer
+verified `[field: Chisle README]`):
+
+| | total bill | worst case | backfires |
+|---|---|---|---|
+| ponytail | 68% of baseline | 227% | 8 / 20 (40%) |
+| **Chisle** | **52%** | **173%** | **1 / 20 (5%)** |
+
+Ponytail's 40 % backfire rate (made things worse than no tool at all) is disqualifying for
+unattended operation. Chisle wins all four columns, root-caused its one backfire, fixed the
+ruleset, re-measured, and published the investigation. Under a subscription model less code
+compounds: less future agent work per feature.
+
+Caveats: benchmarked on Haiku and Sonnet over generic web tasks; verify the ladder does not
+over-constrain stronger models on complex domain tasks before wiring into production; inspect the
+Node lifecycle hooks before enabling (`npx chisle --dry-run` first); vet into the organisation's
+catalog with a 30-day release-age check rather than installing directly from the author's
+marketplace on a production machine `[designed; trial on one complex multi-file domain task before rollout]`.
 
 ## Layer 3: quality ratchets (post-write)
 
