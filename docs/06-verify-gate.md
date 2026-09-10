@@ -70,6 +70,53 @@ deploy; a receipt is what makes the pre-push hook able to refuse an unproven dif
 rejected alternative is a CI end-to-end job on its own: it runs after the push, so the PR arrives
 unproven. That job stays as the follow-up, not the gate.
 
+## Spec-conformance finding (designed 2026-09-10, not yet measured)
+
+Item 2's cross-vendor review checks the diff against itself: correctness, security, baselines. It
+does not check the diff against what was asked for. The original work-loop design named this gap
+directly: "intended-vs-derived reconciliation... the highest-value mechanical signal"
+`[designed 2026-07-21]`, and no cycle since has run it. This is not the same mechanism as ADR
+0007's spec-check skill, which regenerates current-state specs from merged code after the fact;
+this one compares the diff, at review time, against the ticket or spec-delta that motivated it:
+intent versus output, not output versus itself.
+
+Adopt-don't-rebuild applies to the check, not just its plumbing (principle 8): the reviewer
+already reads the same team-context repo and rule packs as the generator
+([04-knowledge-plane](04-knowledge-plane.md)), so a linked spec-delta is already in its context
+whenever the work loop's story-creation-is-spec-delta-creation step was actually followed. The
+gap is one line in the rule pack, not missing context plumbing.
+
+Proposed rule-pack line, added to item 2:
+
+> Cross-check this diff against the linked spec-delta or ticket acceptance check. Report every
+> addition, omission or behavioural divergence as a `spec-drift` finding. Default severity NOTE
+> unless the divergence also breaks the acceptance check, in which case classify it by the normal
+> CRITICAL / SERIOUS / MINOR rule.
+
+Three constraints before this earns a `[measured]` tag, each already paid for elsewhere in this
+design and reused here rather than relearned:
+
+- **Severity default is NOTE, not a gate.** Mid-build spec deviation is the normal shape of
+  discovery, not a defect: one dev-hat cycle ran six such deviations as live decisions with
+  defaults and deadlines, all legitimate. Auto-blocking on divergence reproduces the review-load
+  failure this whole gate design exists to avoid (principle 4: humans inspect output, not
+  process). A `spec-drift` finding routes to the same escalation channel a human decision already
+  uses; it does not fail the gate by itself.
+- **Flag, never fix (principle 4; adr 0005, adr 0006).** The reviewer proposes a divergence; it
+  does not edit the spec-delta to match the code it just reviewed. The silent-mutation failure
+  that moved merge authority off the loop (adr 0006) recurs one layer up the moment a reviewer is
+  allowed to resolve its own finding.
+- **Test the test before it ships as a standing rule (principle 3).** No data yet on whether any
+  reviewer leg reliably tells real drift from noise. Recall on this panel is backend-dependent by
+  a wide margin on ordinary findings (4/5 vs 2/5 vs 0/5 on identical known defects
+  `[measured 2026-09-07]`); run the proposed line once against a diff with deliberately injected
+  drift and once against a clean diff before it becomes a standing rule-pack entry, not after.
+
+Prerequisite this depends on and does not yet universally have: a spec-delta to diff against.
+Where story creation produced only a ticket description rather than a committed spec-delta, the
+reviewer would be diffing the code against two sentences, a weaker and noisier signal than the
+ADR 0007 sister-spec mechanism this is meant to complement, not substitute for.
+
 ## The three axes
 
 A review counts as a consort pass only if all three hold `[measured 2026-08-19]`:
