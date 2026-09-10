@@ -118,9 +118,11 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 16. [Design system](docs/15-design-system.md): tokens, patterns, components and divergences as a knowledge-plane layer
 17. [Inventory](docs/16-inventory.md): every mechanism mapped to the tool or template that provides it, and what an adopter without a standard must build
 18. [Onboarding a repository](docs/17-onboarding.md): the Day 1 runbook, retro-generated specs, mined decision records, the team-context repo, the memory move
+19. [Flightlist](docs/18-flightlist.md): the tickable setup sequence for the next project, one mechanical check and one evidence pointer per leg
 
-Then the [case studies](case-studies/), the [evidence](evidence/), the [templates](templates/)
-and this design's own [decision records](adr/).
+Then the [case studies](case-studies/), the [evidence](evidence/), the [templates](templates/),
+the [skills](templates/skills/) a team copies into its workspaces, and this design's own
+[decision records](adr/).
 
 ## What this is not
 

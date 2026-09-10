@@ -50,5 +50,7 @@ Every claim carries its class, because the difference is the whole point of the 
 - `evidence/` holds source reports copied close to verbatim (anonymised), so the case studies
   can be checked against them.
 - `templates/` are the artifacts a team copies on day one.
+- `templates/skills/` are the agent skills a team copies on day one, anonymised from the
+  reference implementation, one directory per skill with its scripts beside it.
 - `adr/` records the decisions of this design itself, in the same format the design asks
   adopters to use.

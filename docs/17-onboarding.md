@@ -82,7 +82,10 @@ result to collect; kvart's first two cycles did not promote `[measured 2026-09-0
 
 ## 5. Retro-generate the current-state specs
 
-Three modes, run in order, with the owner in the PM role between modes 2 and 3.
+Three modes, run in order, with the owner in the PM role between modes 2 and 3. The skills:
+[templates/skills/retrogenerate-specs](../templates/skills/retrogenerate-specs/SKILL.md),
+[update-specs-for-commits](../templates/skills/update-specs-for-commits/SKILL.md) and the
+checker, [check-specs](../templates/skills/check-specs/SKILL.md).
 
 **Mode 1, prepare.** One read-only explorer per project (backend, web client, mobile client),
 each confined to its own directory, returns a feature map from the user's perspective (routes,
@@ -125,6 +128,9 @@ merged.
 
 ## 6. Mine and write the decision records
 
+The skill: [templates/skills/mine-decision-records](../templates/skills/mine-decision-records/SKILL.md),
+written from this section after the reference implementation ran it by hand.
+
 Two levels. Repo-level records (structure, contracts, data, security, deployment) in the code
 repo; team-level rules that hold across the product's repos in the team repo.
 
@@ -155,7 +161,8 @@ then write.
 ## 7. Set up the PM workspace
 
 Copy the PM workspace template; fill the pointers (repos, team context, design standards,
-ticket tracker or "none"). Run one skill against the copy before trusting the rest: kvart's
+ticket tracker or "none"); copy the five skills from [templates/skills](../templates/skills/)
+into `.claude/skills/`. Run one skill against the copy before trusting the rest: kvart's
 ticket skill referenced a style file the copy did not have, and its lookups missed until the
 specs PR merged `[measured 2026-09-07]`. See [14-pm-surface](14-pm-surface.md).
 
