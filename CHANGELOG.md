@@ -12,6 +12,15 @@ Sensor 2 changes tool: chisle replaces ponytail on the reference implementation,
   pre-adoption audit; section 5 stays as the dated ponytail record.
 - `docs/16-inventory.md`, `README.md`, `STATUS.md`: the Sensor 2 rows and the picture.
 - `WRITING.md`: chisle joins the nameable tools.
+- `templates/ticket.md`: "Escalation triggers" section. Without an explicit list of escalate-when
+  conditions the agent infers its own bail-out criteria; the section makes them a first-class
+  part of the spec `[field: Ichigo, "Harness Engineering", 2026-08-29]`.
+- `docs/10-measurement.md`: headline ratio, accepted outputs over human review minutes. The
+  numerator is merged PRs a human said yes to; the denominator is review-active minutes with
+  idle wait excluded. The per-turn numbers diagnose; this ratio is the mandate signal.
+- Merge note: a parallel session published the tool swap plus the two items above as a second
+  "0.2.4" on 2026-09-10 morning; that entry is folded here, and 0.2.4 stays the browser QA
+  runtime.
 
 ## 0.2.4 (2026-09-10)
 
