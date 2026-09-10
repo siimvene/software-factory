@@ -1,18 +1,18 @@
 # Status ledger
 
-Which parts of the design sit in which evidence class, as of 2026-09-10. See
+Which parts of the design sit in which evidence class, as of 2026-09-10 (evening). See
 [WRITING.md](WRITING.md) for the classes.
 
 | Mechanism | Class | Where | Note |
 |---|---|---|---|
-| The loop end to end on a real product | measured | kvart cycles 1, 2, 3 | 12 to 19 min to PR; <30 min to live without required CI (cycles 1, 2), 41 min with the ruleset's five required checks on hosted runners (cycle 3, 2026-09-09) |
+| The loop end to end on a real product | measured | kvart cycles 1, 2, 3, 5 | 12 to 19 min to PR; <30 min to live without required CI (cycles 1, 2), 41 min with the ruleset's five required checks on hosted runners (cycle 3, 2026-09-09). Cycle 5 (2026-09-10, epic KVART-19, two stories, three build stations): pickup 08:34Z, both PRs open 14:36Z, CI green 14:50Z and 14:52Z, merged 17:26Z and 17:38Z on the owner's word (the second PR needed a main merge and fresh receipts: the ruleset wants branches up to date and auto-merge is off), live 17:41Z, tickets Done by the write-back; 9 h 07 min pickup to live, of which 2 h 26 min was the merge wait; of the rest, ~5 h was contention on one Mac (stations 2 to 3x over cap, Sonar 40 min instead of 30 s, six environmental browser-gate failures) plus a machine restart; serialised on an idle machine the whole receipt tail for both PRs took 10 min. One machine runs one station and one reviewer at a time; scanners and the browser gate alone. Merges wait on the owner |
 | Operating contract loaded in every session | measured | kvart, legacy core | eval suite on contract changes: proposed |
 | Context standard L0 + team-context repo | measured | kvart | L1 ADRs bootstrapped; L2 docs-lint disabled on the plan |
 | Spec retro-generation and findings file | measured | kvart | skills run by hand; sister spec PRs hand-edited |
 | Day 1 onboarding runbook (team repo, standard adoption, memory move, specs, ADRs, PM workspace) | measured | kvart | one session for ~250 features; see 17-onboarding |
 | ADR candidate table and rejected list | measured | kvart | 30 candidates, 13 + 8 written, 1 unconfirmed |
 | PM workspace and skill catalogue | measured (workspace) / designed (most skills) | kvart | only the ticket and readiness skills exercised in the cycles; see 14-pm-surface |
-| Design system as a knowledge-plane layer | designed | kvart | repo built on Day 1; not yet read by a BUILD or QA pass in a measured cycle; prototype-on-the-ticket decided 2026-09-09, first UI cycle will measure it; see 15-design-system |
+| Design system as a knowledge-plane layer | measured (first cycle) | kvart | repo built on Day 1; prototype-on-the-ticket decided 2026-09-09; cycle 5 (KVART-19, 2026-09-10) was the first UI cycle: the PM design handoff (portfolio status table: markers, states, thresholds) sat in the team-context repo and was a named input of the web build station; the station built to it without a design finding in either review leg; the pure marker module carries the thresholds in one constant. Not yet read by a QA pass; see 15-design-system |
 | Concept-to-tool inventory | reference | | see 16-inventory |
 | Memory store bound read-only; promote PR | measured | kvart | store moved; first promote PR opened by the bot identity in cycle 3 (2026-09-09), code owner reviews |
 | Cross-vendor review, three axes | measured | kvart, legacy core | two backends; hard-fail proven |
