@@ -8,7 +8,7 @@ dashboard can read.
 | # | Layer | When | Catches | Tool used here |
 |---|---|---|---|---|
 | 1 | Orientation map | pre-write | the agent not knowing what it is touching: call graph, blast radius, existing exemplars | ripwire |
-| 2 | YAGNI ladder | during write | over-building: code that should be a stdlib call, a platform feature, one line, or nothing | ponytail |
+| 2 | YAGNI ladder | during write | over-building: code that should be a stdlib call, a platform feature, one line, or nothing | chisle |
 | 3 | Quality ratchets | post-write, Stop hook | complexity growth, escapes, duplication, dead symbols, layering, changed-line coverage, public API loss | cleat |
 | 4 | Architecture diff | post-write, Stop hook | layer violations, cycles, scope spillover, cross-repo seams: what THIS change did to structure | enola |
 | 5 | Cross-vendor review | pre-push | intent, security, design, novel risk: the only inferential layer | consort, see [06](06-verify-gate.md) |
@@ -31,7 +31,7 @@ flowchart TB
         M1["1 · orientation map<br/>ripwire"]
     end
     subgraph WRITE["while writing"]
-        M2["2 · YAGNI ladder<br/>ponytail"]
+        M2["2 · YAGNI ladder<br/>chisle"]
     end
     subgraph STOP["Stop hook: the agent cannot call it done"]
         direction TB
@@ -72,7 +72,7 @@ What is wired where, as of 2026-09-07:
 | # | Layer | Checks in use | kvart | The legacy core |
 |---|---|---|---|---|
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired, index unverified across worktrees | not wired |
-| 2 | ponytail | plugin at project scope, marketplace source pinned | wired, no trial on a complex task yet | not wired |
+| 2 | chisle | plugin at project scope, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail), no trial on a complex task yet | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
@@ -106,14 +106,32 @@ already in this codebase; does the stdlib do it; does the platform do it; does a
 dependency do it; is it one line; only then, the minimum that works. Security, validation, error
 handling and accessibility are never on the chopping block.
 
-Published benchmark on a generic web stack: −54 % lines of code mean, −20 % cost, −27 % time,
-with near-zero reduction on already-minimal code `[field: ponytail README, n=4]`. Under a
-subscription model less code compounds: less future agent work per feature.
+Tool: chisle, which replaced ponytail on the reference implementation on 2026-09-10. Same
+ladder, two additions. It compresses the agent's prose with a ruleset injected at session start,
+and it adds an input-side hook: after a tool call, oversized output (over 8,000 characters) has
+its middle elided, keeping 60 head and 40 tail lines plus up to 12 error-like lines, and a
+byte-identical repeat of an earlier output becomes a marker. Read and Edit results are never
+touched, so exact bytes still feed later edits. The kill switch is an environment variable
+(`CHISLE_COMPRESS=0`).
 
-Caveats: the top public reply to the tool's launch was "made my agent lazy", a real risk on
-complex domain tasks; the plugin ships lifecycle hooks, so inspect them before trusting; it
-cannot be revision-pinned through the marketplace format, so a real pin means a fork or the
-organisation's vetted catalog `[designed; trial on one complex multi-file task before rollout]`.
+Why the swap: the ladder was the reason for adopting ponytail, and chisle carries the same
+ladder with a smaller, rarer downside on the vendor's 20-task comparison (billed output tokens as
+a share of the no-tool baseline): ponytail 68 % total, 8 of 20 tasks worse than no tool, 227 %
+worst case; chisle 52 % total, 1 of 20 worse, 173 % worst case `[field: chisle docs/comparison.md]`.
+One vendor benchmarking the other on generic prompts: read it as a smaller worst case, not a
+promise. Under a subscription model less code compounds: less future agent work per feature.
+
+Caveats: "made my agent lazy" stays a real risk on complex domain tasks, the ladder is unchanged;
+the plugin ships three Node.js lifecycle hooks (session start, prompt submit, post tool use),
+read in full before adoption: no child process spawn, one 1.5 s update check against the npm
+registry at session start with an environment variable to disable it, state files only under the
+Claude config directory; the marketplace format accepts a tag or branch, not a commit, so the pin
+is the tag v3.0.0 (released 2026-07-28), and the cached plugin content was verified to match that
+tag's commit rather than the branch head; a tag can move, so a fork or the organisation's vetted
+catalog remains the real pin. Tool-output elision is a context-cost mechanism, not a sensor: it
+changes what the model reads, and a compressed result that hid an error line the agent needed
+would be a new failure class, not yet observed `[designed; trial on one complex multi-file task
+before rollout]`.
 
 ## Layer 3: quality ratchets (post-write)
 

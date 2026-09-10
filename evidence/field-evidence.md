@@ -186,6 +186,52 @@ future agent work means less limit burn.
 
 ---
 
+## 5a. chisle replaces ponytail on the reference implementation `[field: chisle]`
+
+**What it is.** chisle, an MIT-licensed Claude Code and Codex plugin (rules also ship for six
+other agents), version 3.0.0 released 2026-07-28, zero runtime dependencies, 136 GitHub stars on
+2026-09-10. It carries the same 7-rung ladder as ponytail: does this need to exist, reuse what is
+in the codebase, stdlib, native platform feature, installed dependency, one line, only then the
+minimum that works. It adds a zero-fluff prose ruleset injected at session start (about 1,600
+tokens once, a 50-token reminder per prompt) and a post-tool-use compressor for shell, agent,
+grep, glob, web and MCP output: over 8,000 characters the middle is elided, 60 head and 40 tail
+lines and up to 12 error-like lines survive, and a byte-identical repeat becomes a marker. Read
+and Edit results are never touched.
+
+**Numbers (the vendor's own comparison, 20 tasks in two suites, Haiku and Sonnet, billed output
+tokens as % of the no-tool baseline).**
+
+| | total bill | average task | worst case | worse than no tool |
+|---|--:|--:|--:|--:|
+| caveman | 80 % | 98 % | 424 % | 6 / 20 |
+| ponytail | 68 % | 91 % | 227 % | 8 / 20 |
+| chisle | 52 % | 69 % | 173 % | 1 / 20 |
+
+- Tool output was 67.5 % of session context on the vendor's corpus; the compressor claims about
+  46 % smaller per eligible output, and the saving repeats on every later request in the session.
+- The vendor states its own caveats: the largest single drop in its coding table came from asking
+  which framework instead of guessing, and the 3.0.0 ruleset differs from the one the committed
+  benchmark cells were measured on.
+
+**Why it replaced ponytail.** The ladder was the reason for adopting ponytail; chisle has the same
+ladder with a smaller and rarer downside on these numbers, and it adds the input axis nothing else
+in the stack touches. This is the vendor of one tool benchmarking the other on generic prompts:
+field class, not measured here.
+
+**Pre-adoption audit on kvart `[measured 2026-09-10]`.** Hooks and plugin manifest read in full:
+no child process spawn; one 1.5 s update check against the npm registry at session start, disabled
+by an environment variable; state files only under the Claude config directory, refusing symlinks.
+Skill exfiltration scan: 0 findings in 59 files. Marketplace source pinned to tag v3.0.0; the
+format accepts a tag or branch, not a commit, so the pin is a tag; the cached plugin content was
+verified to match the tag's commit, not the branch head, which carries one commit past the tag.
+The two-vendor review of the swap found one HIGH each, the same finding: the first commit left the
+source unpinned, the second commit fixed it. A headless session receives the activation message
+from the session-start hook.
+
+**Open.** As for ponytail: a trial on a complex multi-file task before any rollout beyond the
+reference implementation. New: whether elided tool output ever hides an error line the agent
+needed; the 12 salvaged error-like lines are a heuristic.
+
 ## 6. enola: architectural regression testing `[field: enola]`
 
 **What it is.** enola (Apache 2.0, public repo, CI passing), recorded in the operator memory store on

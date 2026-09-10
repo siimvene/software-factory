@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.5 (2026-09-10)
+
+Sensor 2 changes tool: chisle replaces ponytail on the reference implementation, same ladder.
+
+- `docs/05-sensor-stack.md`: Layer 2 names chisle, what it adds (prose ruleset, tool-output
+  elision with its kill switch), why the swap (the vendor's 20-task comparison), the caveats
+  (hooks read in full, a tag pin rather than a commit pin, elision as a possible new failure
+  class); the wired-where row.
+- `evidence/field-evidence.md`: section 5a, the chisle record with the comparison table and the
+  pre-adoption audit; section 5 stays as the dated ponytail record.
+- `docs/16-inventory.md`, `README.md`, `STATUS.md`: the Sensor 2 rows and the picture.
+- `WRITING.md`: chisle joins the nameable tools.
+
 ## 0.2.4 (2026-09-10)
 
 The browser QA runtime, after evaluating the Playwright CLI against the kvart stack.
