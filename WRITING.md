@@ -16,7 +16,7 @@ can be published without a scrub pass.
 - No person names other than **Siim** (the operator). Colleagues appear as roles: "the CIO",
   "a PM", "the code owner", "a staff engineer at a large marketplace".
 - Third-party tools and public sources may be named: cleat, consort, memspec, enola, ripwire,
-  ponytail, the context standard, Claude Code, Codex, Gemini, Uber Engineering, Pipedrive.
+  ponytail, chisle, the context standard, Claude Code, Codex, Gemini, Uber Engineering, Pipedrive.
 - No credentials, tokens, hostnames, ports of private machines, or private URLs.
 
 ## Evidence classes
