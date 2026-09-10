@@ -35,7 +35,7 @@ flowchart TB
     subgraph ERGO["off the critical path: ergonomics, not gates"]
         direction TB
         L1["Orientation map · sensor 1<br/>ripwire · pre-write<br/>rank symbols before opening a file"]
-        L2["YAGNI ladder · sensor 2<br/>ponytail · during write<br/>7 rungs before code exists"]
+        L2["YAGNI ladder · sensor 2<br/>chisle · during write<br/>7 rungs before code exists"]
     end
     subgraph GATES["gates: each refuses with a file, a line and a reason"]
         direction TB
@@ -67,7 +67,7 @@ this picture.
 | Layer | Tool | When | Refuses | Class |
 |---|---|---|---|---|
 | Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
-| YAGNI ladder (sensor 2) | ponytail | during write | over-building, advisory only | `designed` |
+| YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `designed` |
 | The net | tests, coverage, mutation | post-write | silent behaviour change | `measured` |
 | Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
 | Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
