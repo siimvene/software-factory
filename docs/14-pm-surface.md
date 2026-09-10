@@ -83,6 +83,13 @@ the human only when the answer is genuinely not determinable from either, and sa
 "Gated" below means the skill refuses to proceed or requires an explicit confirmation before a
 write or a promotion. "Advisory" means it produces something a person then decides on.
 
+Five of the seventeen ship in this repository, anonymised from the reference implementation:
+`ticket`, `readiness-evaluator`, `task-improver`, `task-splitter` and `graduate`, under
+[templates/skills](../templates/skills/). They are the chain that turns intent into the
+structured input every later stage reads: a ticket with numbered examples, scored to the
+threshold, split when too large, and graduated into the team layer. The other twelve follow the
+same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopter's to port.
+
 | Skill | Job | Inputs, in read order | Output artifact | Loop position | Kind |
 |---|---|---|---|---|---|
 | `ingest` | Pull a source into the workspace and, first, find what the workspace already says about it | the source (file, wiki page, tracker item, URL, code grep), then the whole workspace for existing coverage | an entry in `Ingest Log.md` plus writes into `discovery/`, `reference/` or the tracking files, after confirmation | SPEC intake | gated: shows the plan and writes only on confirmation |

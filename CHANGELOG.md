@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.7 (2026-09-10)
+
+The skills ship, and the setup sequence becomes a list you tick.
+
+- `templates/skills/`: ten skills a team copies on day one, anonymised from the reference
+  implementation and the group's spec-repos plugin, one directory per skill with scripts beside
+  it, indexed in `templates/skills/README.md`. The PM chain that produces the structured input
+  every later stage reads: `ticket`, `readiness-evaluator`, `task-improver`, `task-splitter`,
+  `graduate`. The spec chain: `retrogenerate-specs` (with the owner-review, check and
+  findings-file steps the reference run added), `update-specs-for-commits`,
+  `check-specs-references`. Two new: `check-specs`, the three-check spec checker whose original
+  lived in a scratch directory and was gone by cycle 1, tested against a clean and a dirty
+  folder before landing; and `mine-decision-records`, the Day 1 ADR procedure of 17-onboarding
+  §6 made repeatable.
+- `docs/18-flightlist.md`: the setup sequence for the next project as legs with a mechanical
+  check, an evidence pointer and an owner each: pre-flight decisions, Day 0 repositories,
+  Day 1 knowledge plane, gate wiring, sandbox and identity, the PM surface, the first cycle,
+  verify on arrival. A skipped leg is a named shortcut in ADR 0001 the day it is skipped.
+- `docs/12-adoption-playbook.md`, `docs/14-pm-surface.md`, `docs/16-inventory.md`,
+  `docs/17-onboarding.md`, `README.md`, `WRITING.md`: pointers to the skills and the list;
+  `templates/skills/` joins the file taxonomy.
+- Ported skills keep their logic; every em dash is gone, every employer, product, person and
+  example ticket key is generic, every frontmatter `name` matches its directory.
+
 ## 0.2.6 (2026-09-10)
 
 The spec becomes a VERIFY input, proposed.
