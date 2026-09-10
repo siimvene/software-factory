@@ -11,12 +11,18 @@ The spec becomes a VERIFY input, proposed.
   including the one that looked obvious (compare with the ticket text) and the one that looked
   disciplined (fold every decision in first); both rejected with reasons.
 - `docs/06-verify-gate.md`: "Spec conformance" section: injected spec pack to every leg, the
-  scope-drift class both ways, REFINE-SPEC, the delta as a receipt-checked pre-push gate, and
+  spec-drift class both ways, REFINE-SPEC, the delta as a receipt-checked pre-push gate, and
   the test the class must pass before it is trusted.
 - `docs/02-loop.md`: REFINE-SPEC in the disposition list; LEARN item 1 names the receipt.
 - `docs/03-operating-contract.md`: §11, a decision that changes behaviour also goes into the
   delta; enforcement table row.
 - `docs/16-inventory.md`, `STATUS.md`, `adr/README.md`: the rows.
+- Merge note: a parallel session designed the same finding class the same evening as a
+  "Spec-conformance finding" section in 06, from the principles (NOTE default, flag never fix,
+  test the test). That section is kept as the home of the mechanism and this entry's material
+  is folded into it; its assumption that the reviewer already holds the spec was checked and
+  corrected, the class keeps its name `spec-drift`, and adr/0009 is the decision record for
+  both.
 
 ## 0.2.5 (2026-09-10)
 
