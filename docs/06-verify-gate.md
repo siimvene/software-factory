@@ -80,18 +80,26 @@ directly: "intended-vs-derived reconciliation... the highest-value mechanical si
 this one compares the diff, at review time, against the ticket or spec-delta that motivated it:
 intent versus output, not output versus itself.
 
-Adopt-don't-rebuild applies to the check, not just its plumbing (principle 8): the reviewer
-already reads the same team-context repo and rule packs as the generator
-([04-knowledge-plane](04-knowledge-plane.md)), so a linked spec-delta is already in its context
-whenever the work loop's story-creation-is-spec-delta-creation step was actually followed. The
-gap is one line in the rule pack, not missing context plumbing.
+What the reviewer actually has in front of it was checked rather than assumed
+`[measured 2026-09-10]`: the reviewer instruction asks for correctness, security and edge cases
+over the diff plus the injected rule packs; the tool's own three packs carry no spec rule; the
+spec lives in the team-context repository, which the code checkout does not contain; and one
+leg reads only the diff payload. So a linked spec delta is not already in the reviewer's
+context, and the check cannot be one line in a pack on its own. The plumbing is small but real:
+the feature's spec, the ticket's numbered examples and the escalation decisions taken so far
+travel to every leg as one more injected pack, the same mechanism the rule packs already use.
+The rule itself is then one paragraph. In cycle 4 the repo-reading leg raised the
+management-company scope question from the code alone, the principal dismissed it "by the spec"
+and escalated it, and the thread was posted at 12:53Z, after all three panels had finished; with
+the spec in front of it the finding would have cited the section `[measured 2026-09-09]`.
 
 Proposed rule-pack line, added to item 2:
 
-> Cross-check this diff against the linked spec-delta or ticket acceptance check. Report every
-> addition, omission or behavioural divergence as a `spec-drift` finding. Default severity NOTE
-> unless the divergence also breaks the acceptance check, in which case classify it by the normal
-> CRITICAL / SERIOUS / MINOR rule.
+> Cross-check this diff against the injected spec and the ticket's numbered examples. Report
+> every addition, omission or behavioural divergence, in either direction, as a `spec-drift`
+> finding citing the spec section or the example number. Default severity NOTE unless the
+> divergence breaks a numbered example or lands on a money, tenant or identity path, in which
+> case classify it by the normal CRITICAL / SERIOUS / MINOR rule.
 
 Three constraints before this earns a `[measured]` tag, each already paid for elsewhere in this
 design and reused here rather than relearned:
@@ -105,17 +113,26 @@ design and reused here rather than relearned:
 - **Flag, never fix (principle 4; adr 0005, adr 0006).** The reviewer proposes a divergence; it
   does not edit the spec-delta to match the code it just reviewed. The silent-mutation failure
   that moved merge authority off the loop (adr 0006) recurs one layer up the moment a reviewer is
-  allowed to resolve its own finding.
+  allowed to resolve its own finding. The adjudicator, not the reviewer, gives intended drift the
+  disposition REFINE-SPEC: it is written into the sister spec delta, and into the escalation
+  thread when it is a product call, and the finding closes when the delta records it. Cycle 4's
+  five refinements, written into the delta by hand after ship, become gate output.
 - **Test the test before it ships as a standing rule (principle 3).** No data yet on whether any
   reviewer leg reliably tells real drift from noise. Recall on this panel is backend-dependent by
   a wide margin on ordinary findings (4/5 vs 2/5 vs 0/5 on identical known defects
   `[measured 2026-09-07]`); run the proposed line once against a diff with deliberately injected
   drift and once against a clean diff before it becomes a standing rule-pack entry, not after.
+  If more than half of its findings on the first live cycle are dismissed, it is demoted to
+  advisory and reworked.
 
-Prerequisite this depends on and does not yet universally have: a spec-delta to diff against.
-Where story creation produced only a ticket description rather than a committed spec-delta, the
-reviewer would be diffing the code against two sentences, a weaker and noisier signal than the
-ADR 0007 sister-spec mechanism this is meant to complement, not substitute for.
+Prerequisite this depends on and does not yet universally have: a spec delta to diff against.
+Cycles 4 and 5 both shipped with the delta still open `[measured 2026-09-10]`, so the delta PR
+is opened at gate time (a stub is enough) and becomes a receipt-checked pre-push gate in the
+same shape as the browser pass: a behaviour-changing diff without a delta receipt for its tree
+does not push. Where story creation produced only a ticket description rather than a committed
+spec, the reviewer would be diffing the code against two sentences, a weaker and noisier signal
+than the ADR 0007 sister-spec mechanism this complements and does not substitute for. The
+decision record is [adr/0009](../adr/0009-the-spec-is-a-gate-input.md).
 
 ## The three axes
 
@@ -134,32 +151,6 @@ A review counts as a consort pass only if all three hold `[measured 2026-08-19]`
 The side-pass is in addition to the code review, not instead of it. Cross-repo mirrors inherit a
 review only when the PR names the reviewed source diff and the mirror is mechanical; anything
 carrying its own logic is new code.
-
-## Spec conformance `[proposed]`
-
-The panel reads the diff, the repository and the rule packs. It does not read the spec, which
-lives in the team-context repository, so the one check it cannot make is whether the diff does
-what the feature is supposed to do. Cycle 4 showed the shape of the gap: the repo-reading leg
-raised the management-company scope question from the code alone, the principal dismissed it
-"by the spec" and escalated it, and the escalation thread was posted at 12:53Z, after all three
-panels had finished `[measured 2026-09-09]`. The only party holding the spec was the authoring
-session.
-
-Proposed mechanism ([adr/0009](../adr/0009-the-spec-is-a-gate-input.md)):
-
-- The feature's spec, the ticket's numbered examples and the escalation decisions so far travel
-  to the reviewer as one more injected pack, so every leg sees them, the diff-only leg included.
-- A finding class, scope drift, in both directions, each finding citing the spec section.
-- A disposition, REFINE-SPEC: intended drift is written into the sister spec delta and the
-  finding closes when the delta records it. Cycle 4's five hand-written refinements (PR 10)
-  become gate output.
-- The delta PR is opened at gate time and receipt-checked before push, the same shape as the
-  browser pass above.
-
-Test the class before trusting it: a planted drift on a known diff must be flagged by at least
-one leg, and a known-conformant diff must produce zero scope findings. A class that cannot fail
-is noise with a name. If more than half of its findings on the first live cycle are dismissed,
-it is demoted to advisory and reworked.
 
 ## No re-run loop
 

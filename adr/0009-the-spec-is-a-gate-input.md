@@ -6,6 +6,11 @@
 
 ## Context
 
+The original work-loop design named "intended-vs-derived reconciliation" as the highest-value
+mechanical signal `[designed 2026-07-21]`; no cycle since has run it. A parallel design note of
+2026-09-10 in [06-verify-gate](../docs/06-verify-gate.md) reached the same finding class from the
+principles; this record folds the two and adds the plumbing that note assumed was present.
+
 ADR 0007 makes specs the implemented state and keeps them current by a sister PR on every
 behaviour-changing code PR, at LEARN, after merge. Two consequences were measured on kvart.
 
@@ -35,12 +40,17 @@ We will make the spec a VERIFY input, not only a LEARN output.
 
 1. The review panel receives the feature's current spec, the ticket's numbered examples and the
    escalation-thread decisions taken so far, injected as one more pack so every leg sees them,
-   including a leg that reads only the diff payload. Findings gain a class, scope drift, in
+   including a leg that reads only the diff payload. Findings gain a class, `spec-drift`, in
    both directions: behaviour in the diff the spec does not describe, and spec behaviour the
-   diff claims and does not deliver. Each cites the spec section.
-2. Dispositions gain REFINE-SPEC: the drift is intended, so it is written into the sister spec
-   delta (and into the escalation thread when it is a product call), and the finding closes
-   when the delta records it. Cycle 4's five hand-written refinements become gate output.
+   diff claims and does not deliver. Each cites the spec section or the example number. Default
+   severity is NOTE, routed to the escalation channel rather than failing the gate, because
+   mid-build deviation is the normal shape of discovery; it is classified by the ordinary rule
+   only when it breaks a numbered example or lands on a money, tenant or identity path.
+2. The reviewer flags and never fixes (ADR 0005, ADR 0006, one layer up). Dispositions gain
+   REFINE-SPEC, given by the adjudicator: the drift is intended, so it is written into the
+   sister spec delta (and into the escalation thread when it is a product call), and the
+   finding closes when the delta records it. Cycle 4's five hand-written refinements become
+   gate output.
 3. The sister spec delta PR is opened at gate time (a stub is enough) and becomes a
    receipt-checked pre-push gate in the same shape as the browser pass: a behaviour-changing
    diff without a delta receipt for its tree does not push. The pre-build spec is merged, or
@@ -84,3 +94,6 @@ Scope: behaviour-changing diffs. A pure refactor carries a delta that says "none
   "five refinements the shipped code made to the text"); the cycle 5 handoff, open item 1.
 - The review tool's reviewer instruction and its rule-pack injection block, which carry no
   spec input today.
+- Reviewer recall on this panel is backend-dependent by a wide margin on ordinary findings, 4 of
+  5 against 2 of 5 against 0 of 5 on identical known defects `[measured 2026-09-07]`, which is
+  why the class is tested against a planted drift and a clean diff before it stands.
