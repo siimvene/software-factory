@@ -82,11 +82,11 @@ human review minutes
 
 This ratio captures what the factory is supposed to do: convert model capability into useful,
 reviewable work without consuming equal human attention on the way out. It is the single number
-to report upward — it compresses cost (denominator) and quality (numerator) into one signal
+to report upward: it compresses cost (denominator) and quality (numerator) into one signal
 `[field: Ichigo, "Harness Engineering", 2026-08-29]`.
 
 Numerator: merged PRs where a human said yes (not reverted, not bounced from gate). Denominator:
-wall-clock minutes a person spent reading, deciding, and merging — idle wait excluded. A factory
+wall-clock minutes a person spent reading, deciding, and merging, idle wait excluded. A factory
 that produces 20 PRs in an afternoon of human attention and a factory that produces 5 PRs after a
 week of back-and-forth have the same accepted-output count; the ratio tells them apart.
 
