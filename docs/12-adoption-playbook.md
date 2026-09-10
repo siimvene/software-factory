@@ -19,7 +19,8 @@ you skip.
 ## Turn 0: adopt (one day for a healthy repo)
 
 The full runbook, with the kvart numbers, is [17-onboarding](17-onboarding.md). The table
-below is the checklist form.
+below is the short checklist; the tickable one, leg by leg with evidence columns and the gate
+and sandbox wiring included, is [18-flightlist](18-flightlist.md).
 
 | Step | Check |
 |---|---|
