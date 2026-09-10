@@ -29,6 +29,10 @@ implemented state.
   which is a measured finding about the friction, not a reason to drop the mechanism.
 - Follow-ups: install the spec-update and spec-check skills so the sister PR is generated,
   not hand-edited; measure whether a solo owner keeps writing memory under promote-PR friction.
+  Distinct from that spec-check skill (which regenerates spec from merged code): a
+  review-time spec-conformance finding, comparing a diff against its own spec-delta before
+  merge, is designed but not yet measured; see
+  [06-verify-gate.md](../docs/06-verify-gate.md#spec-conformance-finding-designed-2026-09-10-not-yet-measured).
 
 ## Alternatives rejected
 
