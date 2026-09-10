@@ -102,8 +102,9 @@ Order matters and is the subject of two documents:
    `[designed 2026-09-09]`. A receipt is a discipline file, never an authorisation token.
 
 Findings are classified (CRITICAL, SERIOUS, MINOR), spot-verified against code, and given a
-disposition (ACCEPT-FIX, ACCEPT-DEFER, ACKNOWLEDGE, DISMISS). CRITICAL and SERIOUS are fixed
-before push. Bootstrap failures (a ratchet red on pre-existing code) are reported separately
+disposition (ACCEPT-FIX, ACCEPT-DEFER, ACKNOWLEDGE, DISMISS; REFINE-SPEC for intended drift
+from the spec, see [06-verify-gate](06-verify-gate.md) `[proposed]`). CRITICAL and SERIOUS are
+fixed before push. Bootstrap failures (a ratchet red on pre-existing code) are reported separately
 from feature failures and never "fixed" by editing a baseline.
 
 ## SHIP
@@ -135,7 +136,9 @@ from feature failures and never "fixed" by editing a baseline.
 
 1. **Specs.** A behaviour-changing PR is incomplete until its sister spec delta is staged in
    the team-context repo. Specs are derived from merged code, never hand-edited. Pure
-   refactors need none, and say so.
+   refactors need none, and say so. Proposed: the delta PR is opened at gate time and
+   receipt-checked before push, so it cannot lag the merge; cycles 4 and 5 both shipped with
+   the delta still open `[measured 2026-09-10]`. See [adr/0009](../adr/0009-the-spec-is-a-gate-input.md).
 2. **Memory.** Facts, decisions and procedures discovered during the turn are written at the
    moment of discovery into local scratch, and promoted to the team store by a batched,
    human-reviewed PR. Anchored claims the diff invalidated are superseded in the same turn.
