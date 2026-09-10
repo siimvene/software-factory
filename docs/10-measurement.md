@@ -72,6 +72,27 @@ the top model tier is half the spend and it is unproven that all of it was hard-
 An earlier estimate of $200 to 500 per slice was 2 to 5× too high; the corrected unit is an
 orchestrator tree, not a bare agent.
 
+## The headline ratio
+
+```
+accepted outputs
+----------------
+human review minutes
+```
+
+This ratio captures what the factory is supposed to do: convert model capability into useful,
+reviewable work without consuming equal human attention on the way out. It is the single number
+to report upward — it compresses cost (denominator) and quality (numerator) into one signal
+`[field: Ichigo, "Harness Engineering", 2026-08-29]`.
+
+Numerator: merged PRs where a human said yes (not reverted, not bounced from gate). Denominator:
+wall-clock minutes a person spent reading, deciding, and merging — idle wait excluded. A factory
+that produces 20 PRs in an afternoon of human attention and a factory that produces 5 PRs after a
+week of back-and-forth have the same accepted-output count; the ratio tells them apart.
+
+Track it alongside the four per-turn numbers. The per-turn numbers diagnose; the ratio is the
+mandate signal.
+
 ## Baselines that must exist before agents dominate
 
 Once agents author most PRs the comparison point is gone. Take these on human-written code
