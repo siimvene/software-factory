@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.4 (2026-09-10)
+
+Layer 2 tool replaced; ticket template extended; headline measurement ratio added.
+
+- `docs/05-sensor-stack.md`: Chisle replaces ponytail as the YAGNI-ladder tool. Head-to-head
+  benchmark added: Chisle 52 % total / 1 / 20 backfires / 173 % worst case; ponytail 68 % /
+  8 / 20 (40 %) / 227 %. The 40 % backfire rate was the deciding factor for unattended
+  operation. Chisle also adds prose compression and a `PostToolUse` hook that reduces the input
+  side (tool output is 67.5 % of context content, re-billed on every later request). Caveats:
+  benchmarked on Haiku and Sonnet; verify on stronger models and domain tasks; vet into the
+  org catalog before production adoption.
+- `STATUS.md`: YAGNI ladder row updated to Chisle with the same caveats.
+- `templates/ticket.md`: "Escalation triggers" section added. Without an explicit list of
+  escalate-when conditions the agent infers its own bail-out criteria; the section makes them a
+  first-class part of the spec `[field: Ichigo, "Harness Engineering", 2026-08-29]`.
+- `docs/10-measurement.md`: Headline ratio added — `accepted outputs / human review minutes`.
+  Numerator is merged PRs a human said yes to; denominator is review-active minutes (idle wait
+  excluded). The per-turn numbers diagnose; this ratio is the mandate signal.
+
 ## 0.2.3 (2026-09-09, evening)
 
 The evening's eight loop-infrastructure PRs on kvart, and two decisions the day forced.
