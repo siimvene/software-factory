@@ -155,7 +155,9 @@ record; the channel is where people see it. The ticket carries a `needs-decision
 `agent-decided` label so a board scan shows the class without reading comments. A decision
 that arrives in the thread is written back to the ticket by the agent until the channel-to-
 ledger write-back exists. Measured lapse, 2026-09-09: two product questions and two dismissals
-filed as a ledger comment only; nobody would have seen them.
+filed as a ledger comment only; nobody would have seen them. A decision that changes what the
+feature does is also written into the sister spec delta, not only the thread and the ledger
+`[proposed, adr/0009]`.
 
 ## Where each rule is enforced today
 
@@ -169,3 +171,4 @@ filed as a ledger comment only; nobody would have seen them.
 | tripwire diff surfaced | behaviour; a hook that diffs the paths is the upgrade | advisory |
 | memory write at discovery | post-commit hook surfaces entries touching changed files | measured |
 | eval suite on contract changes | none yet | proposed |
+| sister spec delta before push | receipt-checked pre-push gate, same shape as the browser pass; behaviour only today | proposed |
