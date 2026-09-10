@@ -135,6 +135,32 @@ The side-pass is in addition to the code review, not instead of it. Cross-repo m
 review only when the PR names the reviewed source diff and the mirror is mechanical; anything
 carrying its own logic is new code.
 
+## Spec conformance `[proposed]`
+
+The panel reads the diff, the repository and the rule packs. It does not read the spec, which
+lives in the team-context repository, so the one check it cannot make is whether the diff does
+what the feature is supposed to do. Cycle 4 showed the shape of the gap: the repo-reading leg
+raised the management-company scope question from the code alone, the principal dismissed it
+"by the spec" and escalated it, and the escalation thread was posted at 12:53Z, after all three
+panels had finished `[measured 2026-09-09]`. The only party holding the spec was the authoring
+session.
+
+Proposed mechanism ([adr/0009](../adr/0009-the-spec-is-a-gate-input.md)):
+
+- The feature's spec, the ticket's numbered examples and the escalation decisions so far travel
+  to the reviewer as one more injected pack, so every leg sees them, the diff-only leg included.
+- A finding class, scope drift, in both directions, each finding citing the spec section.
+- A disposition, REFINE-SPEC: intended drift is written into the sister spec delta and the
+  finding closes when the delta records it. Cycle 4's five hand-written refinements (PR 10)
+  become gate output.
+- The delta PR is opened at gate time and receipt-checked before push, the same shape as the
+  browser pass above.
+
+Test the class before trusting it: a planted drift on a known diff must be flagged by at least
+one leg, and a known-conformant diff must produce zero scope findings. A class that cannot fail
+is noise with a name. If more than half of its findings on the first live cycle are dismissed,
+it is demoted to advisory and reworked.
+
 ## No re-run loop
 
 Once a review has covered a diff, applying that review's own CRITICAL and SERIOUS fixes does not

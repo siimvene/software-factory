@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.6 (2026-09-10)
+
+The spec becomes a VERIFY input, proposed.
+
+- `adr/0009`: the spec is a gate input; scope drift is a finding with its own disposition.
+  Context from cycle 4: the panels ran before the decisions existed, the scope question came
+  from code and was adjudicated by the authoring session alone, the pre-build spec and its
+  delta were both unmerged; cycle 5's delta open at handoff. Four alternatives weighed,
+  including the one that looked obvious (compare with the ticket text) and the one that looked
+  disciplined (fold every decision in first); both rejected with reasons.
+- `docs/06-verify-gate.md`: "Spec conformance" section: injected spec pack to every leg, the
+  scope-drift class both ways, REFINE-SPEC, the delta as a receipt-checked pre-push gate, and
+  the test the class must pass before it is trusted.
+- `docs/02-loop.md`: REFINE-SPEC in the disposition list; LEARN item 1 names the receipt.
+- `docs/03-operating-contract.md`: §11, a decision that changes behaviour also goes into the
+  delta; enforcement table row.
+- `docs/16-inventory.md`, `STATUS.md`, `adr/README.md`: the rows.
+
 ## 0.2.5 (2026-09-10)
 
 Sensor 2 changes tool: chisle replaces ponytail on the reference implementation, same ladder.
