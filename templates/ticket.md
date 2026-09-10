@@ -68,6 +68,16 @@ implementation instructions.>
      blocks the ticket from reaching Ready; it does not become a decision an agent makes
      on its way past. -->
 
+## Escalation triggers
+
+<!-- Conditions that stop execution and surface to a human immediately. Without this list the
+     agent infers its own bail-out criteria, which is how scope creep and silent substitution
+     happen. Write at least one. -->
+
+- Escalate when: <condition that requires a human decision, e.g. a schema change appears necessary>
+- Escalate when: <tests fail three times for the same reason without a clear fix>
+- Escalate when: <the desired result conflicts with an existing product rule or invariant>
+
 ## Approval
 
 - Approved version: <vN>, <YYYY-MM-DD>
