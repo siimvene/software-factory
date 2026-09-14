@@ -1,7 +1,7 @@
 # Sensor stack
 
 Four mechanical, model-free layers around every change, in the agent's own loop, before any
-model reviews anything. Together they substitute for the human eyes a dark factory removes.
+model reviews anything. Together they substitute for the human eyes a software factory removes.
 Each is deterministic, near-zero cost per run, and produces structured output a person or a
 dashboard can read.
 

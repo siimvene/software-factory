@@ -1,4 +1,4 @@
-# Dark factory
+# Software factory
 
 A reference design for lights-out software delivery: humans specify outcomes and inspect
 evidence, machines build, verify and ship, and every human touchpoint is a decision on
