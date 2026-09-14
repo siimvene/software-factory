@@ -36,6 +36,11 @@ replays past incidents against the changed contract.
 - Commit the real change before any throwaway commit in the same tree. A `git commit -am` probe
   swallows an uncommitted fix and the next `git reset --hard` drops it. Recovery:
   `git checkout <probe-sha> -- <paths>`.
+- Open the ledger at pickup, not at the PR tail. Before substantive work, pick or create the
+  ticket, move it to In Progress, and carry its key in the branch so the tracker sync transitions
+  it on its own. The PR check that requires a key is the backstop, not the trigger; the
+  ticketless-PR escape hatch is for genuine chores and reverts only. Enforcement that lives only
+  at the gate lets the ledger open too late (measured miss, 2026-09-14).
 
 ## 3. Verification
 
