@@ -2,7 +2,7 @@
 
 Everything an agent reads that is not the code, where each piece lives, who may write it, and
 how it stays true. The design follows a repository context standard with four layers; this
-document says what the layers are for in a dark factory and what the kvart adoption measured.
+document says what the layers are for in a software factory and what the kvart adoption measured.
 
 ## The four layers
 

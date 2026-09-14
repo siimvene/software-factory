@@ -9,7 +9,7 @@ It was derived from one adoption, a 75-module Gradle Java core owned by a group 
 companies, run between 2026-09-04 and 2026-09-07. Every number below carries the date it
 was observed. The sequence generalises; the numbers are that core's.
 
-## (a) A dark factory over an un-netted core is a crash factory
+## (a) A software factory over an un-netted core is a crash factory
 
 The loop in [02-loop](02-loop.md) moves review load off people and onto gates. That trade
 only works if the gates can actually fail. Over a core with no coverage measurement, no
