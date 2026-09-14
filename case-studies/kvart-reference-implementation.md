@@ -249,7 +249,7 @@ the spec and a design handoff in the team-context repo.
 4. What a solo owner drops (promote PRs, separate PM and dev sessions, installed spec skills,
    branch protection) is the list of what a team must keep, and each is now a measured shortcut
    rather than an opinion.
-5. The ratchet guard held against its own operator. That is the property a dark factory needs
+5. The ratchet guard held against its own operator. That is the property a software factory needs
    from every gate.
 
 ## Open at the end of the window
