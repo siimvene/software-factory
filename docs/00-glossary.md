@@ -2,11 +2,11 @@
 
 Terms are defined once, here, in the sense this design uses them.
 
-**Dark factory.** A delivery line that runs lights-out: humans specify outcomes and
+**Software factory.** A delivery line that runs lights-out: humans specify outcomes and
 constraints, machines build, inspect and ship, and people inspect output rather than process.
 "Dark" describes where the humans are not, not the absence of supervision on risk.
 
-**Flywheel.** The property that makes a dark factory accelerate rather than merely automate:
+**Flywheel.** The property that makes a software factory accelerate rather than merely automate:
 the substrates (verification net, knowledge plane, gates, pattern library) compound with every
 feature shipped, so turn N+1 is cheaper and safer than turn N.
 

@@ -1,6 +1,6 @@
 # How this repository is written
 
-This repository is the reference design for a dark factory: an agentic software delivery
+This repository is the reference design for a software factory: an agentic software delivery
 line where humans specify outcomes and inspect evidence, and machines build, verify and
 ship. It is written to be adapted by any company. Every rule below exists so that the text
 can be published without a scrub pass.

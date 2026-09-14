@@ -1,7 +1,7 @@
 # Measurement
 
 What to measure, what to baseline before agents dominate, what the reference implementation
-measured, and the bar for "it paid off". A dark factory without these numbers is a story.
+measured, and the bar for "it paid off". A software factory without these numbers is a story.
 
 ## The four numbers per turn
 
