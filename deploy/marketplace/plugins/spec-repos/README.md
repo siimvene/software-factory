@@ -24,4 +24,4 @@ Update the specs for this story: /update-specs-for-commits ../ticketing-system-t
 
 ## Maintainers
 
-- Adam Walczak <adam.walczak@kicket.com>
+- the group plugin catalog maintainer (name and address removed in this vendored copy)

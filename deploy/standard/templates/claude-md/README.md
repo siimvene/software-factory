@@ -14,4 +14,4 @@ Keep CLAUDE.md concise — long files get skimmed. When a prompt goes off the
 rails, capture the lesson in CLAUDE.md so the whole team avoids the same trap.
 
 Source: graduated from the GAT "Preparations before you start working on first
-task" page (Adam Walczak); this repo is the canonical copy.
+task" page (a group engineer); this repo is the canonical copy.

@@ -91,4 +91,4 @@ migrations from the changelog, and leaves your own content and your `CLAUDE.md` 
 
 ## Maintainers
 
-- Adam Walczak <adam.walczak@kicket.com>
+- the group plugin catalog maintainer (name and address removed in this vendored copy)
