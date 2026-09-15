@@ -112,6 +112,17 @@ Quality debt compounds faster than it is visible: a characterization net preserv
 contradictory specs get implemented faithfully, and without a revert-rate baseline nobody sees
 the regression until customers do.
 
+## Rework after the first review
+
+Whether design before the build pays is a measurable question. Two numbers per PR: review rounds,
+and the post-review rework share, lines touched by fix passes after the first review divided by
+lines in the merged diff. Cycle 2: one fix pass of 2 commits, 37 % of dev-hat wall-clock
+`[measured 2026-09-07]`; the trial: 2 review rounds, 1 of 4 hands rounds spent on a redesign
+`[measured 2026-09-05]`. The bar for the program design note ([02-loop](02-loop.md)): on sized
+tickets the rework share falls and the review share of wall-clock with it. If neither moves over
+the first five sized tickets, the note is overhead and the sizing rule is wrong `[proposed]`.
+Idle waits and CI reruns are excluded, as everywhere.
+
 ## The honest fix:feat ratio
 
 Raw fix:feat lies in a review-gated repo: about half of fix commits are the review apparatus
@@ -168,6 +179,7 @@ the leak (2026-09-08, about 11,000 calls on the wrong tier since 2026-08-13).
 | spend | the usage CLI per config dir (dedupe by message id; per-account split is not recoverable when session files are mirrored), provider consoles, a daily threshold |
 | surface | `git status`, `git diff --stat`, the scope-spillover check, read-only mounts |
 | merge conflicts per stream | dry-run merges per stream |
+| design quality | review rounds per PR; post-review rework share of the merged diff |
 | net strength | mutation kill rate per module as killed over all mutants (killed over checked hides the unexercised ones), money-surface coverage |
 | parity | replay pass rate per flow |
 | review quality | F1 on the benchmark set |

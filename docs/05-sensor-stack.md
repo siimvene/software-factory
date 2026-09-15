@@ -78,6 +78,7 @@ What is wired where, as of 2026-09-07:
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
 | 5a | e2e receipt gate | scoped browser QA, receipt per git tree, pre-push check | wired `[measured 2026-09-09]` | not wired |
 | 5b | sonar receipt gate | local SonarQube scoped by changed sources, receipt per tree plus project set | built, not yet exercised end to end `[designed 2026-09-09]` | not wired |
+| 3a | fail-on-base check | new or changed tests red on the merge base with the branch's tests applied, green on the branch, exemptions declared, failure kind recorded | not wired; the gate report's `red-before` row is a hand step `[proposed]` | not wired |
 
 The provable and heuristic split in layer 4 matters for gating. Only `layers`, `cycles` and
 `intent` report at confidence 1.00, so those three are the recommended starting gate; the rest
@@ -227,7 +228,8 @@ that the gate ran green on this exact tree, and any later commit voids it. The r
 authorisation token: it cannot be hand-written to satisfy the hook, because it is bound to a tree the
 gate actually produced. Check: the pre-push hook reads the receipt and the tree id it names before
 letting the push proceed `[measured 2026-09-09]`. Two of these run on kvart, the browser QA gate and
-the static-analysis gate, both detailed in [06-verify-gate](06-verify-gate.md).
+the static-analysis gate, both detailed in [06-verify-gate](06-verify-gate.md). The fail-on-base check
+below takes the same shape when its tests need the database.
 
 ### Mutation kill rate as a ratchet on the touched modules
 
@@ -273,6 +275,55 @@ Known limits: a kill rate says nothing about copy-paste (the 100 % module with 6
 and are accepted by name, and async or time-dependent paths produce flaky kills that must be
 excluded explicitly rather than retried into green. The gate is trusted only after it has refused
 one real PR for a real drop (rehearse the blocked direction, below).
+
+### Fail-on-base: every new or changed test is red on the merge base
+
+Coverage is the known-true case and mutation the known-false case for the code. The change has
+a known-false case too: the code as it was before the change. A test that ships with a change
+and also passes on the merge base proves something that was already true; it is not a test of
+this change, whatever its name says. The loop has had the rule since cycle 1 ("tests first, red
+on the unfixed code") and the gate report has had a `red-before` row, and both were done by
+hand: a fix reverted, a test rerun, a line written `[measured 2026-09-07]`. Principle 1 says a
+rule is written twice, so this is the check. The measured cost of not having it is the trial's
+MINOR: a behavioural test that only proved a function was unused, where a `list(...)` would have
+passed `[measured 2026-09-05]`.
+
+Design, `[proposed]`:
+
+- **Select by the diff.** The test functions added or changed against the merge base, by file
+  and node id, read from the diff itself; never a hand-named set (cycle 4's rule for the related
+  set applies here too).
+- **Run them at the base with the branch's tests applied.** A temporary worktree at the merge
+  base, the branch's test files copied over it, then only the selected node ids run with the test
+  cache disabled. Expected: every selected test fails. Then the same ids on the branch: every one
+  passes. Two results per test, both recorded.
+- **Record why it failed.** An assertion failure on the base is the strong witness: the test
+  reached the behaviour and found it absent. A collection or import error (the test cannot load
+  without the new module) is a weak witness: it proves the test needs the change, not that it
+  detects it. The receipt shows the kind; a weak witness on a money, tenant or identity path is a
+  finding, not a pass.
+- **Exemptions are declared, never inferred.** Three legitimate cases pass on the base: a
+  characterization test that locks existing behaviour on purpose (the legacy-core bootstrap in
+  [09-legacy-adoption](09-legacy-adoption.md)), a test moved or renamed by a refactor, and a test
+  added for a defect fixed by an earlier commit on the same branch. Each is named with its reason
+  in the program design note (section 6) or the plan, and the check reads that list. An undeclared
+  pass on the base fails the check. A test the diff deletes is reported on its own line every
+  time: the quality floor forbids deleting a test to make new work pass, and this is where that
+  becomes visible.
+- **Where it fires.** On the Stop hook when the selected tests need no database or browser
+  (seconds: the tests are the diff's own). Otherwise as a receipt-checked pre-push gate in the
+  shape the browser and static-analysis passes use, on the self-provisioning test database. The
+  receipt names the merge base, the node ids, both results per id and the failure kind.
+- **Rehearse both directions before trusting it.** Plant a test that passes on the base and
+  confirm the refusal; run a real red-first test and confirm the pass; declare a characterization
+  test and confirm it is allowed with its label in the receipt.
+
+What it is not: mutation. Mutation asks whether the existing suite notices a planted change in
+the code; fail-on-base asks whether the new tests notice the change they shipped with. A change
+can pass both and still be wrong (the trial's export was byte-identical and its shape was the
+defect); that is the reviewer's job. Cost: the selected tests run twice plus one worktree
+checkout; a handful of unit tests is seconds, the database-coupled ones the testbench's usual
+minute. The check is trusted only after it has refused one real test for passing on the base.
 
 ### Rehearse the blocked direction
 
