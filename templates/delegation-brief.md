@@ -16,6 +16,8 @@
 
 - Working tree: <absolute path, or the worktree to create first>
 - Files to read: <paths>
+- Program design note (sized tickets): <path>; this brief cites its sections by number, and a
+  needed deviation from section 4 is an escalation, not a choice
 - Files that may be changed: <paths>
 - Files that must not be touched: <paths>
 - Where artifacts go: <directory for logs, reports and screenshots>

@@ -53,6 +53,12 @@ mutation as killed over all mutants; killed over (killed plus survived) hides th
 and read 100 % on a module 3.6 % of whose mutants were ever exercised. The gate this argues
 for is in [05-sensor-stack](05-sensor-stack.md), the net.
 
+The change has a known-false case of its own: the code before it. A test shipped with a change
+must fail on the merge base and pass on the branch; one that passes on both proves something
+that was already true. The loop's `red-before` row has been a hand step since cycle 1
+`[measured 2026-09-07]`; its check is the fail-on-base gate in
+[05-sensor-stack](05-sensor-stack.md) `[proposed]`.
+
 ## 4. Humans inspect output, not process
 
 Every human touchpoint is a decision on evidence: an approved ticket, an accepted behaviour, a

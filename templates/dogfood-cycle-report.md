@@ -11,6 +11,7 @@
 - Code PR: `<repo>#<n>` (`<short sha>`, branch `<branch>`)
 - Sister spec PR: `<context repo>#<n>` (branch `<branch>`)
 - Merge authority: <role>. Agents open PRs; they never merge their own.
+- Review rounds: <n>. Post-review rework share: <lines changed after the first review / merged diff lines>
 
 ## Wall-clock per stage
 
@@ -24,11 +25,13 @@
 |---|---|---|---|---|
 | SPEC: investigate the candidate against code and production | | | | |
 | SPEC: draft the ticket, self-score readiness | | | | <n>/100 |
+| BUILD: program design note (sized tickets) and its review leg | | | | size: <one-shot, one-note, full> |
 | BUILD: worktree and dependency install | | | | |
 | BUILD: failing test written first, confirmed red | | | | |
 | BUILD: implementation, unit tests green, lint | | | | |
 | BUILD: end-to-end fence, stack boot, pass | | | | |
 | BUILD: negative run (fix reverted, the fence must fail) | | | | |
+| BUILD: fail-on-base check (new tests red on the merge base) | | | | <n> tests, <n> weak witnesses, <n> declared exemptions |
 | VERIFY: scanner tier (secrets, dependencies, static analysis) | | | | |
 | VERIFY: cross-vendor review | | | | <k> findings, reachability probe first |
 | VERIFY: blind security side-pass | | | | |

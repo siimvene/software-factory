@@ -64,6 +64,9 @@ replays past incidents against the changed contract.
   model is the floor for bounded engineering work; the top tier is reserved for orchestration,
   deep cross-cutting analysis and adversarial verification of the tier below. Simple work never
   runs on the top tier.
+- On a sized ticket (two or more modules, a new type or migration, a money, tenant or identity
+  path) the program design note precedes the plan and the plan follows its slice order; the
+  sizing rule is in [02-loop](02-loop.md).
 - Adversarial questions before implementing: what happens on failure, which edge case breaks
   it, can state be left inconsistent, which assumption might be wrong. No answers, no
   implementation.
@@ -76,7 +79,9 @@ replays past incidents against the changed contract.
 
 - No placeholder completions. TODO stubs, skipped tests and unimplemented branches are blockers
   to report, not work to hide.
-- Tests are the contract: never weaken, skip or delete a test to make new work pass.
+- Tests are the contract: never weaken, skip or delete a test to make new work pass. A new test
+  is red on the merge base and green on the branch, or it is declared a characterization or
+  refactor test with its reason. A test that passes on both is not a test of the change.
 - Do not invent APIs. If it is not in code you have read, search or ask.
 - Surgical diffs: every changed line traces to the task. Match existing style. Clean up only
   orphans your own change created. Mention pre-existing dead code; do not delete it unasked.
@@ -177,3 +182,5 @@ feature does is also written into the sister spec delta, not only the thread and
 | memory write at discovery | post-commit hook surfaces entries touching changed files | measured |
 | eval suite on contract changes | none yet | proposed |
 | sister spec delta before push | receipt-checked pre-push gate, same shape as the browser pass; behaviour only today | proposed |
+| new tests red on the merge base | the fail-on-base check, Stop hook or receipt; the gate report's `red-before` row by hand today | proposed |
+| program design before the plan on sized tickets | behaviour; the spillover check enforces its module list, the fail-on-base check its test list | proposed |
