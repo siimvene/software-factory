@@ -239,6 +239,55 @@ is a warning, never a score adjustment. That is the same failure the improver lo
 same one a builder-authored acceptance criterion invites, which is why
 [07-roles-and-authority](07-roles-and-authority.md) puts acceptance on the requester.
 
+## What the program design note needs from the ticket
+
+For a sized ticket ([02-loop](02-loop.md): two or more modules, a new type or column or migration,
+parallel stations, or a money, tenant or identity path) the head writes a program design note
+before the first brief ([templates/program-design.md](../templates/program-design.md)). The PM
+never writes that note and never reads it; the PM's ticket is what it is derived from. The rubric
+scores the document, and a document can reach 85 on objective, title and actors while still
+leaving the note nothing to work from. What the note needs is concentrated in four of the seven
+criteria, and in fields of [templates/ticket.md](../templates/ticket.md) the rubric only measures
+indirectly `[proposed]`:
+
+| Note section | Derived from the ticket's | Ready enough when | When it is missing |
+|---|---|---|---|
+| 1. Modules and lanes | the feature spec the ticket cites, the exclusions | the ticket names which current-state spec it changes and says what a reader would assume is included and is not; the head reads the module map, not the PM | the head sizes from the code alone and the spillover scope is a guess: escalate, ticket back to Ready |
+| 2. Types and data | examples that name exact values, the "new data" the desired result implies | every value a user will see or enter is written with its exact form (a state name, an amount, a date, a message); the prototype shows every field for UI work | the builder invents a field name; cycle 4 planted one from a wrong frontend type and both review legs had to catch it |
+| 3. Signatures and call paths | actor clarity, the entry point each example starts from | each example says which role does the action and on which surface (page, endpoint, job, message) | entry points are inferred from the code's shape, which is how a reviewer widened scope from the code in cycle 4 |
+| 4. Shape decisions | constraints and failure cases, the invariant lines, the budget line | the invariant that must not break is named with the check that proves it; the performance or capacity budget is a number with units or an explicit "none"; the failure path example (AC-n, failure path) exists | the shape is chosen by the builder on its way past: the trial's per-fragment sends were exactly this |
+| 5. Slices in landing order | pre-conditions and dependencies, sequencing between tickets | what must be true or shipped first is listed; a ticket that depends on another names it | the plan comes out horizontal (all models, then all services, then all UI) |
+| 6. Tests red on the merge base | the numbered examples, one per observable outcome | each example is a starting state, an action and an outcome an independent party can observe; at least one failure path | a test that passes on the merge base is written and the fail-on-base check refuses it after the build instead of the ticket being fixed before it |
+
+Two things the PM writes that the head cannot recover from code:
+
+- **The sizing signals the rubric does not score.** Whether the change touches money, tenant
+  isolation or identity; whether it stores something new; whether another repository or the mobile
+  client consumes it; whether it retires a path. The PM knows these from the discovery; the head
+  can only guess them from the diff it has not yet written. One line each under constraints.
+  These are what put a ticket in the full tier, where the owner reads the note before the build.
+- **The prototype, for UI work.** Sections 2 and 5 of the note are read off it: the fields, the
+  states, the order screens land in. A UI ticket without the agreed prototype attached is not
+  Ready for the note, whatever its score.
+
+What the PM does not write, and the evaluator must not ask for: types, signatures, module names,
+slice order, shape decisions. Those are the note's job. A ticket that carries them stops being the
+delta and the acceptance criteria stop being the requester's (see
+[07-roles-and-authority](07-roles-and-authority.md)).
+
+Consequence for the evaluator, `[proposed]`: when the ticket's own text shows a sizing signal
+(money, new data, another consumer, a retirement, several features cited), the single
+highest-impact question it asks targets a row of the table above, in this order: constraints and
+invariants, exact values in the examples, pre-conditions, actor and surface per example. It still
+never widens scope; it asks for the field the ticket already implies and has not filled. The
+head's own check is mechanical: a note whose section 1, 2, 4 or 6 has to say "not in the ticket"
+returns the ticket to Ready with that gap named, and does not guess.
+
+Not measured yet: the two sized cycles so far (cycle 2, a money-path retirement at 93; cycle 4, a
+four-story batch) both had their shape decided by the principal in the same session that wrote the
+ticket, so no ticket has yet been returned for a note gap. The first sized ticket after this
+version is where the table gets its first correction.
+
 ## From intake to ticket
 
 ```mermaid
@@ -253,7 +302,7 @@ flowchart LR
     M --> R
     R -->|"85+, too big"| P["task-splitter"]
     P --> R
-    R -->|"85+"| B["BUILD"]
+    R -->|"85+"| B["BUILD: size the ticket;<br/>program design note<br/>for one-note and full"]
     F --> G["graduate<br/>six gate checks"]
     G --> H["human submits the PR"]
 ```
