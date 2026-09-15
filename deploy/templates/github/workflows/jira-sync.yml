@@ -168,7 +168,7 @@ jobs:
           # run's end and this job still counts, otherwise a green verdict lost
           # to that race would strand the ticket.
           pr="$(gh api "/repos/${REPO}/commits/${HEAD_SHA}/pulls" \
-                --jq "[.[] | select(.head.repo.full_name == \"${REPO}\" and .head.ref == \"${HEAD_BRANCH}\")] | (map(select(.state == \"open\")) + .)[0].number // empty")"
+                --jq '[.[] | select(.head.repo.full_name == env.REPO and .head.ref == env.HEAD_BRANCH)] | (map(select(.state == "open")) + .)[0].number // empty')"
           if [ -z "$pr" ]; then
             echo "::notice::no same-repo PR for ${HEAD_SHA}; nothing synced"
             exit 0
