@@ -1,0 +1,10 @@
+{
+  "name": "ux-qa",
+  "displayName": "UX QA",
+  "version": "0.1.2",
+  "description": "Clicks through your app in a real browser to test the screens your change touched, then reports what looked broken, ranked by seriousness. Catches UI problems a plain code review can't see.",
+  "author": {
+    "name": "Siim Vene",
+    "email": "siim.vene@piletilevi.ee"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "team-memory",
+  "displayName": "Team Memory",
+  "version": "0.1.2",
+  "description": "Moves the useful things the assistant learned during your own sessions into the team's shared memory, in reviewed batches so a person approves what gets kept.",
+  "author": {
+    "name": "PLG",
+    "email": "dev@piletilevi.ee"
+  }
+}

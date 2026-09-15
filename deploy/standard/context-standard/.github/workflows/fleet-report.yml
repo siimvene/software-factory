@@ -1,0 +1,95 @@
+# Center-side audit: weekly table of adopter repos × pinned version × managed-file
+# integrity × open context-standard PRs. Read-only; uses the same App credential as
+# propagate.yml. This is where conscious forks and ignored MAJOR PRs become visible.
+name: fleet-report
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Monday 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bot credential check
+        id: creds
+        env:
+          APP_ID: ${{ secrets.PROPAGATE_APP_ID }}
+        run: |
+          if [ -z "$APP_ID" ]; then
+            echo "::notice::PROPAGATE_APP_ID not configured — fleet report skipped."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/create-github-app-token@v1
+        if: steps.creds.outputs.enabled == 'true'
+        id: app
+        with:
+          app-id: ${{ secrets.PROPAGATE_APP_ID }}
+          private-key: ${{ secrets.PROPAGATE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.enabled == 'true'
+
+      - name: Build report
+        if: steps.creds.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          set -euo pipefail
+          CANON_VERSION=$(grep -Eo 'context-standard: v[0-9]+\.[0-9]+' template/CLAUDE.md | head -1 | awk '{print $2}')
+          # agents-core.md is fetched, not shipped in template/ — pull the canonical
+          # copy the same way adopt.sh does so its divergence is audited too.
+          CORE_REL="docs/standard/agents-core.md"
+          CORE_SRC="Piletilevi/plg-development-standards"
+          CORE_FILE=$(mktemp)
+          gh api "repos/$CORE_SRC/contents/agents-core.md" \
+            -H "Accept: application/vnd.github.raw" > "$CORE_FILE"
+          [ -s "$CORE_FILE" ] || { echo "::error::cannot fetch canonical agents-core.md from $CORE_SRC"; exit 1; }
+          # canonical shas from the template (or the fetched core), keyed by managed path
+          canon() {
+            if [ "$1" = "$CORE_REL" ]; then sha256sum "$CORE_FILE" | cut -d' ' -f1
+            else sha256sum "template/$1" | cut -d' ' -f1; fi
+          }
+          {
+            echo "## context-standard fleet report — canonical $CANON_VERSION"
+            echo ""
+            echo "| repo | pinned | managed integrity | open std PRs |"
+            echo "|---|---|---|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+          repos=$(gh search repos --owner "$OWNER" --topic context-standard --json fullName --jq '.[].fullName')
+          for repo in $repos; do
+            lock=$(gh api "repos/$repo/contents/.context-standard.lock" --jq '.content' 2>/dev/null | base64 -d || true)
+            if [ -z "$lock" ]; then
+              echo "| $repo | — | ⚠️ topic set but no lock (never adopted?) | — |" >> "$GITHUB_STEP_SUMMARY"; continue
+            fi
+            pinned=$(printf '%s' "$lock" | sed -n 's/^context-standard: //p' | head -1)
+            integrity="✅"
+            while IFS= read -r line; do
+              rel="${line%%:*}"; rel="${rel#  }"
+              want=$(printf '%s' "$line" | sed -n 's/.*"sha256:\(.*\)".*/\1/p'); [ -n "$want" ] || continue
+              # conscious-fork detection: lock sha vs canonical sha for the pinned template
+              # (agents-core.md compares against the fetched canonical copy)
+              if [ "$pinned" = "$CANON_VERSION" ] && { [ -f "template/$rel" ] || [ "$rel" = "$CORE_REL" ]; } \
+                && [ "$want" != "$(canon "$rel")" ]; then
+                integrity="🔀 forked: $rel"
+              fi
+            done < <(printf '%s\n' "$lock" | sed -n '/^managed:/,$p' | tail -n +2)
+            [ "$pinned" != "$CANON_VERSION" ] && integrity="⏳ behind ($pinned)"
+            prs=$(gh pr list --repo "$repo" --search "head:chore/context-standard" --json number --jq 'length' 2>/dev/null || echo "?")
+            echo "| $repo | $pinned | $integrity | $prs |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          # repos with a lock but missing the topic (invisible to propagation)
+          orphans=$(gh search code --owner "$OWNER" --filename .context-standard.lock --json repository --jq '.[].repository.fullName' 2>/dev/null | sort -u || true)
+          for repo in $orphans; do
+            echo "$repos" | grep -qx "$repo" && continue
+            echo "| $repo | ? | ⚠️ lock present but 'context-standard' topic missing — add it | — |" >> "$GITHUB_STEP_SUMMARY"
+          done
