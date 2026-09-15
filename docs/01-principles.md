@@ -42,6 +42,17 @@ every number if one misclassifies. The layering rules were validated on 10 cases
 match, 6 must not) after the first draft reported 7 violations that were all legitimate
 test-scope dependencies `[measured 2026-09-04]`.
 
+The test suite is itself a predicate over the code, and the same rule applies to it. Coverage
+is the known-true case: a line ran. Mutation is the known-false case: a planted change in that
+line must turn a test red. A suite with green coverage and a low kill rate is blind in exactly
+the way a scan that cannot fail is blind. Paid for on the reference implementation: coverage
+green across the service layer, whole-module kill rate 30.3 % on 59 database-free modules
+(5,394 of 17,783 mutants) and 39.9 % on 81 database-coupled modules (11,709 of 29,341), and
+11.2 % on the largest billing module (235 of 2,095) `[measured 2026-09-15]`. Rule: report
+mutation as killed over all mutants; killed over (killed plus survived) hides the uncovered ones
+and read 100 % on a module 3.6 % of whose mutants were ever exercised. The gate this argues
+for is in [05-sensor-stack](05-sensor-stack.md), the net.
+
 ## 4. Humans inspect output, not process
 
 Every human touchpoint is a decision on evidence: an approved ticket, an accepted behaviour, a
