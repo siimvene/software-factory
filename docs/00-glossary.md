@@ -70,8 +70,9 @@ every shortcut.
 **Provenance trailer.** Commit metadata naming the agent and session that authored a change.
 Humans approve and merge; they do not author. A trailer-less commit is rejected.
 
-**Verification net.** The tests, coverage ratchet, mutation score, characterization suite
+**Verification net.** The tests, coverage ratchet, mutation kill rate, characterization suite
 and self-provisioning test infrastructure that make lights-out changes safe on a given core.
+Coverage says a line ran; the kill rate says a test would notice it changing; the net needs both.
 On a legacy core, building it is turn 1.
 
 **Characterization test.** A test that locks current behaviour, bugs included, so that a

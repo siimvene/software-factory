@@ -229,6 +229,51 @@ gate actually produced. Check: the pre-push hook reads the receipt and the tree 
 letting the push proceed `[measured 2026-09-09]`. Two of these run on kvart, the browser QA gate and
 the static-analysis gate, both detailed in [06-verify-gate](06-verify-gate.md).
 
+### Mutation kill rate as a ratchet on the touched modules
+
+Coverage is the ratchet layer's only test-strength signal, and it is gameable by construction: a
+test that calls the function and asserts that something came back covers every line and notices
+nothing. Machine-written tests do this by default (see [09-legacy-adoption](09-legacy-adoption.md)
+§2, where mutation score, not coverage, was the exit gate for generated characterization tests).
+On the reference implementation the same shape showed up in the human-era suite: the service
+layer's whole-module kill rate was 30.3 % on the database-free modules and 39.9 % on the
+database-coupled ones, with the largest billing module at 11.2 % and the platform billing module
+at 31.3 % `[measured 2026-09-15]`, next to a changed-line coverage gate that had passed every PR.
+Two failure modes, told apart by the module's own coverage: assertion theatre (coverage 64 to
+100 %, kill rate 13 to 35 %: nine modules, one of them the passkey service, one the platform
+billing service) and unit-coverage gaps (coverage 3 to 17 %, the module lives on integration
+tests). Only the first condemns the tests.
+
+Design, `[proposed]` on kvart with the baseline `[measured 2026-09-15]`:
+
+- **Scope by the diff, like every other slow gate.** Mutation runs the suite once per mutant, so
+  the whole repository is hours (47,124 mutants across 140 modules on the reference
+  implementation). The gate mutates only the source modules the diff touched, with the tests the
+  test-selection map names for them, and writes a receipt keyed by the tree id (see above).
+- **A baseline per module, one writer, tightened only by the tool.** The campaign's CSV is the
+  day-one baseline: killed, survived, not exercised, total, per module. The gate refuses a drop
+  in killed over total on a touched module and accepts only a rise, the same `--tighten` shape as
+  the other ratchets (adr 0004). A person re-cuts the baseline; the agent cannot edit it.
+- **Killed over total, never killed over checked.** The not-exercised column stays in the
+  denominator, or a module that no test reaches reports 100 %.
+- **Money and identity modules get a target as well as a ratchet.** Tiering per class
+  ([12-adoption-playbook](12-adoption-playbook.md)) already sets mutation targets for the money
+  lane; a module at 11.2 % gets a named hardening ticket, and "did not get worse" is not a pass.
+- **Generated tests must earn their kills.** A build station that adds or changes tests ships
+  them with the kill rate on the touched module, and the station's exit check is that number, not
+  coverage. This is principle 3 applied to the artefact the loop produces most of.
+- **The database-coupled half needs isolation.** Mutant runs in parallel collide on one shared
+  test database and the scores are garbage. The measured fix: migrate a template database once,
+  clone it per run (`CREATE DATABASE ... TEMPLATE`), gated behind a flag so the ordinary suite is
+  untouched `[measured 2026-09-15]`. A fresh worktree must be able to do this itself
+  ([09-legacy-adoption](09-legacy-adoption.md) §3).
+
+Known limits: a kill rate says nothing about copy-paste (the 100 % module with 6 clones in
+[13-failure-catalogue](13-failure-catalogue.md)), equivalent mutants inflate the survivor count
+and are accepted by name, and async or time-dependent paths produce flaky kills that must be
+excluded explicitly rather than retried into green. The gate is trusted only after it has refused
+one real PR for a real drop (rehearse the blocked direction, below).
+
 ### Rehearse the blocked direction
 
 Rehearse the BLOCKED path of a gate, not only the pass: a gate that cannot fail is not a gate. Check:
