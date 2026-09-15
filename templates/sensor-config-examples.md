@@ -151,6 +151,41 @@ A crossing is declared, not discovered. `because:` is not documentation: it is w
 gate prints at the violation, which is the difference between an agent fixing the design
 and an agent adding a suppression.
 
+### The scan boundary (`mcp-arch.yaml`)
+
+`enola-intent.yaml` says what the layers ARE; `mcp-arch.yaml` says what gets walked in the
+first place. The agent runtime nests other branches' worktrees inside the repo, and the
+architecture walker reads them as duplicate module trees — same package names, so it
+invents cycles and layer violations that span the copies and sends the Stop-hook check red
+on a change that is clean.
+
+```yaml
+# mcp-arch.yaml. `ignore` REPLACES the built-in walker globs, it does not add to
+# them, so this list is the defaults verbatim PLUS the nested worktrees. Drop a
+# default and node_modules / dist / vendor leak back in as thousands of cycles.
+ignore:
+  - "<repo>.worktrees/**"    # git worktree roots created under the repo
+  - ".claude/worktrees/**"   # agent-runtime worktrees
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/vendor/**"
+  - "**/venv/**"
+  - "**/.venv/**"
+  - "**/__pycache__/**"
+  - "**/.git/**"
+  - "**/tests/**"
+  # … the rest of enola's built-in defaults, kept in sync
+```
+
+Two traps. `ignore` is a full replacement, not an addition — the sibling `exclude` key
+filters findings, not the walk, so it does not stop the walker reaching a worktree. And the
+baseline records the ignore-glob set, so after you change it you must re-pin
+(`enola baseline pin`) or the next `check` declines as incomparable (exit 3). The
+file-walking gates (the ratchets, the container scan) take the same worktree exclusion in
+their own config; this is the architecture walker's copy of it, and it has to be added
+separately.
+
 ## 3. Agent hook wiring (`.claude/settings.json` and `.mcp.json`)
 
 Hooks are where the gates stop being something an agent is asked to run and become
