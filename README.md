@@ -39,7 +39,7 @@ flowchart TB
     end
     subgraph GATES["gates: each refuses with a file, a line and a reason"]
         direction TB
-        L3["The net<br/>tests, aggregate coverage, mutation<br/>refuses silent behaviour change"]
+        L3["The net<br/>tests, aggregate coverage, mutation, fail-on-base<br/>refuses silent behaviour change"]
         L4["Quality ratchets · sensor 3<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
         L5["Architecture diff · sensor 4<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
         L6["Adversarial review · sensor 5<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
@@ -68,7 +68,7 @@ this picture.
 |---|---|---|---|---|
 | Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
 | YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `designed` |
-| The net | tests, coverage, mutation kill rate | post-write | silent behaviour change, tests that notice nothing | `measured` (kill-rate ratchet `proposed`) |
+| The net | tests, coverage, mutation kill rate, fail-on-base | post-write | silent behaviour change, tests that notice nothing, tests that prove nothing new | `measured` (kill-rate ratchet and fail-on-base `proposed`) |
 | Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
 | Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
 | Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |

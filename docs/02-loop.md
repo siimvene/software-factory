@@ -7,7 +7,7 @@ write-backs that make it a flywheel.
 ```mermaid
 flowchart LR
     SPEC["SPEC<br/>ticket as the delta<br/>numbered examples<br/>a person approves"]
-    BUILD["BUILD<br/>worktree per turn<br/>plan first, tests red first<br/>disjoint parallel lanes"]
+    BUILD["BUILD<br/>worktree per turn<br/>program design for sized tickets<br/>plan, tests red on the merge base<br/>disjoint parallel lanes"]
     VERIFY["VERIFY<br/>sensors, then consort<br/>scanners, browser QA<br/>findings dispositioned"]
     SHIP["SHIP<br/>PR arrives reviewed<br/>the owner merges<br/>release is separate"]
     LEARN["LEARN<br/>two write-backs<br/>cycle report: wall-clock,<br/>tokens, every shortcut"]
@@ -58,6 +58,61 @@ Where the PM investigation corrected the premise: cycle 2 started as "fix a misl
 and became "retire a payment path" after 20 minutes of reading code, the production database
 and the audit trail `[measured 2026-09-07]`. The SPEC stage is where that reading belongs.
 
+## Program design (the first step of BUILD, for sized tickets)
+
+**Input:** a Ready ticket and the architecture it lands in: the module map, the decision
+records, the contract file where one exists.
+**Output:** a program design note ([templates/program-design.md](../templates/program-design.md)):
+modules and lanes, types, signatures and call paths, shape decisions with their rejected option,
+slices in landing order, and the tests that must be red on the merge base.
+
+The ticket says what changes in observable terms and the knowledge plane says which modules
+exist. Neither says which function gains which parameter, where the transaction boundary sits,
+whether the export streams or buffers, or which slice lands first. Left unnamed, those choices
+are made by the builder on its way past and discovered by the reviewer in a finished diff, which
+is the expensive place to discover them. The head-and-hands trial spent one of its four rounds
+on a shape choice the brief had left open (per-fragment sends, 32,018 for 2,000 rows); the
+cross-vendor reviewer caught it, the tests did not, because the output was byte-identical
+`[measured 2026-09-05]`. Cycle 4 is the measured precursor of the note: one scout produced a
+code map, the principal wrote an API contract (storage columns, two endpoints, CSV shape,
+recording rules) and three stations built to it in parallel on disjoint worktrees; the one
+defect in the contract, a field name planted from a wrong frontend type, was caught by both
+review legs `[measured 2026-09-09]`. The note generalises that contract and moves its review
+before the build.
+
+Sizing is a rule, not a feeling `[proposed]`:
+
+| Size | Signal, read from the ticket and the orientation map | Design artifact | Review before any brief |
+|---|---|---|---|
+| one-shot | one module; no new type, column or migration; no money, tenant or identity path | none; the plan names the file and the test | none |
+| one-note | two or more modules, or a new type, column or migration, or parallel stations | the note, sections 1 to 6 | one cross-vendor leg on the note; it is a page, so minutes |
+| full | a money, tenant or identity path, a contract another repository consumes, a retirement | the note plus a decision record per shape decision that outlives the ticket | the panel on the note, and the owner reads it |
+
+Cycle 1 (+47/−1, one module) was one-shot and needed nothing. Cycle 2 (a money-path
+retirement) would have been full, and its planning document carried pseudocode keyed on a
+retired flag that production still held as `true`, found by the reviewer in the diff stage
+rather than before it `[measured 2026-09-07]`.
+
+Two mechanical checks make the note more than a document. Section 1 is the scope the
+architecture diff's spillover check runs with (`--target=<scope> --max-spillover=0`,
+[05-sensor-stack](05-sensor-stack.md) layer 4): a file outside the declared modules fails the
+Stop hook. Section 6 is the list the fail-on-base check confirms after the build: each named
+test red on the merge base and green on the branch ([05-sensor-stack](05-sensor-stack.md)
+layer 3). The rest of the note travels to the review panel as one more injected pack
+([06-verify-gate](06-verify-gate.md), spec conformance), so drift from an agreed shape is a
+`spec-drift` finding citing the section and intended drift is written back under REFINE-SPEC.
+The head writes the note; the hands never do ([07-roles-and-authority](07-roles-and-authority.md)).
+Where the organisation ships a starter kit per stack, the kit is the architecture the note
+builds on: error format, money type, layering and the test layout are the kit's settled
+decisions, and the note names only the deltas.
+
+Rejected: putting the design in the ticket (the PM hat does not write signatures, and a ticket
+that does stops being the delta); leaving it to plan mode (the measured plans are step lists
+with a model tier per step, and a plan made without a design is horizontal by default: all
+models, then all services, then all UI); a design review by the authoring session alone (the
+judgement the gate exists not to trust, ADR 0003). Decision record:
+[adr/0010](../adr/0010-program-design-before-the-plan.md).
+
 ## BUILD
 
 **Input:** a Ready ticket.
@@ -67,16 +122,20 @@ and the audit trail `[measured 2026-09-07]`. The SPEC stage is where that readin
   mutation in a shared checkout. See [08-sandbox-and-isolation](08-sandbox-and-isolation.md).
 - Orientation before writing: the codebase map (sensor layer 1), the specs, the decision
   records, the memory store. Do not open files you have not located.
-- Plan mode first for anything non-trivial: a 2 to 6 step plan with a model tier per step and
-  a verify step per step. Adversarial questions before implementing: what fails, which edge
+- Plan mode first for anything non-trivial, from the design note where one exists: a 2 to 6
+  step plan in the note's slice order, with a model tier per step and a verify step per step. Adversarial questions before implementing: what fails, which edge
   case breaks it, can state be left inconsistent, which assumption might be wrong.
 - Tests first, red on the unfixed code. Cycle 1: the unit case failed on the unfixed
   middleware with the exact wrong redirect, then passed after a one-line fix; the browser
-  spec was proven to fail with the fix reverted `[measured 2026-09-07]`.
+  spec was proven to fail with the fix reverted `[measured 2026-09-07]`. Checked, not trusted:
+  the fail-on-base check ([05-sensor-stack](05-sensor-stack.md) layer 3) confirms every new or
+  changed test is red on the merge base and green on the branch `[proposed]`; until it is
+  wired, the negative run is a hand step recorded in the gate report.
 - Parallel lanes on disjoint file ownership. Cycle 2 ran the backend lane in the principal
   session and the frontend lane in a subagent on disjoint files; the subagent returned 20
   green unit tests in 118 s `[measured 2026-09-07]`.
-- Every subagent gets a five-part brief and a wall-clock cap. See
+- Every subagent gets a five-part brief and a wall-clock cap, and on a sized ticket the brief
+  cites the design note's sections by number. See
   [templates/delegation-brief.md](../templates/delegation-brief.md).
 
 ## VERIFY

@@ -10,6 +10,7 @@ table; the entries here are the ones that apply to any adoption.
 |---|---|---|
 | child process produces no output and no diff; the head "waits" for hours (2026-09-05) | stdin inherited; child blocks on "reading additional input" | `< /dev/null` or a payload on stdin; wall-clock cap on every delegation; never end a turn on a bare wait; empty output + empty diff = hung |
 | subagent returns "you should now verify X" | delegation brief without the proactivity phrases | the three phrases in every brief; two-phase pattern when verify is expensive |
+| a hands round is spent on a redesign after the reviewer finds the shape wrong (2026-09-05, round 3 of 4) | the brief named the outcome and left the shape (streaming granularity) to the builder | the program design note names shape decisions before the first brief; the brief cites its sections |
 | worktree Bash guard refuses ~6 commands per cycle (2026-09-07) | guard cannot prove computed paths, heredocs mentioning git, relative `cd` stay in the worktree | absolute paths, editor tools on worktree paths, plain commands |
 | a plugin or MCP server works in one session type and not another | two config directories on one machine | register in both |
 | a skill runs in the main checkout and is absent from every station worktree (2026-09-10) | the skill directory is gitignored with the rest of the agent state; a worktree checks out only tracked files | re-include the skill in `.gitignore` and commit it; a skill the loop depends on is code |
@@ -81,6 +82,7 @@ table; the entries here are the ones that apply to any adoption.
 | changed-line coverage green on every PR, whole-module kill rate 30 to 40 %, 11.2 % on the largest billing module (2026-09-15) | coverage says a line ran; a test that asserts only that something came back covers everything | mutation kill rate as a ratchet on the touched modules, killed over total |
 | a module reads 100 % mutation score with 3.6 % of its mutants exercised (2026-09-15) | killed over (killed plus survived) drops the not-exercised column | report killed over total, always |
 | parallel mutant runs against one shared test database score garbage (2026-09-15) | workers collide on the same rows | a migrated template database, cloned per run, behind a flag |
+| a new test passes on the merge base as well as on the branch (the trial's behavioural test proved only that a function was unused; a `list(...)` would have passed, 2026-09-05) | it asserts something that was already true | the fail-on-base check: red on the base, green on the branch, exemptions declared, failure kind recorded |
 | a test that passes alone and fails in the suite reported as a regression | test pollution | run in isolation first; check the history of the asserted contract |
 | "verified in CI" for a change never run locally | the coverage library could not read the JVM's bytecode version | run it; intent is not completion |
 

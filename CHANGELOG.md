@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.10 (2026-09-15)
+
+Design before the plan; red-first becomes a gate.
+
+- `docs/02-loop.md`: program design as the first step of BUILD for sized tickets, with a sizing
+  rule (one-shot, one-note, full), the cycle-4 contract as its measured precursor, the trial's
+  round-3 redesign and cycle 2's planning document as its cost, two mechanical checks (the module
+  list as the spillover scope, section 6 as the fail-on-base list), the rejected alternatives,
+  and starter kits as the architecture layer a note builds on.
+- `templates/program-design.md`: the note, seven sections.
+- `adr/0010`: the decision record for both changes, with the public argument they trace to.
+- `docs/05-sensor-stack.md` layer 3: the fail-on-base check `[proposed]`: select by the diff, run
+  at the merge base with the branch's tests applied, record the failure kind, declared exemptions
+  only, deleted tests always reported, Stop hook or receipt, rehearse both directions; wired-where
+  row 3a.
+- `docs/01-principles.md` §3: the change has a known-false case of its own, the code before it.
+- `docs/06-verify-gate.md`: design review before the build; the note joins the spec pack.
+- `docs/10-measurement.md`: rework after the first review as the instrument that decides whether
+  the note pays; a design-quality row in the instruments table.
+- `evidence/field-evidence.md` §7: the talk the two gaps trace to, what is taken and what is not.
+- Pointers and rows in 00, 03, 07, 12, 13, 16, 18, README, STATUS, the ADR index, and the gate
+  report, cycle report and delegation brief templates.
+
 ## 0.2.9 (2026-09-15)
 
 The PM surface after the group's planning session.
