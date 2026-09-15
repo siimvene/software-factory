@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# post-commit: memspec reconciliation check
+#
+# Fires after every commit. Greps memspec entries (project-local .memspec/
+# and global ~/.memspec/) for files touched by this commit. Informational
+# only — does not block. Designed to surface drift at the moment it would
+# otherwise propagate into memory.
+#
+# Install per clone: git config core.hooksPath scripts/git-hooks
+
+set -euo pipefail
+
+# Files changed in this commit. Diff HEAD~1..HEAD handles merges naturally.
+if git rev-parse HEAD~1 >/dev/null 2>&1; then
+    CHANGED_FILES=$(git diff HEAD~1..HEAD --name-only 2>/dev/null || true)
+else
+    CHANGED_FILES=$(git diff-tree --root --no-commit-id --name-only -r HEAD 2>/dev/null || true)
+fi
+[ -z "$CHANGED_FILES" ] && exit 0
+
+# Code-like files only — skip pure-doc commits to reduce noise
+CODE_FILES=$(echo "$CHANGED_FILES" | grep -E '\.(py|ts|tsx|js|jsx|vue|kt|kts|swift|go|rs|java|cs|rb|sh|sql|yaml|yml|toml|gradle|dockerfile)$' || true)
+[ -z "$CODE_FILES" ] && exit 0
+
+# Memspec dirs to search
+SEARCH_DIRS=()
+[ -d ".memspec/memory" ] && SEARCH_DIRS+=(".memspec/memory")
+[ -d "$HOME/.memspec/memory" ] && SEARCH_DIRS+=("$HOME/.memspec/memory")
+[ -d "$HOME/git/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("$HOME/git/<team>-team-context/.memspec/memory")
+[ -d "/workspaces/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("/workspaces/<team>-team-context/.memspec/memory")
+[ ${#SEARCH_DIRS[@]} -eq 0 ] && exit 0
+
+# Build search alternation: full paths AND basenames.
+# Skip very common basenames that produce too much noise.
+COMMON_NAMES='^(__init__\.py|index\.(ts|tsx|js|jsx)|main\.(py|go|js)|App\.(kt|swift)|types\.ts|constants\.ts|utils\.ts|setup\.py|conftest\.py|build\.gradle\.kts|settings\.gradle\.kts)$'
+
+PATTERNS=""
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    PATTERNS="${PATTERNS}${f}"$'\n'
+    BASE=$(basename "$f")
+    if [ "$BASE" != "$f" ] && ! echo "$BASE" | grep -qE "$COMMON_NAMES"; then
+        PATTERNS="${PATTERNS}${BASE}"$'\n'
+    fi
+done <<< "$CODE_FILES"
+
+# Escape regex metacharacters, build alternation
+ALT=$(echo "$PATTERNS" | grep -v '^$' | sort -u | sed 's/[.[\*^$()+?{|]/\\&/g' | paste -sd '|' -)
+[ -z "$ALT" ] && exit 0
+
+# Grep memspec for any of these
+HITS=$(grep -rEl -e "$ALT" "${SEARCH_DIRS[@]}" 2>/dev/null || true)
+[ -z "$HITS" ] && exit 0
+
+# Output to stderr so it surfaces in interactive shells but doesn't pollute stdout
+{
+  echo ""
+  echo "═══ memspec reconciliation ═══"
+  echo "This commit touched files mentioned in memspec entries:"
+  echo ""
+  while IFS= read -r hit; do
+    TITLE=$(grep -m1 '^# ' "$hit" 2>/dev/null | sed 's/^# //' | head -c 90 || echo "")
+    REL=${hit#$HOME/}
+    REL=${REL#$(pwd)/}
+    echo "  • ${REL}"
+    [ -n "$TITLE" ] && echo "      → ${TITLE}"
+  done <<< "$HITS"
+  echo ""
+  echo "Verify each before continuing:"
+  echo "  • Fact still true → leave alone (or memspec_promote)"
+  echo "  • Your commit invalidated it → memspec_correct now, don't defer"
+  echo "  • Can't verify quickly → flag for follow-up"
+  echo "═══════════════════════════════"
+} >&2

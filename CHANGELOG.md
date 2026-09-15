@@ -1,5 +1,60 @@
 # Changelog
 
+## 0.2.11 (2026-09-16)
+
+The setup becomes a runbook a second engineer can execute.
+
+- `deploy/`: how the factory is stood up, in the shape it runs on the reference implementation.
+  `01-workstation-macos.md` (the tools, plugins, credentials and settings for one Mac, an
+  engineer profile and a PM profile, the traps from the reference machine);
+  `02-scaffold-a-project.md` (the agent runbook: inputs to collect, then the flightlist's D0, G
+  and M legs as commands with a check and an evidence pointer each, test-the-test, verify on
+  arrival, the run record); `bin/check-workstation.sh` and `bin/check-project.sh` (one line per
+  requirement, exit 1 on a missing required item, tested against a known-true and a known-false
+  case); `marketplace/` (a Claude Code marketplace holding the eight plugins from the group's
+  catalog the loop uses, verbatim at pinned commits, `pm-workspace` at 1.6.0); `standard/` (the
+  group's context standard v0.4 with its adopt script, the operating contract, the team-context
+  and instructions templates); `templates/` (kvart's wiring: tracked agent settings with the
+  sensor hooks, MCP servers, rule files, git hooks including the provenance trailer, the ledger
+  script with its tests, the gate and ledger workflows, the ruleset body, the memory binding, the
+  Jira workflow payload). Two changes to the copied workflows: both ledger workflows now pass
+  `JIRA_PROJECT_KEY` from a repository variable, so the key regex is not hard-wired to the
+  reference project.
+- `README.md`, `WRITING.md`, `STATUS.md`, `docs/18-flightlist.md`: the pointer, the file-taxonomy
+  entry with the anonymisation exemption for vendored trees, the status row (designed until a
+  second engineer runs it), and the flightlist's link to the commands that execute its legs.
+
+## 0.2.10 (2026-09-15)
+
+Design before the plan; red-first becomes a gate.
+
+- `docs/02-loop.md`: program design as the first step of BUILD for sized tickets, with a sizing
+  rule (one-shot, one-note, full), the cycle-4 contract as its measured precursor, the trial's
+  round-3 redesign and cycle 2's planning document as its cost, two mechanical checks (the module
+  list as the spillover scope, section 6 as the fail-on-base list), the rejected alternatives,
+  and starter kits as the architecture layer a note builds on.
+- `templates/program-design.md`: the note, seven sections.
+- `adr/0010`: the decision record for both changes, with the public argument they trace to.
+- `docs/05-sensor-stack.md` layer 3: the fail-on-base check `[proposed]`: select by the diff, run
+  at the merge base with the branch's tests applied, record the failure kind, declared exemptions
+  only, deleted tests always reported, Stop hook or receipt, rehearse both directions; wired-where
+  row 3a.
+- `docs/01-principles.md` §3: the change has a known-false case of its own, the code before it.
+- `docs/06-verify-gate.md`: design review before the build; the note joins the spec pack.
+- `docs/14-pm-surface.md`: what the program design note needs from the ticket, section by section,
+  the sizing signals only the PM can write, the prototype as a readiness condition for UI work,
+  what the PM must not write, and the evaluator's question order on a sized ticket.
+- `templates/skills/readiness-evaluator/SKILL.md`: the "Bigger tickets: one extra question"
+  section, written for the person who maintains the skill rather than for the design: when it
+  applies (from the ticket text only, score-neutral), the four questions in order, the plain-words
+  line the author sees, what the skill never asks for and points out as misplaced. Not yet run on
+  such a ticket.
+- `docs/10-measurement.md`: rework after the first review as the instrument that decides whether
+  the note pays; a design-quality row in the instruments table.
+- `evidence/field-evidence.md` §7: the talk the two gaps trace to, what is taken and what is not.
+- Pointers and rows in 00, 03, 07, 12, 13, 16, 18, README, STATUS, the ADR index, and the gate
+  report, cycle report and delegation brief templates.
+
 ## 0.2.9 (2026-09-15)
 
 The PM surface after the group's planning session.

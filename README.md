@@ -39,7 +39,7 @@ flowchart TB
     end
     subgraph GATES["gates: each refuses with a file, a line and a reason"]
         direction TB
-        L3["The net<br/>tests, aggregate coverage, mutation<br/>refuses silent behaviour change"]
+        L3["The net<br/>tests, aggregate coverage, mutation, fail-on-base<br/>refuses silent behaviour change"]
         L4["Quality ratchets · sensor 3<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
         L5["Architecture diff · sensor 4<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
         L6["Adversarial review · sensor 5<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
@@ -68,7 +68,7 @@ this picture.
 |---|---|---|---|---|
 | Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
 | YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `designed` |
-| The net | tests, coverage, mutation kill rate | post-write | silent behaviour change, tests that notice nothing | `measured` (kill-rate ratchet `proposed`) |
+| The net | tests, coverage, mutation kill rate, fail-on-base | post-write | silent behaviour change, tests that notice nothing, tests that prove nothing new | `measured` (kill-rate ratchet and fail-on-base `proposed`) |
 | Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
 | Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
 | Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |
@@ -119,10 +119,11 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 17. [Inventory](docs/16-inventory.md): every mechanism mapped to the tool or template that provides it, and what an adopter without a standard must build
 18. [Onboarding a repository](docs/17-onboarding.md): the Day 1 runbook, retro-generated specs, mined decision records, the team-context repo, the memory move
 19. [Flightlist](docs/18-flightlist.md): the tickable setup sequence for the next project, one mechanical check and one evidence pointer per leg
+20. [Deploying the factory](deploy/README.md): the macOS workstation guide, the agent runbook that scaffolds a project, two checkers, and the vendored plugins, standard and wiring files
 
 Then the [case studies](case-studies/), the [evidence](evidence/), the [templates](templates/),
-the [skills](templates/skills/) a team copies into its workspaces, and this design's own
-[decision records](adr/).
+the [skills](templates/skills/) a team copies into its workspaces, the [deployment
+directory](deploy/) an engineer runs, and this design's own [decision records](adr/).
 
 ## What this is not
 

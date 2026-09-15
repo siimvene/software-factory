@@ -267,3 +267,48 @@ reported with exit 0 until the adopter names what should break. Recommended star
 **Caveats.** Only 3 of 19 explainers are certain; the other 16 are heuristics and should not gate
 without a confidence floor. The tool is young, and the recommendation above is one engineer's, not a
 study. Nothing here is a measured result on this design's own repositories.
+
+## 7. Horthy, "Harness Engineering is not Enough: Why Software Factories Fail" `[field: Horthy]`
+
+**What it is.** A 19-minute conference talk (AI Engineer World's Fair, published 2026-07-23) by
+the founder of HumanLayer, a company selling an agent collaboration workspace. It expands two
+public threads from 2026-07-24 and 07-25 that the operator assessed against the group's built
+estate on 2026-07-26. The speaker sells a plan-heavy product, so the plan-heavy conclusion is
+also a product story; the argument stands on its own and is recorded here for the argument.
+
+**The argument.** Coding models are trained by reinforcement on a reward of the shape "the hidden
+tests pass and nothing regressed". The speaker walks through a multilingual issue-resolution
+benchmark: base commit checked out, the agent's edits to test files reverted, the held-out test
+patch applied, binary reward. Nothing in that reward prices architecture, whose cost arrives
+months later, so a model gets better at passing tests and no better at keeping a codebase
+changeable. His own company ran without human code review from July 2025 and paid with an
+outage in code nobody had read for three months. Conclusion: restore human review and make it
+cheap by deciding earlier, in four phases (product review, architecture, program design down to
+types and call graphs, vertical slices), on the estimate that 30 minutes of alignment saves
+hours of review. Two admissions on stage: the maintainability claim is experience, not a
+benchmark result; the three-to-six-month horizon is anecdote.
+
+**What this design takes.**
+- The durable justification for [adr/0003](../adr/0003-cross-vendor-non-inheriting-review-is-the-merge-gate.md)
+  and [adr/0006](../adr/0006-pr-gated-output-human-release.md): a review gate does not sunset with
+  model releases, because the training signal has no maintainability oracle. Field evidence, not
+  measured here.
+- Program design as a named stage ([02-loop](../docs/02-loop.md),
+  [adr/0010](../adr/0010-program-design-before-the-plan.md)). The phase is the speaker's; the
+  sizing rule, the template and the two mechanical checks are this design's own.
+- The check from a public evaluation the talk cites (FrontierCode): an agent-written test must
+  fail against the pre-patch code, or it has not shown it detects the behaviour the patch
+  repairs. This design's fail-on-base check ([05-sensor-stack](../docs/05-sensor-stack.md))
+  generalises it to every new or changed test, with declared exemptions and the failure kind
+  recorded.
+- Review as rework: a pull request whose decisions were not agreed forces the reviewer back into
+  design. The rework-share metric in [10-measurement](../docs/10-measurement.md) is how this
+  design will tell whether the note pays.
+
+**Caveats.** No number in the talk is a measurement on this design's repositories. The speaker
+attributes one agent runtime's commercial rise to training against its own harness: plausible,
+unverified, and irrelevant to the gates here. The speaker's target is a factory with no human
+code review at all; this design never proposed one (the human gate is a decision on evidence,
+[01-principles](../docs/01-principles.md) §4), so the talk argues for the design's shape rather
+than against it, and its two named gaps are what [adr/0010](../adr/0010-program-design-before-the-plan.md)
+closes.

@@ -1,0 +1,16 @@
+{
+  "name": "secret-guard",
+  "displayName": "Secret Guard",
+  "version": "0.1.2",
+  "description": "Stops the assistant from opening files that hold passwords and keys (.env files, credentials, cloud logins). Works automatically, nothing to set up.",
+  "author": {
+    "name": "Siim Vene"
+  },
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "secrets",
+    "hook",
+    "guard"
+  ]
+}
