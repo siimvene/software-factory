@@ -1,0 +1,18 @@
+# Kvart carries no memspec store of its own (context standard §6). The team store
+# lives in <org>/<team>-team-context (moved 2026-09-07 with history). This file
+# only binds the memspec engine: 0.10.x reads `stores:` here and does not yet read
+# the `.memspec.yaml` pointer at the repo root, which is kept for the standard.
+# Durable memory writes are promote PRs into the team repo. Local scratch lands in
+# ~/.memspec (scope kvart) and is never committed here.
+stores:
+  - name: team
+    path: ~/git/<team>-team-context/.memspec
+    priority: 10
+    writable: false
+  - name: global
+    path: ~/.memspec
+    priority: 0
+    writable: true
+
+search:
+  engine: fts5

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ripwire": {
+      "command": "sh",
+      "args": ["-c", "PATH=\"$HOME/.local/bin:$PATH\"; exec ripwire --mcp"]
+    },
+    "enola": {
+      "command": "sh",
+      "args": ["-c", "PATH=\"$HOME/.local/bin:$PATH\"; exec enola"]
+    }
+  }
+}

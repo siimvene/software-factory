@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Operator side of the ticket ledger: assign at pickup, link, deploy write-back.
+#
+#   jira pickup <KEY-N>              assign the ticket to YOU (the token's account) and
+#                                    walk it Backlog -> Ready -> In Progress. Run it the
+#                                    moment you start on a ticket.
+#   jira link <KEY-N> <url> <title>
+#   jira deployed --keys K1,K2 --sha S        (the deploy script does this itself)
+#   jira <any jira_sync.py subcommand ...>    passthrough
+#   jira whoami
+#
+# The implementation is scripts/ci/jira_sync.py in the code repo (stdlib, unit-tested);
+# this wrapper only fills the environment and execs it. Configure once, per machine:
+#
+#   ~/.config/factory/jira.env     JIRA_BASE_URL=https://<site>.atlassian.net
+#                                  JIRA_USER_EMAIL=<you>@<company>
+#                                  JIRA_PROJECT_KEY=<KEY>
+#                                  FACTORY_REPO=$HOME/git/<code-repo>   (any worktree works)
+#   login keychain                 security add-generic-password -s factory-jira-api-token \
+#                                    -a "$JIRA_USER_EMAIL" -w '<api token>'
+set -euo pipefail
+
+CONF="${FACTORY_JIRA_ENV:-$HOME/.config/factory/jira.env}"
+[[ -r "$CONF" ]] && set -a && . "$CONF" && set +a
+: "${JIRA_BASE_URL:?set JIRA_BASE_URL in $CONF}"
+: "${JIRA_USER_EMAIL:?set JIRA_USER_EMAIL in $CONF}"
+REPO="${FACTORY_REPO:-$PWD}"
+SCRIPT="$REPO/scripts/ci/jira_sync.py"
+[[ -f "$SCRIPT" ]] || { echo "jira: $SCRIPT not found (set FACTORY_REPO in $CONF)" >&2; exit 1; }
+if [[ -z "${JIRA_API_TOKEN:-}" ]]; then
+  JIRA_API_TOKEN="$(security find-generic-password -s factory-jira-api-token -w)"
+fi
+export JIRA_BASE_URL JIRA_USER_EMAIL JIRA_API_TOKEN JIRA_PROJECT_KEY="${JIRA_PROJECT_KEY:-}"
+
+case "${1:-}" in
+  ""|-h|--help) sed -n '2,11p' "$0"; exit 0 ;;
+  whoami)
+    python3 - <<'PY'
+import base64, json, os, urllib.request
+req = urllib.request.Request(os.environ["JIRA_BASE_URL"] + "/rest/api/3/myself",
+    headers={"Authorization": "Basic " + base64.b64encode(f"{os.environ['JIRA_USER_EMAIL']}:{os.environ['JIRA_API_TOKEN']}".encode()).decode()})
+d = json.load(urllib.request.urlopen(req, timeout=30)); print(d["displayName"], d["accountId"])
+PY
+    ;;
+  pickup) shift; exec python3 "$SCRIPT" pickup --key "$1" ;;
+  link)   shift; exec python3 "$SCRIPT" link --keys "$1" --url "$2" --title "$3" ;;
+  *)      exec python3 "$SCRIPT" "$@" ;;
+esac

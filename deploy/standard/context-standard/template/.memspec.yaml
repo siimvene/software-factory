@@ -1,0 +1,6 @@
+# Pointer only — this repo carries no store; durable memory lives in the team store (writes via promote PRs), local agent scratch is disposable and never committed. Fill {{TEAM_CONTEXT}} with your <team>-team-context repo name.
+stores:
+  - name: team
+    path: /workspaces/{{TEAM_CONTEXT}}
+    priority: 10
+    writable: false

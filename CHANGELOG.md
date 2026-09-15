@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.11 (2026-09-16)
+
+The setup becomes a runbook a second engineer can execute.
+
+- `deploy/`: how the factory is stood up, in the shape it runs on the reference implementation.
+  `01-workstation-macos.md` (the tools, plugins, credentials and settings for one Mac, an
+  engineer profile and a PM profile, the traps from the reference machine);
+  `02-scaffold-a-project.md` (the agent runbook: inputs to collect, then the flightlist's D0, G
+  and M legs as commands with a check and an evidence pointer each, test-the-test, verify on
+  arrival, the run record); `bin/check-workstation.sh` and `bin/check-project.sh` (one line per
+  requirement, exit 1 on a missing required item, tested against a known-true and a known-false
+  case); `marketplace/` (a Claude Code marketplace holding the eight plugins from the group's
+  catalog the loop uses, verbatim at pinned commits, `pm-workspace` at 1.6.0); `standard/` (the
+  group's context standard v0.4 with its adopt script, the operating contract, the team-context
+  and instructions templates); `templates/` (kvart's wiring: tracked agent settings with the
+  sensor hooks, MCP servers, rule files, git hooks including the provenance trailer, the ledger
+  script with its tests, the gate and ledger workflows, the ruleset body, the memory binding, the
+  Jira workflow payload). Two changes to the copied workflows: both ledger workflows now pass
+  `JIRA_PROJECT_KEY` from a repository variable, so the key regex is not hard-wired to the
+  reference project.
+- `README.md`, `WRITING.md`, `STATUS.md`, `docs/18-flightlist.md`: the pointer, the file-taxonomy
+  entry with the anonymisation exemption for vendored trees, the status row (designed until a
+  second engineer runs it), and the flightlist's link to the commands that execute its legs.
+
 ## 0.2.10 (2026-09-15)
 
 Design before the plan; red-first becomes a gate.
