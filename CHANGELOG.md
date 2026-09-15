@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.9 (2026-09-15)
+
+The PM surface after the group's planning session.
+
+- `docs/14-pm-surface.md`: the PM runs the same tooling as the engineer (decided 2026-09-15,
+  tooling and access parity, authority unchanged); tracker fields are deduced from the source, the
+  code and a `TRACKER.md` configured once, shown with a reason each, approved or corrected, with
+  corrections written back so nothing is asked twice; attachments on issues and epics through the
+  tracker's REST endpoint because the hosted MCP has none; prototypes are clickable and navigable,
+  published only on the PM's explicit decision.
+- `templates/skills/ticket/SKILL.md`: step 4b, tracker fields; the never-list now distinguishes
+  what is proposed (type, project, parent, labels, links) from what stays with grooming.
+
 ## 0.2.8 (2026-09-15)
 
 Test the test applies to the tests.
