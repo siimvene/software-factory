@@ -17,6 +17,9 @@ Design before the plan; red-first becomes a gate.
   row 3a.
 - `docs/01-principles.md` §3: the change has a known-false case of its own, the code before it.
 - `docs/06-verify-gate.md`: design review before the build; the note joins the spec pack.
+- `docs/14-pm-surface.md`: what the program design note needs from the ticket, section by section,
+  the sizing signals only the PM can write, the prototype as a readiness condition for UI work,
+  what the PM must not write, and the evaluator's question order on a sized ticket.
 - `docs/10-measurement.md`: rework after the first review as the instrument that decides whether
   the note pays; a design-quality row in the instruments table.
 - `evidence/field-evidence.md` §7: the talk the two gaps trace to, what is taken and what is not.
