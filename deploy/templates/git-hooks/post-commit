@@ -26,8 +26,8 @@ CODE_FILES=$(echo "$CHANGED_FILES" | grep -E '\.(py|ts|tsx|js|jsx|vue|kt|kts|swi
 SEARCH_DIRS=()
 [ -d ".memspec/memory" ] && SEARCH_DIRS+=(".memspec/memory")
 [ -d "$HOME/.memspec/memory" ] && SEARCH_DIRS+=("$HOME/.memspec/memory")
-[ -d "$HOME/git/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("$HOME/git/kvart-team-context/.memspec/memory")
-[ -d "/workspaces/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("/workspaces/kvart-team-context/.memspec/memory")
+[ -d "$HOME/git/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("$HOME/git/<team>-team-context/.memspec/memory")
+[ -d "/workspaces/<team>-team-context/.memspec/memory" ] && SEARCH_DIRS+=("/workspaces/<team>-team-context/.memspec/memory")
 [ ${#SEARCH_DIRS[@]} -eq 0 ] && exit 0
 
 # Build search alternation: full paths AND basenames.

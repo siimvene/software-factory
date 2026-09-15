@@ -442,7 +442,9 @@ def build_parser(project: str) -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    project = os.environ.get("JIRA_PROJECT_KEY", "KVART")
+    # `or`, not a get() default: the workflows always export the variable, and an unset
+    # repository variable arrives as "" (which would turn KVART-12 into "-12").
+    project = os.environ.get("JIRA_PROJECT_KEY") or "KVART"
     args = build_parser(project).parse_args(argv)
     jira = None if getattr(args, "offline", False) else Jira.from_env()
     return int(args.fn(jira, args))
