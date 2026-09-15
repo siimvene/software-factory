@@ -117,7 +117,7 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 | `analyze` | Produce an exhaustive verified picture of an existing feature or flow, not a partial slice | specs, then code entry points, input classes, configuration types, validators, message bundles, feature flags, then workspace notes | an analysis document in the workspace, every claim citing a path or class | SPEC intake | advisory |
 | `architect-review` | Senior-engineer adversarial pass over draft tickets before build starts | the domain's specs, workspace reference and open questions, then the frontend and backend code | findings as BLOCKER, MAJOR or MINOR, each with evidence and a concrete fix | SPEC readiness | advisory, but a BLOCKER is a stop |
 | `ticket` | Draft a story or an epic from a source spec, with its tracker fields | the source file, then the story and epic templates plus the skill's own style rules, then `TRACKER.md`, then code for gap resolution | a ticket file under the tickets folder with type, project, epic parent, labels and links proposed with a reason each, saved only on approval | SPEC intake | gated: refuses an epic without a `features/` spec, blocks on unresolved product decisions, never writes to the tracker; never proposes assignee, priority, sprint or points |
-| `readiness-evaluator` | Score a ticket against a 7-criterion rubric out of 100 | the ticket text, then the domain spec folders, then the workspace notes | a score table, per-criterion gaps with citations, and one highest-impact question | SPEC readiness | gated: below the threshold it hands off to the improver |
+| `readiness-evaluator` | Score a ticket against a 7-criterion rubric out of 100; on a sized ticket its top question follows the program design note's order | the ticket text, then the domain spec folders, then the workspace notes | a score table, per-criterion gaps with citations, and one highest-impact question | SPEC readiness | gated: below the threshold it hands off to the improver |
 | `task-improver` | Conversational refinement loop that raises a weak ticket to the threshold, one question at a time | the ticket, the evaluation output, then the same context sources as the evaluator | a polished ticket, a drift check, and a session log with score progression | SPEC readiness | advisory, with a gated write-back |
 | `task-splitter` | Split a ticket that is over about 2 person-days into independently deliverable sub-tasks | the polished ticket only | a split proposal with a coverage check, the parent promoted to an epic | SPEC readiness | gated: proposal, then explicit confirmation before any write |
 | `task-degrader` | Degrade a good ticket into a bad one to test the scoring pipeline | a good ticket | a synthetic bad ticket for calibration | LEARN | advisory, test fixture only |
@@ -275,7 +275,8 @@ slice order, shape decisions. Those are the note's job. A ticket that carries th
 delta and the acceptance criteria stop being the requester's (see
 [07-roles-and-authority](07-roles-and-authority.md)).
 
-Consequence for the evaluator, `[proposed]`: when the ticket's own text shows a sizing signal
+Consequence for the evaluator, written into `templates/skills/readiness-evaluator` and not yet run
+on a sized ticket `[designed]`: when the ticket's own text shows a sizing signal
 (money, new data, another consumer, a retirement, several features cited), the single
 highest-impact question it asks targets a row of the table above, in this order: constraints and
 invariants, exact values in the examples, pre-conditions, actor and surface per example. It still
