@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Estate commit-msg hook: every commit carries a Provenance trailer (humans approve, never author).
+#   Provenance: human            a person wrote this
+#   Provenance: agent:<name>     an agent wrote it (e.g. agent:claude-therin, agent:codex)
+# Merge commits made by git itself are exempt (they carry no authored code).
+msg="$1"
+if grep -qE '^Merge (branch|flywheel|remote-tracking)' "$msg" && ! grep -qE '^Provenance:' "$msg"; then exit 0; fi
+if ! grep -qE '^Provenance: (human|agent:[a-z0-9._-]+)$' "$msg"; then
+  echo "commit-msg: BLOCKED — missing trailer 'Provenance: human' or 'Provenance: agent:<name>' (estate rule: humans approve, never author)." >&2
+  exit 1
+fi

@@ -1,0 +1,24 @@
+# Docs conformance gate — thin caller (managed file, do not edit).
+# All check logic lives in the context-standard repo's reusable workflow; improvements
+# to checks ship by moving the @v1 tag there, with no PR to this repo.
+name: docs-lint
+
+on:
+  pull_request:
+    paths: ["docs/**", "CLAUDE.md", ".memspec.yaml", ".memspec/**", ".context-standard.lock"]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docs-lint:
+    # The v0.4 check logic (`.memspec.yaml` pointer, L0 team-context resolution)
+    # lives in the context-standard's home repo — the old starter-kits copy still
+    # requires the retired AGENTS.md/.memspec-dir layout.
+    uses: Piletilevi/plg-development-standards/.github/workflows/docs-lint-reusable.yml@main

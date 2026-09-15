@@ -27,7 +27,23 @@ model decision is reviewed anyway.
 The net runs before this list, on the Stop hook and the pre-push receipt: ratchets, changed-line
 coverage and, proposed, the mutation kill rate on the touched modules
 ([05-sensor-stack](05-sensor-stack.md) layer 3). A reviewer reading a diff whose tests kill
-nothing is reviewing the wrong artefact.
+nothing is reviewing the wrong artefact. The fail-on-base check sits in the same place: every
+new or changed test red on the merge base and green on the branch, exemptions declared, so the
+reviewer is not the party that discovers a test proves nothing (the trial's MINOR, below).
+
+## Design review before the build (proposed)
+
+For a sized ticket ([02-loop](02-loop.md), the sizing rule) the program design note is reviewed
+before the first brief: one cross-vendor leg on the note for a one-note ticket, the panel and the
+owner for a full one. The note is a page, so the leg returns in minutes, and it is the cheapest
+review in the loop because nothing has been built yet. The reviewer is asked the adversarial
+questions of the operating contract §4 against the note (what fails, which edge case breaks it,
+can state be left inconsistent, which assumption might be wrong) plus two of its own: can every
+numbered example pass while this design is still wrong, and does each slice boundary leave the
+branch coherent. It flags and never edits; findings are dispositioned into the note before any
+brief is written. The class it moves earlier is cycle 2's MEDIUM below: a planning document
+keyed on a retired flag, found in the diff stage `[measured 2026-09-07]`. Not measured yet on
+any cycle; the first sized ticket after this version is where it gets a number.
 
 ## Receipt-checked pre-push gates
 
@@ -93,6 +109,10 @@ leg reads only the diff payload. So a linked spec delta is not already in the re
 context, and the check cannot be one line in a pack on its own. The plumbing is small but real:
 the feature's spec, the ticket's numbered examples and the escalation decisions taken so far
 travel to every leg as one more injected pack, the same mechanism the rule packs already use.
+On a sized ticket the program design note travels with them
+([templates/program-design.md](../templates/program-design.md)): drift from an agreed shape
+decision, a signature or the slice order is the same `spec-drift` class citing the note's
+section, and intended drift takes REFINE-SPEC into the note `[proposed, adr/0010]`.
 The rule itself is then one paragraph. In cycle 4 the repo-reading leg raised the
 management-company scope question from the code alone, the principal dismissed it "by the spec"
 and escalated it, and the thread was posted at 12:53Z, after all three panels had finished; with

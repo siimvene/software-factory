@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# Commit-time tripwires, scoped to STAGED files only — never the full suite.
+# Active for every clone via `git config core.hooksPath scripts/git-hooks`
+# (the same setting that enables the memspec post-commit hook).
+# Bypass: git commit --no-verify — only when a human explicitly asks.
+#
+# Honesty note: checks run against the working tree. That equals the index
+# only when every checked file is FULLY staged, so partially-staged checked
+# files are an explicit block below. A staged test can still pass against
+# unstaged src it imports — this hook is a tripwire, not CI.
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+fail() {
+  echo "" >&2
+  echo "pre-commit: BLOCKED — $1" >&2
+  exit 1
+}
+
+# macOS ships bash 3.2 — no mapfile; while-read + process substitution only.
+staged=()
+while IFS= read -r f; do staged+=("$f"); done < <(git diff --cached --name-only --diff-filter=ACMR)
+staged_any=()
+while IFS= read -r f; do staged_any+=("$f"); done < <(git diff --cached --name-only)   # incl. deletions/renames
+[ "${#staged_any[@]}" -eq 0 ] && exit 0
+
+[ "$(uname)" = "Darwin" ] && export DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib
+
+py_staged=()
+test_staged=()
+for f in ${staged[@]+"${staged[@]}"}; do
+  case "$f" in
+    tests/unit/test_*.py) py_staged+=("$f"); test_staged+=("$f") ;;
+    src/*.py | tests/*.py | alembic/*.py | scripts/*.py) py_staged+=("$f") ;;
+  esac
+done
+
+migration_touched=0
+for f in ${staged_any[@]+"${staged_any[@]}"}; do
+  case "$f" in alembic/versions/*) migration_touched=1 ;; esac
+done
+
+# 0. Checked files must be fully staged — otherwise the working tree we test
+#    is not the index git will commit.
+partial=()
+unstaged=()
+while IFS= read -r f; do unstaged+=("$f"); done < <(git diff --name-only)
+for f in ${py_staged[@]+"${py_staged[@]}"}; do
+  for u in ${unstaged[@]+"${unstaged[@]}"}; do
+    [ "$f" = "$u" ] && partial+=("$f")
+  done
+done
+[ "${#partial[@]}" -gt 0 ] && fail "partially staged (index != working tree), cannot verify what will be committed: ${partial[*]} — stage the full file"
+
+# 1. Lint AND format-check staged Python. Two separate ruff passes: `ruff check`
+#    never complains about a call wrapped more conservatively than line-length
+#    allows, so formatting drifted unnoticed for months (228 files on 2026-09-04,
+#    ~20% of the tree, and stable at that share since at least 2026-08-02 —
+#    nothing in the commit path checked it and this repo has no CI). Scoped to
+#    staged files like every other check here, so the existing backlog is cleared
+#    file by file as those files are touched rather than in one 228-file commit
+#    that would conflict with every live worktree.
+if [ "${#py_staged[@]}" -gt 0 ]; then
+  uv run ruff check "${py_staged[@]}" || fail "ruff on staged files"
+  #    Capture the exit code as well as the names: on any non-zero exit that
+  #    named no files (ruff missing, a config error) an output-only check would
+  #    pass silently, which is a gate that cannot fail.
+  fmt_out=$(uv run ruff format --check "${py_staged[@]}" 2>&1)
+  fmt_rc=$?
+  unformatted=$(echo "$fmt_out" | sed -n 's/^Would reformat: //p')
+  if [ "$fmt_rc" -ne 0 ] && [ -z "$unformatted" ]; then
+    fail "ruff format --check errored (exit $fmt_rc) instead of reporting files:
+$fmt_out"
+  fi
+  if [ -n "$unformatted" ]; then
+    #    Shell-quote each path before pasting it into a copyable command: these
+    #    names come from the repository, and a file called `$(cmd).py` would
+    #    otherwise render a hint that executes `cmd` when someone follows it.
+    fmt_cmd=""
+    while IFS= read -r _p; do
+      [ -n "$_p" ] && fmt_cmd="${fmt_cmd}$(printf '%q' "$_p") "
+    done <<EOF
+$unformatted
+EOF
+    fail "ruff format on staged files:
+$(echo "$unformatted" | sed 's/^/    /')
+
+  Fix with:  uv run ruff format $fmt_cmd
+
+  If you did not reformat anything, the file was simply never formatted (about a
+  fifth of the repo is in that state) — running the command above is the fix, and
+  the whitespace-only churn belongs in your commit."
+  fi
+fi
+
+# 2. Migration touched (incl. deleted/renamed) → exactly one alembic head,
+#    and the RLS coverage guard must be green. The guard's covered list is
+#    hand-kept: a migration that inlines ENABLE/FORCE RLS DDL must append its
+#    table to _rls_covered_tables() in tests/unit/test_rls_coverage_guard.py
+#    in the SAME commit (forgotten twice before this hook existed).
+if [ "$migration_touched" = "1" ]; then
+  heads_out=$(uv run alembic heads 2>&1) || fail "alembic heads errored: $heads_out"
+  heads=$(grep -c "(head)" <<<"$heads_out" || true)
+  [ "$heads" = "1" ] || fail "alembic heads shows $heads heads — renumber your migration (see CLAUDE.md Migrations): $heads_out"
+  uv run pytest tests/unit/test_rls_coverage_guard.py --noconftest -q -p no:cacheprovider \
+    || fail "RLS coverage guard is red. If your migration inlines FORCE RLS, append the table to _rls_covered_tables() in tests/unit/test_rls_coverage_guard.py; if the table is legitimately exempt, document it in _RLS_EXEMPT."
+fi
+
+# 3. Staged backend test files must pass. Files touching real-DB conftest
+#    fixtures (db_session / async_engine / setup_database) need conftest and
+#    a running Docker daemon; the rest run faster with --noconftest.
+need_conftest=()
+no_conftest=()
+for f in ${test_staged[@]+"${test_staged[@]}"}; do
+  [ -f "$f" ] || continue
+  [ "$migration_touched" = "1" ] && [ "$f" = "tests/unit/test_rls_coverage_guard.py" ] && continue  # already ran above
+  if grep -qE "db_session|async_engine|setup_database" "$f"; then
+    need_conftest+=("$f")
+  else
+    no_conftest+=("$f")
+  fi
+done
+if [ "${#need_conftest[@]}" -gt 0 ] && ! docker info >/dev/null 2>&1; then
+  fail "staged tests need real-DB conftest fixtures but Docker is not running (${need_conftest[*]}) — start Docker or unstage them"
+fi
+if [ "${#no_conftest[@]}" -gt 0 ]; then
+  uv run pytest "${no_conftest[@]}" --noconftest -q -p no:cacheprovider || fail "staged tests (mock-tier)"
+fi
+if [ "${#need_conftest[@]}" -gt 0 ]; then
+  uv run pytest "${need_conftest[@]}" -q -p no:cacheprovider || fail "staged tests (real-DB tier)"
+fi
+
+exit 0
