@@ -1,0 +1,137 @@
+# The mechanical gates on main, as required status checks. Job names are STABLE
+# (cleat, enola, trivy): the branch ruleset names them, so renaming a job silently
+# drops its protection. Source: the reference implementation's ci.yml (kvart), the
+# three gate jobs lifted out; the project's own lint + test job(s) live in the
+# project's ci.yml and are named in the same ruleset.
+#
+# cleat needs a coverage report for the changed-coverage gate. Produce one in the
+# test job and upload it as the `backend-coverage` artifact (or drop the download
+# step and the --postflight flag until a report exists; the pre-push hook does the
+# same locally).
+#
+# Every third-party action is pinned to a full commit SHA (supply-chain rule); the
+# `# vX.Y.Z` comment is the tag it resolves to.
+name: gates
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: gates-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+jobs:
+  cleat:
+    name: cleat
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - name: Fetch origin/main (cleat base_ref)
+        run: git fetch --no-tags origin +refs/heads/main:refs/remotes/origin/main
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86 # v5.4.2
+        with:
+          version: "0.12.7"
+      # lizard drives the complexity gate; pin the version the baselines were
+      # measured under so the config hash stays comparable.
+      - name: Install lizard
+        run: uv tool install lizard==1.23.0
+      # Optional: a coverage report from the test job. Remove this step and
+      # --postflight below until the test job uploads `backend-coverage`.
+      - name: Download coverage report
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: backend-coverage
+        continue-on-error: true
+      - name: Run cleat gates (strict + postflight)
+        run: python3 quality/bin/gate.py --strict --postflight
+
+  # enola is a DELTA gate: pin a baseline at the base commit, then check the head
+  # against it, so only NEW layer/cycle/intent violations fail.
+  enola:
+    name: enola
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      ENOLA_VERSION: 0.4.15
+      ENOLA_SHA256: bf21cf08cc054ed3a3d12b1cc706b06d3098953444077d267b8da681ee9a8d9d
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      # Pinned release binary from github.com/enola-labs/enola, sha256-verified.
+      - name: Install enola
+        run: |
+          set -euo pipefail
+          url="https://github.com/enola-labs/enola/releases/download/v${ENOLA_VERSION}/enola-${ENOLA_VERSION}-linux-amd64.tar.gz"
+          curl -fsSL -o enola.tar.gz "$url"
+          echo "${ENOLA_SHA256}  enola.tar.gz" | sha256sum -c -
+          tar -xzf enola.tar.gz
+          sudo install -m 0755 "enola-${ENOLA_VERSION}-linux-amd64" /usr/local/bin/enola
+          rm -f enola.tar.gz "enola-${ENOLA_VERSION}-linux-amd64" LICENSE NOTICE
+          enola --version
+      - name: Determine base commit
+        id: base
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          set -euo pipefail
+          base="$PR_BASE_SHA"
+          if [ -z "$base" ]; then base="$PUSH_BEFORE_SHA"; fi
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            base="$(git rev-parse HEAD^)"
+          fi
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+      # Pin at base, check at head. .enola/ is gitignored, so the pinned baseline
+      # survives the checkout back to head.
+      - name: Enola architecture check
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+        run: |
+          set -euo pipefail
+          head="$(git rev-parse HEAD)"
+          git checkout --quiet --detach "$BASE_SHA"
+          enola baseline pin .
+          git checkout --quiet --detach "$head"
+          enola check -fail-on=layers,cycles,intent .
+
+  # Trivy: secrets and misconfig at HIGH/CRITICAL block; CRITICAL fixable deps block.
+  trivy:
+    name: trivy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Trivy — secret & misconfig scan (HIGH,CRITICAL block)
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+        with:
+          version: v0.74.0
+          scan-type: fs
+          scan-ref: .
+          scanners: secret,misconfig
+          severity: HIGH,CRITICAL
+          exit-code: '1'
+          skip-dirs: .enola,.secrets,node_modules,.venv,.pnpm-store
+      - name: Trivy — dependency vulnerabilities (CRITICAL block)
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # v0.33.1
+        with:
+          version: v0.74.0
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+          skip-dirs: .enola,.secrets,node_modules,.venv,.pnpm-store

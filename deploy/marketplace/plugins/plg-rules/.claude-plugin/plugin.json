@@ -1,0 +1,16 @@
+{
+  "name": "plg-rules",
+  "displayName": "PLG Rules",
+  "version": "0.1.2",
+  "description": "Installs PLG's shared coding standards so reviews and generated code follow the same house rules everywhere. Kept in sync from plg-development-standards.",
+  "author": {
+    "name": "Siim Vene"
+  },
+  "license": "MIT",
+  "keywords": [
+    "rule-packs",
+    "standards",
+    "rubric",
+    "code-review"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "spec-repos",
+  "displayName": "Spec Repos",
+  "version": "1.0.2",
+  "description": "Keeps a team's written specifications in step with the actual code: it can write specs from an existing codebase, and update them whenever a change ships.",
+  "author": {
+    "name": "Adam Walczak",
+    "email": "adam.walczak@kicket.com"
+  }
+}

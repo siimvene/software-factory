@@ -1,0 +1,73 @@
+# Ledger enforcement — every PR must name its KVART ticket, mechanically.
+#
+# The ledger drifts silently when a PR carries no ticket key: jira-sync reads
+# keys from the head branch and PR title only, so a keyless PR (e.g.
+# `fix/ticket-notify-gaps`) merges with no link, no comment, no transition, and
+# nothing flags it. This check makes that state red instead of invisible.
+#
+# A PR passes when `extract_keys` finds a `KVART-N` in the branch name OR the
+# title, OR when it carries the `no-ticket` label (the escape hatch for a
+# genuinely ticketless change: a mechanical revert, a one-off chore). It fails
+# otherwise, with the fix spelled out.
+#
+# Like jira-sync, this runs MAIN's copy of the extractor (sparse checkout, no
+# credentials), never the PR's: a branch cannot weaken its own gate by editing
+# `jira_sync.py`. The check needs no secrets and touches no Jira.
+#
+# Make it binding: add the `ticket-key` check to main's ruleset required
+# checks. Until then it runs and reports but does not block.
+name: pr-ticket-key
+
+on:
+  pull_request:
+    # `synchronize` (a new commit) is required even though the verdict depends
+    # only on branch/title/label: a required check must report a status on the
+    # PR's latest commit SHA, so without it a push leaves the PR stranded at
+    # "Expected — waiting for status" until an unrelated edit retriggers it.
+    types: [opened, reopened, edited, ready_for_review, labeled, unlabeled, synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+env:
+  JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}   # jira_sync.py's key regex; default KVART when unset
+
+# A rapid series of edits (title tweaks, label toggles) should leave only the
+# latest evaluation standing.
+concurrency:
+  group: pr-ticket-key-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  ticket-key:
+    name: ticket-key
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main's copy of the extractor (never the PR's)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          sparse-checkout: scripts/ci
+          persist-credentials: false
+
+      - name: Require a KVART ticket key in the branch or title
+        env:
+          # Passed as env, never interpolated into the script line: a title is
+          # attacker-controlled text and must not reach the shell as code.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BRANCH: ${{ github.event.pull_request.head.ref }}
+          HAS_OPT_OUT: ${{ contains(github.event.pull_request.labels.*.name, 'no-ticket') }}
+        run: |
+          set -euo pipefail
+          if [ "$HAS_OPT_OUT" = "true" ]; then
+            echo "::notice::'no-ticket' label present — ledger entry intentionally skipped for this PR."
+            exit 0
+          fi
+          # `--text=` so a branch or title beginning with '-' is data, not a flag.
+          keys="$(python3 scripts/ci/jira_sync.py keys --text="${PR_BRANCH} ${PR_TITLE}" | paste -sd, -)"
+          if [ -z "$keys" ]; then
+            echo "::error::No KVART-N key in the branch name or PR title, and no 'no-ticket' label."
+            echo "::error::Put the ticket in the branch (feat/KVART-42-...) or the title, so jira-sync links and transitions it. For a genuinely ticketless change, add the 'no-ticket' label."
+            exit 1
+          fi
+          echo "::notice::ticket key(s): ${keys}"
