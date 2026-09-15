@@ -173,6 +173,17 @@ configured table (an agent-eligibility label set at the readiness gate is the fi
 teams will want, see [02-loop](02-loop.md) on dispatch). Assignee, priority, sprint and points are
 never deduced; they belong to the team lead and grooming.
 
+**Tested on the reference workspace `[measured 2026-09-15]`.** Two fresh headless sessions, one
+fixture story under an existing epic folder. With `TRACKER.md` present: the preview carried type,
+project, parent, labels and links with a reason each, asked for no configured value, and proposed
+one configuration correction (the folder-to-epic mapping had no epic keys, so the two runs disagreed
+on the parent: one named the folder, one said "ask once"). With `TRACKER.md` removed: the skill said
+so, did not ask for the project key, rebuilt the proposal from the live tracker's own metadata and
+found a label in use on 14 issues that the table lacked. Both runs also caught the fixture's three
+disagreements with the code (a table name, a status value and a route that did not exist), which is
+the read-order rule doing its job. Corrections applied the same day: an epic-key column, the live
+label rows, and the vocabulary line.
+
 **Attachments.** Screenshots and the `demo` prototype belong on the issue, and an epic takes
 attachments like any other issue. The hosted tracker MCP exposes create, edit, comment, transition
 and link, and no attachment call `[measured 2026-09-15]`, so the tracker skill attaches through the
@@ -315,7 +326,10 @@ Findings about the surface itself, each one a defect in the template rather than
   the ticket was drafted from the story template alone `[measured 2026-09-07]`. A template that
   ships with its own lookups broken fails silently, because a missing reference reads as a skipped
   step rather than an error. The check is mechanical and belongs in the template's own test: for
-  every path a skill names, assert it exists.
+  every path a skill names, assert it exists. Still missing on 2026-09-15, eight days and five cycles later, and reported again by
+  both test runs of the tracker-fields step; the eleven rules were written that day and ship with
+  the `ticket` skill under `references/`. The lesson stands: a defect that only shows as a skipped
+  step is not fixed by noticing it.
 - **A ticket tracker, which closed a cycle-1 shortcut.** On 2026-09-07 there was no tracker, so the
   stage was a status line in a file `[measured 2026-09-07]`: tickets lived as files in the workspace
   and moved Ready, In Progress, In Test, Ready for LIVE by editing one line, and four of seventeen

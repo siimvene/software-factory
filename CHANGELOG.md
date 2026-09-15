@@ -12,6 +12,9 @@ The PM surface after the group's planning session.
   published only on the PM's explicit decision.
 - `templates/skills/ticket/SKILL.md`: step 4b, tracker fields; the never-list now distinguishes
   what is proposed (type, project, parent, labels, links) from what stays with grooming.
+- `templates/skills/ticket/references/style-rules.md`: the eleven rules the skill has named since it
+  shipped, now present. Step 4b measured on the reference workspace in two fresh sessions, with and
+  without the configuration file; both passed, both surfaced the missing epic-key mapping.
 
 ## 0.2.8 (2026-09-15)
 
