@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.8 (2026-09-15)
+
+Test the test applies to the tests.
+
+- `docs/01-principles.md` §3: the suite is a predicate over the code; coverage is its known-true
+  case and mutation its known-false case. Numbers from the reference implementation's first
+  mutation campaign: kill rate 30.3 % (database-free) and 39.9 % (database-coupled) under green
+  changed-line coverage, 11.2 % on the largest billing module.
+- `docs/05-sensor-stack.md` layer 3: the mutation kill rate as a ratchet on the touched modules,
+  `[proposed]`: scope by the diff, per-module baseline, killed over total, refuse a drop, targets
+  on the money lane, generated tests exit on their kills, template-cloned database per run for
+  the coupled half.
+- Pointers and rows in 00, 06, 09, 10, 11, 13, 16, README, STATUS.
+
 ## 0.2.7 (2026-09-10)
 
 The skills ship, and the setup sequence becomes a list you tick.

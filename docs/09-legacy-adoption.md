@@ -126,7 +126,10 @@ Two derived rules:
   change hiding inside a test commit. The fix is a separate, specified turn.
 
 Keep the mutation scope narrow while the net is small. Mutation testing runs the suite once
-per mutant, so widening the target list costs real wall-clock.
+per mutant, so widening the target list costs real wall-clock. Once the net exists, the scope
+is the diff: the kill rate on the touched modules becomes a ratchet in the sensor stack
+([05-sensor-stack](05-sensor-stack.md) layer 3), so the number this turn establishes is not
+lost the first time an agent adds a test that asserts nothing.
 
 ### 3. Self-provisioning test infrastructure
 

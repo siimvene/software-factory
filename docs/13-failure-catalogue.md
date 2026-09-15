@@ -78,6 +78,9 @@ table; the entries here are the ones that apply to any adoption.
 | one file in 4,317 disagrees with its directory | globs matched directories; the bytecode package differed | match the declared package |
 | a filtered test run silently corrupts the aggregate | `--rerun-tasks` with a filter overwrites the module's exec data | re-run the full module task before trusting the aggregate |
 | a 100 % mutation score next to 6 real clones | mutation says the tests notice changes; it says nothing about copy-paste | keep both gates |
+| changed-line coverage green on every PR, whole-module kill rate 30 to 40 %, 11.2 % on the largest billing module (2026-09-15) | coverage says a line ran; a test that asserts only that something came back covers everything | mutation kill rate as a ratchet on the touched modules, killed over total |
+| a module reads 100 % mutation score with 3.6 % of its mutants exercised (2026-09-15) | killed over (killed plus survived) drops the not-exercised column | report killed over total, always |
+| parallel mutant runs against one shared test database score garbage (2026-09-15) | workers collide on the same rows | a migrated template database, cloned per run, behind a flag |
 | a test that passes alone and fails in the suite reported as a regression | test pollution | run in isolation first; check the history of the asserted contract |
 | "verified in CI" for a change never run locally | the coverage library could not read the JVM's bytecode version | run it; intent is not completion |
 
