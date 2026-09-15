@@ -49,7 +49,7 @@ ALT=$(echo "$PATTERNS" | grep -v '^$' | sort -u | sed 's/[.[\*^$()+?{|]/\\&/g' |
 [ -z "$ALT" ] && exit 0
 
 # Grep memspec for any of these
-HITS=$(grep -rEl "$ALT" "${SEARCH_DIRS[@]}" 2>/dev/null || true)
+HITS=$(grep -rEl -e "$ALT" "${SEARCH_DIRS[@]}" 2>/dev/null || true)
 [ -z "$HITS" ] && exit 0
 
 # Output to stderr so it surfaces in interactive shells but doesn't pollute stdout
