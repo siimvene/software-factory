@@ -32,7 +32,7 @@ the L6 release owner.
 | Rung | What | State |
 |---|---|---|
 | L0 | sandbox with egress allowlist and scoped identity | measured (booted; identity blocked) |
-| L1 | verification net: ratchets, characterization, mutation kill on money classes, async paths, YAGNI ladder | measured on kvart; partial on the legacy core |
+| L1 | verification net: ratchets, characterization, mutation kill rate baselined per module and ratcheted on the touched ones, async paths, YAGNI ladder | measured on kvart (kill-rate gate proposed, baseline measured 2026-09-15); partial on the legacy core |
 | L2 | parity replay against an oracle (the mature system): same input, diff the outputs, money cent-exact | proposed |
 | L3 | adversarial review loop, cross-vendor, bounded to 3 to 4 cycles | measured |
 | L4 | contract tests at module boundaries plus the architecture gate: a boundary violation fails the build | designed (the architecture diff's provable explainers plus scope spillover = 0 are the gate; no agent needed) |

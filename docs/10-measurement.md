@@ -168,7 +168,7 @@ the leak (2026-09-08, about 11,000 calls on the wrong tier since 2026-08-13).
 | spend | the usage CLI per config dir (dedupe by message id; per-account split is not recoverable when session files are mirrored), provider consoles, a daily threshold |
 | surface | `git status`, `git diff --stat`, the scope-spillover check, read-only mounts |
 | merge conflicts per stream | dry-run merges per stream |
-| net strength | mutation score, money-surface coverage |
+| net strength | mutation kill rate per module as killed over all mutants (killed over checked hides the unexercised ones), money-surface coverage |
 | parity | replay pass rate per flow |
 | review quality | F1 on the benchmark set |
 | escape | revert rate and prod defect count vs baseline |

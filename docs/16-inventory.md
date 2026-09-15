@@ -54,6 +54,7 @@ not the tool. See [05-sensor-stack](05-sensor-stack.md).
 | Sensor 4, architecture diff: snapshot before, diff after, 19 explainers, three of them provable at confidence 1.00, a scope-spillover check, cross-repo seam declarations, a doctor command that proves the hooks fired | enola, Apache 2.0, `enola-labs/enola`, one binary plus an MCP server and hook installation | same tool. Nothing else in the stack crosses repository boundaries, so an adopter with more than one repo needs this or an equivalent | designed |
 | Changed-line coverage as a gate | a ratchet gate, fed by a converter from the project's coverage report format | the converter is local work on any stack whose coverage output is not LCOV or Cobertura | measured |
 | Mutation score on the money surface | the language ecosystem's own mutation tool, wired per project | local wiring; the design's contribution is using mutation, not coverage, as the exit gate for a verification-net bootstrap | measured |
+| Mutation kill rate as a ratchet on the touched modules, killed over total, per-module baseline, receipt per tree | the same mutation tool scoped by the diff, the ratchet's `--tighten` shape, the receipt helpers the browser and static-analysis gates share | local wiring; baseline campaign measured on kvart 2026-09-15, gate not built | proposed |
 
 ## 4. Verify gate
 
