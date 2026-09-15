@@ -131,46 +131,66 @@ Is the title a clear, actionable one-liner that stands alone?
 
 ---
 
-## Sized tickets: what the program design note will need
+## Bigger tickets: one extra question
 
-Downstream of Ready, a ticket above one-shot size gets a program design note written by the build
-side (docs/02-loop, templates/program-design.md). The note is derived from the ticket, and a
-ticket can score 85 on objective, title and actors while leaving the note nothing to work from.
-The evaluator is the cheapest place to catch that: before the build, in one question, instead of
-the head returning the ticket for a note gap after pickup.
+Some tickets are more than a quick fix. Once they are Ready, the build side writes its own short
+design from the ticket before any code (docs/02-loop). It can only write what the ticket gives it.
+A ticket can score 85 and still leave that design with nothing to work from, and then the build
+bounces the ticket back to the author after pickup. Asking here is the same question, an hour
+earlier, before anyone has started building.
 
-**Detection, from the ticket's own text only.** A ticket is treated as sized when its text shows
-any of: money moved, charged, refunded or displayed as an amount people pay on; tenant or account
-isolation; login, identity or permissions; something new stored; another consumer (a mobile client,
-another repository, an external API); a path being retired or removed; more than one current-state
-spec cited. Detection never moves the score and never adds a criterion. It changes only which
-question is asked first and what is flagged as out of place.
+**When this applies.** Only if the ticket's own text says one of these:
 
-**Question order on a sized ticket.** The single highest-impact question (step 5) targets the first
-unfilled item in this order, still scoped to what the ticket already implies:
+- money is moved, charged, refunded, or shown as an amount people pay on
+- login, identity, permissions, or keeping one customer's data away from another's
+- something new gets stored
+- someone else consumes it: a mobile app, another system, an external API
+- an existing feature or path is removed
+- more than one existing feature spec is touched
 
-1. Constraints and invariants: the invariant that must not break, named with the check that proves
-   it; the performance or capacity budget as a number with units or an explicit "none"; a failure
-   path example (the unauthorised, duplicate, expired or malformed case) with what must not change.
-2. Exact values in the examples: every state name, amount, date, message or field a person will see
-   or enter, in its exact form. For UI work, whether the agreed prototype is attached to the ticket;
-   without it the note cannot read off the fields and states, whatever the score.
-3. Pre-conditions and sequencing: what must be true or shipped first, and which ticket this one
-   depends on, so the slices can be ordered.
-4. Actor and surface per example: which role does the action, on which page, endpoint, job or
-   message, so the entry point of each call path is the ticket's and not inferred from the code.
+Nothing about the score changes. This only decides which question you ask first and what you
+point out as misplaced.
 
-**What the evaluator never asks for, and flags if it finds.** Types, signatures, module or file
-names, slice order, shape decisions (streaming or buffered, batch size, transaction boundary,
-retry policy). Those belong to the program design note. If the ticket carries them, list them under
-gaps as `belongs in the program design note, not the ticket`: no score change, but the author
-should know the acceptance criteria stop being the requester's once implementation detail is in
-them (docs/07-roles-and-authority).
+**The one question, in this order.** Ask for the first thing on the list that the ticket does not
+already have. One question, then stop.
 
-**Sizing signals only the author can write.** Money, tenant or identity path; new stored data;
-another consumer; a retirement. The build side cannot recover these from code it has not written.
-When detection fires on one of them and the ticket does not state it as a constraint line, the
-first question asks for that line before anything else in the order above.
+1. **What must never break, and how would we know?** Also: is there a speed or volume limit
+   (a number, or "none"), and what happens on the bad case (wrong person, duplicate, expired,
+   malformed input) including what must stay unchanged.
+2. **What exactly does the user see or type?** Exact names, amounts, dates, messages, field
+   labels. For anything with a screen: is the agreed clickable prototype attached to the
+   ticket? Without it the build cannot know the fields and states, whatever the score.
+3. **What has to exist or ship before this?** Including which other ticket this depends on.
+4. **Who does this, and where?** Which role, on which page, button, endpoint, job, or message,
+   for each example.
+
+Put it at the top of the gaps list, in plain words, like this:
+
+```
+This one is bigger than a quick fix. Before the build can plan it, I need:
+[the one thing, as a question the author can answer in a sentence or two]
+```
+
+Ask it at Good scores too. A high score means the ticket is well written, not that the build has
+what it needs.
+
+**Never ask for, and point out if you find:** file or module names, database tables, function
+names, the order engineering will build things in, or technical choices such as streaming versus
+buffering, batch sizes, retry rules. Those are decided downstream. If the ticket contains them,
+add one gap line, no score change:
+
+```
+This belongs to the build's design, not the ticket; you can drop it: [what was found]
+```
+
+and say why in one sentence: once implementation detail is in the acceptance criteria, the
+criteria are no longer the requester's (docs/07-roles-and-authority).
+
+**The lines only the author can write.** Whether money, identity, or customer isolation is
+involved; whether something new is stored; whether another system consumes it; whether a path is
+being removed. The build cannot find these out from code it has not written yet. If the text
+shows one of them but the ticket never states it as a constraint, ask for that line first,
+before anything else in the order above.
 
 ---
 
@@ -225,7 +245,7 @@ Search recursively across `features/`, `reference/`, and `<tickets>/` for filena
 2. Score each criterion independently using the rubric above, based only on what is written in the ticket.
 3. Sum the scores. State the total and label (Good / Decent / Bad).
 4. For each criterion scored below its midpoint, output one specific, actionable gap statement referencing only content (or its absence) within the ticket. Where the workspace lookup found relevant spec content, append a `[available in features/X.md § N]` citation.
-5. If the ticket is Decent or Bad, identify the **single highest-impact question** to ask the author that would unlock the most score improvement, scoped to what the ticket already covers, not to topics outside it. On a sized ticket (see "Sized tickets" above) the question follows that section's order, and it is asked at Good scores too, as the first line under gaps, because a Good score does not mean the note has what it needs.
+5. If the ticket is Decent or Bad, identify the **single highest-impact question** to ask the author that would unlock the most score improvement, scoped to what the ticket already covers, not to topics outside it. For a bigger ticket (see "Bigger tickets" above) the question follows that section's order and is asked at Good scores too, as the first line under gaps.
 5b. **Auto-transition to improver.** If the total score is below 85, immediately invoke the `task-improver` skill without waiting for the user to ask. Pass the ticket content and the full evaluation output (score, gaps, top clarifying question) as context so the improver starts from the first gap question rather than re-evaluating from scratch.
 5c. **Good score: offer three paths.** If the total score is 85 or above, always present all three options before taking any action:
 
@@ -285,8 +305,8 @@ Score is [X]/100, Good. What would you like to do?
 
 > Context: [features or reference path] matched, gaps annotated with workspace citations.
 > (omit this line if no workspace file was found)
-> Sized: [signals found in the ticket text, e.g. money path, new stored data]; question order applied.
-> (omit this line when no sizing signal is present)
+> Bigger ticket: [why, e.g. money is charged; something new is stored]. One extra question below.
+> (omit this line otherwise)
 
 | Criterion                   | Score | Max |
 |-----------------------------|-------|-----|
@@ -300,7 +320,7 @@ Score is [X]/100, Good. What would you like to do?
 
 ### Gaps
 - [criterion]: [specific gap and what's missing] [available in features/X.md § N, if applicable]
-- note input (sized tickets only, no score effect): [first unfilled item of the question order, or "implementation detail present: ... belongs in the program design note"]
+- This one is bigger than a quick fix. Before the build can plan it, I need: [the one question] (bigger tickets only, no score effect)
 
 ### Top clarifying question
 [Single most impactful question to ask the author]
