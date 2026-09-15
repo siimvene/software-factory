@@ -21,7 +21,7 @@
 | types | `<type checker on changed files>` | | |
 | unit tests | `<test command>` | <PASS n/n> | `<log path>` |
 | integration tests | `<test command>` | <PASS n/n> | `<log path>` |
-| red-before check | <fix reverted, new test must fail> | <RED confirmed> | `<log path>` |
+| fail-on-base (red-before) | `<check command>`: new or changed tests at the merge base with the branch's tests applied | <n/n RED on base, n/n GREEN on branch> | failure kind per test; declared exemptions <n>; `<receipt or log path>` |
 | changed-line coverage | `<coverage gate command>` | <PASS, >= threshold> | threshold <n> |
 | ratchet: escapes | `<gate command>` | | baselined debt only |
 | ratchet: conventions | `<gate command>` | | |

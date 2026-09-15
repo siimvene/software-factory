@@ -10,7 +10,12 @@ you skip.
    standard, a sandbox template and a plugin catalog, adopt them; build only what is specific to
    your system ([adr/0001](../adr/0001-adopt-a-standard-not-build-a-harness.md)). If it ships
    nothing, this repository's [templates](../templates/) and the third-party tools named in
-   [05](05-sensor-stack.md) and [06](06-verify-gate.md) are the minimum.
+   [05](05-sensor-stack.md) and [06](06-verify-gate.md) are the minimum. Where the organisation
+   ships a starter kit per stack (a working reference service with the contract handling, CI
+   gates, test layout and agent rules already encoded), the kit is the architecture layer a
+   program design note builds on: a note for a service on the kit names only the deltas, and
+   the kit is where a gate script such as the fail-on-base check ships once for every fork
+   ([02-loop](02-loop.md)).
 2. **What is your money surface?** The code where a wrong change moves wrong money or shows
    wrong numbers people pay on. Tier it per class. It sets human sign-off and mutation targets.
 3. **Which baselines do you take now?** Revert rate, defect escape, lead time on human-written
@@ -59,7 +64,11 @@ Run [02-loop](02-loop.md). After each turn:
 - the sister spec PR is open before the code PR is called done;
 - the cycle report has the four numbers ([10-measurement](10-measurement.md));
 - every shortcut is in the report, and a repeated shortcut becomes a ticket against the
-  process.
+  process;
+- every new or changed test was red on the merge base, or is declared a characterization or
+  refactor test with its reason (the fail-on-base check, [05](05-sensor-stack.md));
+- a sized ticket had its program design note before the first brief, and the note's module
+  list is the scope the spillover check ran with ([02](02-loop.md)).
 
 First turns are deliberately small and risky in the right way: a one-line fix through the
 whole loop (proves the loop), then a money-path change with an owner decision inside it
@@ -114,3 +123,5 @@ Add to the above, in this order:
 - Attaching a gate into a live shared tree.
 - A rule file that describes a model the code stopped using months ago.
 - A cost estimate per bare agent instead of per orchestrator tree.
+- A brief that names the outcome and leaves the shape to the builder.
+- A test that passes on the merge base counted as a test of the change.
