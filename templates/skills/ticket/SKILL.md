@@ -73,6 +73,33 @@ Resolution paths per gap:
 
 Hard blockers (multiple unresolved PM decisions, incomplete scope) - surface them and STOP. Do not draft a half-baked ticket.
 
+## Step 4b - Tracker fields: deduce, propose, never ask twice
+
+The tracker fields are part of the draft, not a question for every session. Read the workspace's
+tracker configuration first (`TRACKER.md` in the workspace root, or the tracker section of the
+workspace's instruction file): project key, board, issue types in use, the epic-parent convention,
+the labels the team uses and what each means (for example an agent-eligibility label the PM sets at
+the readiness gate), and the team's working language. That file is written once at onboarding and
+corrected in place; if it is missing, say so and propose its content from the tracker's own metadata
+before drafting.
+
+Then deduce, and show each field with its reason in the preview:
+
+| Field | Deduce from | Rule of thumb |
+|---|---|---|
+| Issue type | the source and the mode from step 3 | a user-visible flow a tester or end user can exercise is a **story**; work that unlocks a capability with nothing to see on the surface is **technical development**, linked to the stories it blocks; a defect with steps to reproduce is a **bug**; work outside the engineering workflow (no review, no test environment) is a **task**; multi-story scope is an **epic**. Follow the team's own type rules where the configuration names them |
+| Project and board | the configuration, then the code repository the change lands in | one team, one project; a change spanning teams is an initiative-level question for the PM, not a guess |
+| Epic parent | the tickets folder the draft is saved under, then the tracker | a story under an existing epic folder inherits that epic; a story with no epic gets the question, once |
+| Labels | the configuration's label table, matched against the ticket's content | apply only labels the table defines; never invent one. A label the PM adds by hand in the preview is proposed as a new table row |
+| Links | step 4's cross-scope check | technical development blocks the stories it enables; a bug relates to the story that shipped the behaviour |
+
+Never deduce: assignee, priority, sprint, story points. Those stay with the team lead and grooming.
+
+The PM approves or corrects the fields with the draft. A correction that would apply to every
+future ticket (a type rule, a label meaning, the parent convention) is offered as an edit to the
+tracker configuration in the same approval, so the same correction is not made twice. Asking the
+same question in the next session is the failure this step exists to remove.
+
 ## Step 5 - Draft
 
 Apply all rules from `references/style-rules.md`. Use workspace template structure.
@@ -102,6 +129,7 @@ Confirm the save path in chat. Stop.
 
 - **Push to the tracker via MCP** - never. If the user explicitly asks to create it in the tracker after the save, that's a separate request - handle it then.
 - **Edit existing tracker tickets** - if the user wants to update an existing ticket after research, present findings in chat first, ask before touching. (See `feedback_no_tracker_edits_without_ask` memory.)
-- **Suggest assignees, priorities, sprint placement, story points** - those are team-lead / grooming decisions.
+- **Suggest assignees, priorities, sprint placement, story points** - those are team-lead / grooming decisions. Issue type, project, epic parent, labels and links ARE proposed (step 4b); they are fields the draft is incomplete without.
+- **Attach design artifacts** - the prototype or screenshots go onto the created issue (an epic takes attachments like any issue) through the tracker skill after creation, under a "Design artifacts" heading; the tracker's MCP surface has no attachment call, so the tracker skill uses the tracker's REST attachment endpoint with the PM's own token, preview and confirm as for every write.
 - **Draft from discovery/ source for epics** - discovery is unresolved research, not ready for tickets. Propose promotion first.
 - **Add competitor monitoring context** - separate workflow.

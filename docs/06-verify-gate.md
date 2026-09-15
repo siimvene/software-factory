@@ -24,6 +24,11 @@ Before any push containing code changes:
 Exempt: docs-only and memory-only commits. A docs commit that encodes a security rule or a data
 model decision is reviewed anyway.
 
+The net runs before this list, on the Stop hook and the pre-push receipt: ratchets, changed-line
+coverage and, proposed, the mutation kill rate on the touched modules
+([05-sensor-stack](05-sensor-stack.md) layer 3). A reviewer reading a diff whose tests kill
+nothing is reviewing the wrong artefact.
+
 ## Receipt-checked pre-push gates
 
 Two of these checks are too slow to run on the Stop hook but must run before the push. Each runs

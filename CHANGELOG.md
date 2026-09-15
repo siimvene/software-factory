@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.2.9 (2026-09-15)
+
+The PM surface after the group's planning session.
+
+- `docs/14-pm-surface.md`: the PM runs the same tooling as the engineer (decided 2026-09-15,
+  tooling and access parity, authority unchanged); tracker fields are deduced from the source, the
+  code and a `TRACKER.md` configured once, shown with a reason each, approved or corrected, with
+  corrections written back so nothing is asked twice; attachments on issues and epics through the
+  tracker's REST endpoint because the hosted MCP has none; prototypes are clickable and navigable,
+  published only on the PM's explicit decision.
+- `templates/skills/ticket/SKILL.md`: step 4b, tracker fields; the never-list now distinguishes
+  what is proposed (type, project, parent, labels, links) from what stays with grooming.
+- `templates/skills/ticket/references/style-rules.md`: the eleven rules the skill has named since it
+  shipped, now present. Step 4b measured on the reference workspace in two fresh sessions, with and
+  without the configuration file; both passed, both surfaced the missing epic-key mapping.
+
+## 0.2.8 (2026-09-15)
+
+Test the test applies to the tests.
+
+- `docs/01-principles.md` §3: the suite is a predicate over the code; coverage is its known-true
+  case and mutation its known-false case. Numbers from the reference implementation's first
+  mutation campaign: kill rate 30.3 % (database-free) and 39.9 % (database-coupled) under green
+  changed-line coverage, 11.2 % on the largest billing module.
+- `docs/05-sensor-stack.md` layer 3: the mutation kill rate as a ratchet on the touched modules,
+  `[proposed]`: scope by the diff, per-module baseline, killed over total, refuse a drop, targets
+  on the money lane, generated tests exit on their kills, template-cloned database per run for
+  the coupled half.
+- Pointers and rows in 00, 06, 09, 10, 11, 13, 16, README, STATUS.
+
 ## 0.2.7 (2026-09-10)
 
 The skills ship, and the setup sequence becomes a list you tick.
