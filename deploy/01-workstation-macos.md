@@ -97,8 +97,11 @@ V=0.4.19; A=darwin-arm64
 curl -fsSLO "https://github.com/enola-labs/enola/releases/download/v$V/enola-$V-$A.tar.gz"
 curl -fsSLO "https://github.com/enola-labs/enola/releases/download/v$V/enola-$V-$A.sha256"
 shasum -a 256 -c "enola-$V-$A.sha256" && tar -xzf "enola-$V-$A.tar.gz" && install -m 0755 "enola-$V-$A" ~/.local/bin/enola
-# sensor 1: ripwire, from its installer (checksum-verified); RIPWIRE_NO_ACTIVATE=1 keeps it from editing your agent config
-git clone --depth 1 https://github.com/redhat-et/ripwire /tmp/ripwire && RIPWIRE_NO_ACTIVATE=1 bash /tmp/ripwire/skills/install.sh
+# sensor 1: ripwire, from its installer at the pinned commit the reference binary was built from (0.4.0).
+# Read skills/install.sh before running it: it is a script from a third-party checkout, not a signed release.
+# RIPWIRE_NO_ACTIVATE=1 keeps it from editing your agent config.
+git clone https://github.com/redhat-et/ripwire /tmp/ripwire && git -C /tmp/ripwire checkout e663ca8f8
+less /tmp/ripwire/skills/install.sh && RIPWIRE_NO_ACTIVATE=1 bash /tmp/ripwire/skills/install.sh
 # sensor 2: chisle is a marketplace plugin registered PER PROJECT by the scaffold, pinned to tag v3.0.0; nothing to do here
 ```
 
@@ -147,12 +150,17 @@ catalog at pinned versions ([README.md](README.md) has the pins). Install per ro
 | Role | Install | Why |
 |---|---|---|
 | PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, graduate skills |
-| PM | `claude plugin install secret-guard@software-factory` | the agent cannot open credential files, deterministically |
+| PM | `claude plugin install secret-guard@software-factory` | a pre-tool hook that refuses reads of credential files; a deterrent, not a boundary (it fails open without `jq`, and a renamed file passes) |
 | Engineer | `secret-guard`, `spec-repos`, `team-memory`, `plg-rules`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |
 
 Project scope, written by the scaffold into the repo's tracked settings: `chisle` pinned to tag
 v3.0.0. Do not install it at user scope; the pin is the point and the pin lives in the repo.
+
+The `claude plugin marketplace add` commands above track each source's default branch, and a
+plugin runs code. Where the source has tags, pin it the way the scaffold pins chisle: an
+`extraKnownMarketplaces` entry in `~/.claude/settings.json` with a `ref` (consort tags its
+releases; check the other two before pinning). An unpinned marketplace is a named shortcut.
 
 Known trap: two config directories. A canvas or terminal-multiplexer runtime may start Claude
 Code with its own `CLAUDE_CONFIG_DIR`; a marketplace, plugin or MCP server registered in one
