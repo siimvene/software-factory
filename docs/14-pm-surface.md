@@ -36,6 +36,7 @@ the team's source of truth.
 | `reference/` | how things work now, stable knowledge | permanent |
 | `templates/` | story, epic and product-spec templates | permanent |
 | `POINTERS.md` | where every read-only clone lives and what it answers | permanent |
+| `TRACKER.md` | the tracker's project key, board, issue types in use, epic-parent convention and the label table with a meaning per label | permanent, corrected in place from ticket previews |
 | `SENSITIVITY.md` | the tier that decides what may leave the machine | permanent |
 | `.claude/skills/` | the skill catalogue below | permanent |
 
@@ -72,6 +73,26 @@ not version-controlled so that the PM learns git.
 The cost is real and worth naming: a PM who never runs git also never sees a merge conflict, so
 the agent must surface staleness loudly rather than working from a remembered state.
 
+### The PM runs the same tooling as the engineer
+
+Decided in the group's planning session with its PMs and engineers on 2026-09-15: PMs hold the
+same permission level as engineers. Recorded as tooling and access parity: the same agent runtime
+(the terminal one, with skills, plugins and local clones, rather than the desktop assistant working
+on one folder through connectors), the same connectors, read access to the code, specs and
+design-system repositories, and the tracker. It does not change authority: the PM still authors
+proposals and approves tickets, code owners still merge the team layer (adr 0005, adr 0006), and
+the write contract above is unchanged.
+
+What it changes is the surface. The earlier launch position, that PMs read repositories only
+through a hosted connector because git on their laptops and clone placement outside a synced
+folder could not be assumed, is superseded: the PM's machine is set up like an engineer's, clones
+in `POINTERS.md` are local, and multiple repositories are the normal case rather than a
+limitation. Two constraints survive the change: the workspace must not live inside a
+cloud-synced folder (a `.git` directory under file sync corrupts), and PM plugins stay
+available-to-install rather than enabled for everyone, because PMs are about one in fifty seats.
+Visual prototyping stays where it was: the `demo` skill builds it locally, and publishing it
+anywhere is the sensitivity decision below. `[decided 2026-09-15, not yet measured]`
+
 ## The skill catalogue
 
 Seventeen skills, in the shape the kvart adoption ran them. Names here are generic: rename freely,
@@ -95,7 +116,7 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 | `ingest` | Pull a source into the workspace and, first, find what the workspace already says about it | the source (file, wiki page, tracker item, URL, code grep), then the whole workspace for existing coverage | an entry in `Ingest Log.md` plus writes into `discovery/`, `reference/` or the tracking files, after confirmation | SPEC intake | gated: shows the plan and writes only on confirmation |
 | `analyze` | Produce an exhaustive verified picture of an existing feature or flow, not a partial slice | specs, then code entry points, input classes, configuration types, validators, message bundles, feature flags, then workspace notes | an analysis document in the workspace, every claim citing a path or class | SPEC intake | advisory |
 | `architect-review` | Senior-engineer adversarial pass over draft tickets before build starts | the domain's specs, workspace reference and open questions, then the frontend and backend code | findings as BLOCKER, MAJOR or MINOR, each with evidence and a concrete fix | SPEC readiness | advisory, but a BLOCKER is a stop |
-| `ticket` | Draft a story or an epic from a source spec | the source file, then the story and epic templates plus the skill's own style rules, then code for gap resolution | a ticket file under the tickets folder, saved only on approval | SPEC intake | gated: refuses an epic without a `features/` spec, blocks on unresolved product decisions, never writes to the tracker |
+| `ticket` | Draft a story or an epic from a source spec, with its tracker fields | the source file, then the story and epic templates plus the skill's own style rules, then `TRACKER.md`, then code for gap resolution | a ticket file under the tickets folder with type, project, epic parent, labels and links proposed with a reason each, saved only on approval | SPEC intake | gated: refuses an epic without a `features/` spec, blocks on unresolved product decisions, never writes to the tracker; never proposes assignee, priority, sprint or points |
 | `readiness-evaluator` | Score a ticket against a 7-criterion rubric out of 100 | the ticket text, then the domain spec folders, then the workspace notes | a score table, per-criterion gaps with citations, and one highest-impact question | SPEC readiness | gated: below the threshold it hands off to the improver |
 | `task-improver` | Conversational refinement loop that raises a weak ticket to the threshold, one question at a time | the ticket, the evaluation output, then the same context sources as the evaluator | a polished ticket, a drift check, and a session log with score progression | SPEC readiness | advisory, with a gated write-back |
 | `task-splitter` | Split a ticket that is over about 2 person-days into independently deliverable sub-tasks | the polished ticket only | a split proposal with a coverage check, the parent promoted to an epic | SPEC readiness | gated: proposal, then explicit confirmation before any write |
@@ -103,8 +124,8 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 | `improver-optimizer` | Mine the session logs for bottlenecks, drift and stagnation, then propose edits to the improver skill itself | `session-logs/` in bulk | a diagnostic report plus numbered recommendations against the improver's own instructions | LEARN | advisory, applies edits only on request |
 | `session-checkpoint` | Save, list, resume and branch a refinement session | the conversation's score tables and question log | a checkpoint file outside the workspace | daily ops | advisory, non-destructive by rule |
 | `graduate` | Promote a `features/` file into the team layer | the file, then `POINTERS.md`, then the target repository's spec conventions | a rewritten file plus a handoff package: target path, branch name, title, description, and both submission routes | SPEC to team layer | gated: six checks, all must pass, no partial packages, the human submits |
-| `demo` | Build a throwaway clickable prototype as a stakeholder reaction artifact | a discovery or features file, then the design standards, then the code for the behaviour it mirrors | one self-contained HTML file in the discovery folder | SPEC intake | gated by three hard rules: a visible throwaway banner, fake data only, never lands in the team layer. Once the flow is agreed it is attached to the ticket as a design artifact, a load-bearing input for the frontend builder (decided 2026-09-09, not yet measured) |
-| `tracker-mcp` | Every read and write against a ticket tracker such as Jira | tracker identifiers and the current user, then the issues themselves | tracker mutations | daily ops and SHIP | gated: preview, confirm, execute on every write |
+| `demo` | Build a throwaway clickable, navigable prototype as a stakeholder reaction artifact | a discovery or features file, then the design standards, then the code for the behaviour it mirrors | one self-contained HTML file in the discovery folder; on request, a published private page for stakeholders | SPEC intake | gated by three hard rules: a visible throwaway banner, fake data only, never lands in the team layer. Once the flow is agreed it is attached to the ticket or epic as a design artifact, a load-bearing input for the frontend builder (decided 2026-09-09, not yet measured). Publishing is an explicit sensitivity decision by the PM, never the skill's default |
+| `tracker-mcp` | Every read and write against a ticket tracker such as Jira, attachments included | tracker identifiers and the current user, then `TRACKER.md`, then the issues themselves | tracker mutations; design artifacts and screenshots attached to the issue or epic under a "Design artifacts" heading | daily ops and SHIP | gated: preview, confirm, execute on every write. The hosted MCP surface has no attachment call, so attachments go through the tracker's REST endpoint with the PM's own token, under the same preview |
 | `release-note` | Turn shipped tickets into a release page entry | the tickets, grouped by user-visible change | a title plus a two or three sentence factual description | SHIP | advisory |
 | `morning` | Start-of-day brief with chase and overdue flags | `Todo.md`, `Waiting-On.md`, `Action-Points.md`, then the tracker if connected | a brief under 25 lines: top three, chase list, overdue, blocked, heads-up | daily ops | advisory |
 | `wrap-up` | Persist the session's outcomes so nothing agreed dies in the transcript | the conversation | updates to the four tracking files plus a five-line summary of what landed where | daily ops and LEARN | advisory, but capture is mechanical by rule |
@@ -124,6 +145,57 @@ Three observations about the catalogue as a whole.
   optimizer reads the session logs and proposes edits to the refinement loop. That is the LEARN
   write-back of [02-loop](02-loop.md) applied to the PM surface rather than to code, and it is the
   part most teams skip.
+
+## Tracker fields are deduced, shown, approved, and configured once
+
+A ticket that arrives in the tracker with the wrong issue type, no epic parent or a label the team
+does not use is wrong in a way the readiness rubric cannot see, and the group's planning session
+named it as a live problem `[decided 2026-09-15]`. The group standard's tracker page defines the
+issue types (initiative, epic, story, technical development, bug, sub-task, and a task type outside
+the engineering workflow) and the status workflow; it defines no labels, so every label is a team
+convention that has to be written down somewhere the agent reads.
+
+Three options, and the design picks the third:
+
+- Ask the PM for the fields every session. Rejected: the same question in every session is the
+  workspace failing to remember, and the answers are the same.
+- Deduce silently. Rejected: a wrong type or parent lands in the tracker as fact.
+- **Deduce from the source, the code and `TRACKER.md`, show every field with its reason in the
+  preview, and let the PM approve or correct.** A correction that would apply to every future
+  ticket is offered as an edit to `TRACKER.md` in the same approval. The second ticket needs no
+  correction, or the configuration is wrong and gets fixed once.
+
+The deduction rules the `ticket` skill applies: a flow a tester or end user can exercise is a
+story; work that unlocks a capability with nothing visible is technical development, linked to the
+stories it blocks; a defect with steps to reproduce is a bug; multi-story scope is an epic; the
+epic parent comes from the tickets folder the draft is saved under; labels come only from the
+configured table (an agent-eligibility label set at the readiness gate is the first entry most
+teams will want, see [02-loop](02-loop.md) on dispatch). Assignee, priority, sprint and points are
+never deduced; they belong to the team lead and grooming.
+
+**Tested on the reference workspace `[measured 2026-09-15]`.** Two fresh headless sessions, one
+fixture story under an existing epic folder. With `TRACKER.md` present: the preview carried type,
+project, parent, labels and links with a reason each, asked for no configured value, and proposed
+one configuration correction (the folder-to-epic mapping had no epic keys, so the two runs disagreed
+on the parent: one named the folder, one said "ask once"). With `TRACKER.md` removed: the skill said
+so, did not ask for the project key, rebuilt the proposal from the live tracker's own metadata and
+found a label in use on 14 issues that the table lacked. Both runs also caught the fixture's three
+disagreements with the code (a table name, a status value and a route that did not exist), which is
+the read-order rule doing its job. Corrections applied the same day: an epic-key column, the live
+label rows, and the vocabulary line.
+
+**Attachments.** Screenshots and the `demo` prototype belong on the issue, and an epic takes
+attachments like any other issue. The hosted tracker MCP exposes create, edit, comment, transition
+and link, and no attachment call `[measured 2026-09-15]`, so the tracker skill attaches through the
+tracker's REST endpoint with the PM's own token, under the same preview-confirm rule as every
+write. Until that is wired, the `demo` skill's "attach it to the ticket" step is a hand step in the
+tracker's web interface, and the design says so rather than pretending.
+
+**Sharing a prototype.** The prototype is one self-contained file: clickable and navigable across
+its screens, fake data, a visible throwaway banner. For stakeholders who will not open a file, the
+agent runtime can publish it as a private page in the organisation's own tenancy, or as a design
+canvas they can inspect. Both leave the machine, so `SENSITIVITY.md` governs: fake data only, and
+the PM decides to publish, per prototype. The skill never publishes by default.
 
 ## The readiness rubric
 
@@ -254,7 +326,10 @@ Findings about the surface itself, each one a defect in the template rather than
   the ticket was drafted from the story template alone `[measured 2026-09-07]`. A template that
   ships with its own lookups broken fails silently, because a missing reference reads as a skipped
   step rather than an error. The check is mechanical and belongs in the template's own test: for
-  every path a skill names, assert it exists.
+  every path a skill names, assert it exists. Still missing on 2026-09-15, eight days and five cycles later, and reported again by
+  both test runs of the tracker-fields step; the eleven rules were written that day and ship with
+  the `ticket` skill under `references/`. The lesson stands: a defect that only shows as a skipped
+  step is not fixed by noticing it.
 - **A ticket tracker, which closed a cycle-1 shortcut.** On 2026-09-07 there was no tracker, so the
   stage was a status line in a file `[measured 2026-09-07]`: tickets lived as files in the workspace
   and moved Ready, In Progress, In Test, Ready for LIVE by editing one line, and four of seventeen

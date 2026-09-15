@@ -68,7 +68,7 @@ this picture.
 |---|---|---|---|---|
 | Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
 | YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `designed` |
-| The net | tests, coverage, mutation | post-write | silent behaviour change | `measured` |
+| The net | tests, coverage, mutation kill rate | post-write | silent behaviour change, tests that notice nothing | `measured` (kill-rate ratchet `proposed`) |
 | Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
 | Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
 | Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |
