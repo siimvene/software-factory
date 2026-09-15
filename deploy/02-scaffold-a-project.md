@@ -94,11 +94,21 @@ $SF/deploy/standard/context-standard/adopt.sh --set-team <org>/<team>-team-conte
 $SF/deploy/standard/context-standard/adopt.sh --check .
 ```
 
-The script seeds the sentinel header in `CLAUDE.md` (creating the file if absent, migrating an
-`AGENTS.md` sentinel with `--migrate-rule-file`), vendors `docs/standard/agents-core.md` (the
+The script seeds the sentinel header in `CLAUDE.md` when the file is absent (an `AGENTS.md`
+sentinel migrates with `--migrate-rule-file`), vendors `docs/standard/agents-core.md` (the
 operating contract; never edited in the repo), writes `.context-standard.lock`, the
 `.memspec.yaml` pointer and skeleton docs. Fill the seeded `{{PLACEHOLDERS}}` from the existing
 documentation, not from memory, and mark seeded docs "for L1 review".
+
+Two defects in the vendored standard to work around, both confirmed on 2026-09-16 and listed in
+[README.md](README.md) for upstreaming. First, a repo that already has a `CLAUDE.md` is left
+without the sentinel (seed mode treats the file as team-owned and skips it), so the `--set-team`
+step then refuses. Before the first command, move the existing file aside, let the seed write the
+template, then paste the repo's own body back under the closing sentinel line; `--check` is what
+proves the result. Second, the seeded `docs/adr/0001-adopt-context-standard.md` still describes
+the v0.1 topology (memory embedded in the code repo) and pins `{{v0.1}}`; rewrite it to what v0.4
+actually does (the pointer only, durable memory in the team repo, `context-standard: v0.4`) before
+it is merged, or it becomes an accepted record that contradicts the wiring.
 
 Then bind the memory engine, which reads its own file rather than the standard's pointer:
 
@@ -133,12 +143,15 @@ claude   # in $PM:  /pm-workspace-setup .
 ```
 
 The plugin's setup skill writes the folder layout, `CLAUDE.md`, `CONVENTIONS.md`, the registers,
-`POINTERS.md`, `SENSITIVITY.md` and `TRACKER.md`, and it discovers repositories for `POINTERS.md`
-when clones sit next to the workspace. So before running it, clone read-only next to `$PM`:
-the team-context repo and each code repo, with a token that cannot push (a fine-grained token
-with contents read, or the PM's own account with no write access on those repos). Then:
+`POINTERS.md`, `SENSITIVITY.md` and `TRACKER.md`. Its repository discovery reads through a hosted
+GitHub connector and leaves `POINTERS.md` blank when that connector is absent; the PM profile
+reads local clones instead (decided 2026-09-15), so the engineer fills the file. Clone read-only
+next to `$PM`: the team-context repo and each code repo, with a token that cannot push (a
+fine-grained token with contents read, or the PM's own account with no write access on those
+repos). Then:
 
-- `POINTERS.md`: one entry per clone with its `org/repo` slug and what it answers.
+- `POINTERS.md`: one entry per clone with its local path, its `org/repo` slug and what it
+  answers; written by you, not by the skill's discovery.
 - `SENSITIVITY.md`: the tier; default Sensitive, which means generic topics only leave the
   machine.
 - `TRACKER.md`: project key, issue types, the folder-to-epic mapping, the label table. Filled
@@ -286,7 +299,8 @@ evidence line.
 
 ### M4 The ticket ledger (Agent, **Human** for the tracker admin steps)
 
-Skip with a named shortcut if the tracker answer in section 0 was "none".
+Skip with a named shortcut if the tracker answer in section 0 was "none"; the project checker
+then runs with `--no-tracker`.
 
 Tracker side, once per project, by someone with Jira admin. The workflow is six statuses in a
 chain, Backlog, Ready, In Progress, In Test, Ready for LIVE, Done, with three loopbacks (In
@@ -348,7 +362,7 @@ Flightlist G7. Every gate made to fail once, in this run, with the red observed:
 Then, in a fresh session, before trusting any of it:
 
 ```
-bash $SF/deploy/bin/check-project.sh                # in the code repo: every REQUIRED line OK
+bash $SF/deploy/bin/check-project.sh                # in the code repo: every REQUIRED line OK (--no-tracker if M4 was skipped)
 memspec stores | head -2                            # team [ro] N items, scratch [rw]
 python3 quality/bin/gate.py                         # green
 enola check --fail-on=layers,cycles,intent .        # exit 0

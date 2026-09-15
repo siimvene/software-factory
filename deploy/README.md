@@ -48,7 +48,7 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 | consort | the cross-vendor verify gate, panel, scan, security side-pass | 0.9.1 (`5f68ef6`) | `siimvene/consort`, plugin plus a checkout |
 | memspec | memory engine and MCP server | 0.11.0 | npm `memspec` |
 | cleat | quality ratchets (sensor 3) | fork `siimvene/cleat` @ `c2947a5` | vendored into each project by `attach.py` |
-| enola | architecture diff (sensor 4) | 0.4.19 on the Mac, 0.4.15 pinned in CI | `enola-labs/enola` releases, sha256-verified |
+| enola | architecture diff (sensor 4) | 0.4.19, the same pin in `templates/github/workflows/gates.yml` | `enola-labs/enola` releases, sha256-verified |
 | ripwire | orientation map (sensor 1) | 0.4.0 | `redhat-et/ripwire` installer |
 | chisle | YAGNI ladder (sensor 2) | tag v3.0.0 | marketplace `JayPokale/Chisle`, pinned to the tag, project scope |
 | claude-hud | status line | 0.6.0 | marketplace `jarrodwatts/claude-hud` |
@@ -67,6 +67,24 @@ is personal data and the exemption is for the group's identity, not a person's. 
 scrubbed plugin would be a fork, and a fork would drift from what the PMs actually install. They
 are never edited in place beyond that. To update one, re-vendor from the source at a new pin and change the pin in the table
 above, in the same commit.
+
+## Findings against the vendored trees, for upstreaming
+
+The gate on this directory (two-vendor panel plus a blind security pass, 2026-09-16) read the
+vendored copies too. Defects in them are not fixed here, because a vendored tree is re-vendored,
+never edited; they are listed so the next person does not rediscover them, with the workaround
+the runbooks carry.
+
+| Where | Finding | Disposition |
+|---|---|---|
+| `standard/context-standard/adopt.sh` seed mode | a repo that already has `CLAUDE.md` gets no sentinel, so `--set-team` then refuses | workaround in the scaffold runbook D0.3; upstream fix: seed the sentinel into an existing file |
+| `standard/context-standard/template/docs/adr/0001-*.md` | the seeded ADR describes the v0.1 memory topology and pins `{{v0.1}}` | rewrite before merge, per D0.3; upstream: regenerate the template for v0.4 |
+| `standard/context-standard/adopt.sh --check` | passes with the team import line missing or pointing elsewhere | `bin/check-project.sh` greps the wired `org/repo` and `memspec stores` proves the binding; upstream: check the import |
+| `standard/context-standard/adopt.sh` | a token passed to curl on the command line is visible in the process list | upstream: `gh api` or a header file |
+| `standard/context-standard/.github/workflows/{propagate,fleet-report}.yml` | `create-github-app-token@v1` and `checkout@v4` by movable tag while holding the App private key | upstream: pin both to full commit SHAs, as every workflow in `templates/` does |
+| `marketplace/plugins/secret-guard/hooks/` | intercepts Read and Bash only (a Grep call reads the file); the Bash path passes when an allowlisted template name appears in the same command; fails open without `jq` | described as a deterrent, not a boundary, in both guides and the marketplace index; upstream: add Grep and per-path checks |
+| `marketplace/plugins/pm-workspace/skills/pm-workspace-setup` | repository discovery needs the hosted GitHub connector and leaves `POINTERS.md` blank otherwise | the engineer fills `POINTERS.md` from the local clones (runbook M0); upstream: discover adjacent clones |
+| `marketplace/plugins/team-memory/skills/promote/SKILL.md` | `grep` invocations without `--`, a pattern starting with `-` is parsed as an option | cosmetic; upstream |
 
 ## Keeping the vendored copies honest
 

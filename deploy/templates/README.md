@@ -18,10 +18,10 @@ them in order.
 | `git-hooks/pre-commit.example` | port per stack | everything below the header | the reference stack's staged-file tripwires (lint, single migration head, staged tests) |
 | `git-hooks/README.md` | `scripts/git-hooks/` | nothing | the one-line install: `git config core.hooksPath scripts/git-hooks` |
 | `github/workflows/gates.yml` | `.github/workflows/` | the coverage artifact step if the test job does not upload one | cleat, enola, trivy as required checks with stable job names |
-| `github/workflows/jira-sync.yml` | `.github/workflows/` | nothing; needs the `ci` workflow name and the vars/secrets | the ledger follows PR events and CI verdicts; always runs main's script |
+| `github/workflows/jira-sync.yml` | `.github/workflows/` | nothing; needs the `ci` workflow name and the vars/secrets | the ledger follows PR events and CI verdicts; always runs main's script. Diverges from kvart in two lines: the project key comes from a variable, and the PR lookup compares branch and repo through jq's `env` rather than string interpolation (panel finding, 2026-09-16), to be mirrored back |
 | `github/workflows/pr-ticket-key.yml` | `.github/workflows/` | nothing | a PR names its ticket or carries `no-ticket` |
 | `github/ruleset.json` | `gh api repos/<org>/<repo>/rulesets --input` | `required_status_checks` to the job names that exist | PR required, five green checks, no force-push, no deletion, empty bypass list |
-| `ci/jira_sync.py` | `scripts/ci/` | nothing; `JIRA_PROJECT_KEY` from the environment | the ledger transitions, planned from the current status; stdlib only |
+| `ci/jira_sync.py` | `scripts/ci/` | nothing; `JIRA_PROJECT_KEY` from the environment | the ledger transitions, planned from the current status; stdlib only. Diverges from kvart in one line: an exported-but-empty key falls back to the default (panel finding, 2026-09-16), to be mirrored back |
 | `ci/test_ci_jira_sync.py` | `tests/unit/` | the module path at the top if `scripts/ci` moves | the tests for the above; run with pytest from the repo root |
 | `bin/jira` | `~/.local/bin/jira` | nothing; configured by `~/.config/factory/jira.env` | pickup, link, deploy write-back from the operator's machine, token from the keychain |
 | `memspec/config.yaml` | `.memspec/config.yaml`, the only tracked file under `.memspec/` | the team store path | the engine binding: team store read-only, scratch read-write |
