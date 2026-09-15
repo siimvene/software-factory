@@ -91,4 +91,4 @@ migrations from the changelog, and leaves your own content and your `CLAUDE.md` 
 
 ## Maintainers
 
-- a group engineer <dev@example.com>
+- the group plugin catalog maintainer (name and address removed in this vendored copy)

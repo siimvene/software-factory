@@ -24,4 +24,4 @@ Update the specs for this story: /update-specs-for-commits ../ticketing-system-t
 
 ## Maintainers
 
-- a group engineer <dev@example.com>
+- the group plugin catalog maintainer (name and address removed in this vendored copy)
