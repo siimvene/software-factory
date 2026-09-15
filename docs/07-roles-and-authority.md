@@ -25,7 +25,9 @@ Inside the dev hat, the delegation shape that was trialled and measured:
 - **Head**: the expensive model. Selects the item (verification-first: probe the backlog against
   code, reject what is already shipped), designs, writes the five-part briefs, reviews the
   hands' output, directs remediation, runs every gate itself, and verifies everything itself. It
-  writes glue, never bulk code.
+  writes glue, never bulk code. On a sized ticket it writes the program design note before the
+  first brief ([02-loop](02-loop.md)); the hands build to sections cited by number and never
+  design.
 - **Hands**: a cheaper model or a second vendor, fresh process per call, implements against the
   brief and returns schema-shaped results. The same vendor serves as the blind reviewer.
 
@@ -88,7 +90,7 @@ the full ladder by operating agents end to end, never by typing `[proposed]`.
 
 | Change class | Minimum human authority |
 |---|---|
-| money (transaction tier), tenant isolation, identity, migrations | named-human outcome sign-off, always |
+| money (transaction tier), tenant isolation, identity, migrations | named-human outcome sign-off, always; the owner reads the program design note before the build |
 | new business or shared-interface behaviour, authorisation, sensitive copy, external side effects, new dependencies, infra or gate changes, capacity risk, uncertain impact | engineering review |
 | display or filter of existing approved data through existing interfaces, low-risk surfaces | candidate for PM-final acceptance once qualified |
 

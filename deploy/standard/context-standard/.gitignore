@@ -1,0 +1,5 @@
+# The standard repo carries only the template + spec. Nothing generated.
+.DS_Store
+*.log
+node_modules/
+.omc/

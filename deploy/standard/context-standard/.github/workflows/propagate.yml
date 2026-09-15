@@ -1,0 +1,94 @@
+# Push channel: on release (or manual dispatch), open chore/context-standard-vX.Y PRs
+# in every adopter repo (discovered by the 'context-standard' GitHub topic).
+# Requires a GitHub App credential (PROPAGATE_APP_ID / PROPAGATE_APP_PRIVATE_KEY
+# secrets) with contents:write + pull-requests:write on product repos — see
+# governance/distribution.md §11 (open decision 1). Skips gracefully until configured.
+name: propagate
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      repos:
+        description: "space-separated owner/repo list — overrides topic discovery (day-1 onboarding wave)"
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  propagate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Bot credential check
+        id: creds
+        env:
+          APP_ID: ${{ secrets.PROPAGATE_APP_ID }}
+        run: |
+          if [ -z "$APP_ID" ]; then
+            echo "::notice::PROPAGATE_APP_ID not configured — propagation skipped. Create the GitHub App per governance/distribution.md §11."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/create-github-app-token@v1
+        if: steps.creds.outputs.enabled == 'true'
+        id: app
+        with:
+          app-id: ${{ secrets.PROPAGATE_APP_ID }}
+          private-key: ${{ secrets.PROPAGATE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.enabled == 'true'
+        with:
+          path: context-standard
+
+      - name: Open update PRs in adopter repos
+        if: steps.creds.outputs.enabled == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          OWNER: ${{ github.repository_owner }}
+          REPOS_OVERRIDE: ${{ inputs.repos }}
+        run: |
+          set -euo pipefail
+          VERSION=$(grep -Eo 'context-standard: v[0-9]+\.[0-9]+' context-standard/template/CLAUDE.md | head -1 | awk '{print $2}')
+          BRANCH="chore/context-standard-$VERSION"
+          if [ -n "$REPOS_OVERRIDE" ]; then
+            repos="$REPOS_OVERRIDE"
+          else
+            repos=$(gh search repos --owner "$OWNER" --topic context-standard --json fullName --jq '.[].fullName')
+          fi
+          [ -n "$repos" ] || { echo "no adopter repos found"; exit 0; }
+          git config --global user.name  "context-standard-bot"
+          git config --global user.email "context-standard-bot@users.noreply.github.com"
+          changelog=$(awk '/^## /{n++} n==2{exit} n==1' context-standard/CHANGELOG.md)
+          for repo in $repos; do
+            echo "── $repo"
+            rm -rf work && gh repo clone "$repo" work -- --depth 1
+            ./context-standard/adopt.sh --update work
+            # status --porcelain also catches newly created untracked files, which
+            # `git diff --quiet` would miss (worktree vs index only).
+            if [ -z "$(git -C work status --porcelain)" ]; then echo "   up to date"; continue; fi
+            git -C work checkout -B "$BRANCH"
+            git -C work add -A
+            git -C work commit -m "chore: context-standard $VERSION"
+            # Fetch the remote branch (if any) so --force-with-lease has a tracking
+            # ref to lease against — protects concurrent pushes to the update branch
+            # from being silently erased between this fetch and the push.
+            git -C work fetch --depth 1 origin "+refs/heads/$BRANCH:refs/remotes/origin/$BRANCH" 2>/dev/null || true
+            git -C work push --force-with-lease origin "$BRANCH"
+            body="$(printf '%s\n\n%s' "$changelog" \
+              "Managed-file update from the context-standard. Team-owned files are untouched — see governance/distribution.md §8 for the push/pull policy.")"
+            # Only treat a skipped `pr create` as benign when an open PR for this
+            # head actually exists; any other failure must fail the step.
+            if [ -n "$(gh pr list --repo "$repo" --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+              echo "   PR already open — branch updated"
+            else
+              gh pr create --repo "$repo" --head "$BRANCH" \
+                --title "chore: context-standard $VERSION" \
+                --body "$body"
+            fi
+          done

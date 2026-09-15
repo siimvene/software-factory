@@ -1,0 +1,17 @@
+{
+  "name": "dev-hygiene",
+  "displayName": "Dev Hygiene",
+  "version": "0.1.2",
+  "description": "A tidy-up pass before you call code done: it double-checks the work actually runs, trims needless complexity without changing behavior, and only suggests changes rather than making them.",
+  "author": {
+    "name": "Siim Vene"
+  },
+  "license": "MIT",
+  "keywords": [
+    "verify",
+    "deslop",
+    "cleanup",
+    "meta-reasoning",
+    "quality"
+  ]
+}

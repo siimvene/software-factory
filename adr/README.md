@@ -14,3 +14,4 @@ The design's own decisions, in the format it asks adopters to use
 | [0007](0007-specs-are-derived-memory-promotes-by-pr.md) | Specs are derived; memory promotes by PR | accepted |
 | [0008](0008-browser-qa-drives-a-cli-not-a-protocol-server.md) | The browser QA pass drives a CLI, not a protocol server or a browser extension | accepted |
 | [0009](0009-the-spec-is-a-gate-input.md) | The spec is a gate input; scope drift is a finding with its own disposition | proposed |
+| [0010](0010-program-design-before-the-plan.md) | Program design before the plan on sized tickets; red-first becomes a gate (fail-on-base) | proposed |
