@@ -169,7 +169,13 @@ Rules that are not obvious until you have been bitten:
 - **Walkers must honour the ignore file, or nested worktrees poison the tree.** The agent runtime
   nests other branches' worktrees under the repo; the walkers pruned by directory name and read
   every nested tree, sending 3 of 6 gates red in the primary checkout. Config-only fix, proven
-  with planted files `[measured 2026-09-07]`.
+  with planted files `[measured 2026-09-07]`. The fix reaches each walker separately: the
+  file gates (ratchets, container scan) got the worktree exclude then, but the architecture
+  walker kept reading the worktrees until it got its own `mcp-arch.yaml` `ignore` set — and
+  there `ignore` REPLACES the built-in globs rather than adding to them, so it must carry the
+  full default list plus the worktrees, and the baseline must be re-pinned after (a changed
+  ignore set is incomparable, exit 3). Verified the custom layer gate still fires under the new
+  config with a planted foundation→entry import `[measured 2026-09-15]`.
 - **The guard is a speed bump, not a wall.** `python3 -c` walks past a PreToolUse guard. The
   control is branch protection; the guard exists to make the honest path the easy path.
 - **Line-based clone detection flags import blocks.** A token-based finder was measured and made
