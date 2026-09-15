@@ -1,0 +1,60 @@
+{
+  "enabledPlugins": {
+    "chisle@chisle": true
+  },
+  "extraKnownMarketplaces": {
+    "chisle": {
+      "source": {
+        "source": "github",
+        "repo": "JayPokale/Chisle",
+        "ref": "v3.0.0"
+      }
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; command -v enola >/dev/null 2>&1 && enola hook session-start || :",
+            "timeout": 60,
+            "source": "enola"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --guard; fi"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --hook --changed; fi"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f \"${CLAUDE_PROJECT_DIR:-.}/scripts/claude-hooks/enola-stop.sh\" ]; then bash \"${CLAUDE_PROJECT_DIR:-.}/scripts/claude-hooks/enola-stop.sh\"; fi",
+            "timeout": 60,
+            "source": "enola"
+          }
+        ]
+      }
+    ]
+  }
+}

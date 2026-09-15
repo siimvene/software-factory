@@ -54,3 +54,8 @@ Every claim carries its class, because the difference is the whole point of the 
   reference implementation, one directory per skill with its scripts beside it.
 - `adr/` records the decisions of this design itself, in the same format the design asks
   adopters to use.
+- `deploy/` is how the design is stood up: two runbooks, two checkers, and vendored copies of
+  the plugins, the group standard and the wiring files. The prose follows this file; the
+  vendored trees under `deploy/marketplace/` and `deploy/standard/` are verbatim at a pinned
+  commit and exempt from the anonymisation rule, because a scrubbed plugin is a fork. They are
+  re-vendored, never edited.

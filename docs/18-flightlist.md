@@ -16,6 +16,9 @@ Three rules for using it:
   session runs before trusting any of it.
 
 Legend: `[ ]` not started, `[x]` done with evidence, `[~]` skipped, shortcut recorded.
+The commands that execute the D0, G and M legs, with the files they copy, are in
+[deploy/02-scaffold-a-project.md](../deploy/02-scaffold-a-project.md); the machine they run on is
+[deploy/01-workstation-macos.md](../deploy/01-workstation-macos.md).
 "Human" in the who column means the leg cannot be delegated to an agent by this design.
 
 ## P. Pre-flight: decide before anything is created
