@@ -12,7 +12,7 @@ vague one is a skill that never fires or fires always.
 | Skill | Produces | Used at | Ported from | Notes |
 |---|---|---|---|---|
 | [`ticket`](ticket/SKILL.md) | a story or epic draft under the tickets folder with its tracker fields (type, project, epic parent, labels, links) deduced and shown for approval, saved on approval, never pushed to the tracker | SPEC intake | the PM workspace's ticket skill | enforces discovery, features, ticket for epics; relaxed for a single story; tracker configuration read once from the workspace, corrections written back so nothing is asked twice |
-| [`readiness-evaluator`](readiness-evaluator/SKILL.md) | a score out of 100 against seven criteria, per-criterion gaps, one highest-impact question | SPEC readiness | the PM workspace | 85 is Ready; below it hands off to the improver |
+| [`readiness-evaluator`](readiness-evaluator/SKILL.md) | a score out of 100 against seven criteria, per-criterion gaps, one highest-impact question; on a sized ticket that question follows the program design note's order | SPEC readiness | the PM workspace | 85 is Ready; below it hands off to the improver |
 | [`task-improver`](task-improver/SKILL.md) | a polished ticket, a drift check, a session log with score progression | SPEC readiness | the PM workspace | one question at a time; the session logs feed the optimizer |
 | [`task-splitter`](task-splitter/SKILL.md) | a split proposal with a coverage check; the parent promoted to an epic | SPEC readiness | the PM workspace | for tickets over about two person-days |
 | [`graduate`](graduate/SKILL.md) | a rewritten features file plus a handoff package the human submits | SPEC to the team layer | the PM workspace | six checks, all must pass, no partial packages |
