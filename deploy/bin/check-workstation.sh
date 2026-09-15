@@ -8,6 +8,10 @@
 set -u
 PM=0; [ "${1:-}" = "--pm" ] && PM=1
 fail=0
+# The runtime's config directory: a canvas or multiplexer runtime may set CLAUDE_CONFIG_DIR, and a
+# plugin or marketplace registered under one directory is absent under the other. Run the checker
+# under each environment you use; it reports which one it read.
+CFG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 ok()   { printf 'OK       %-28s %s\n' "$1" "${2:-}"; }
 miss() { printf 'MISSING  %-28s %s\n' "$1" "${2:-}"; fail=1; }
 warn() { printf 'OPTIONAL %-28s %s\n' "$1" "${2:-}"; }
@@ -16,22 +20,22 @@ have() { command -v "$1" >/dev/null 2>&1; }
 ver()  { "$@" 2>/dev/null | head -1 | tr -d '\n'; }
 req()  { if have "$1"; then ok "$1" "$(ver "${@:2}")"; else miss "$1" "$3"; fi; }
 opt()  { if have "$1"; then ok "$1" "$(ver "${@:2}")"; else warn "$1" "not on PATH"; fi; }
-plugin_enabled() { python3 - "$1" <<'PY' 2>/dev/null
+plugin_enabled() { CFG="$CFG" python3 - "$1" <<'PY' 2>/dev/null
 import json,os,sys
-p=os.path.expanduser('~/.claude/settings.json')
+p=os.path.join(os.environ['CFG'],'settings.json')
 d=json.load(open(p)) if os.path.exists(p) else {}
 sys.exit(0 if d.get('enabledPlugins',{}).get(sys.argv[1]) else 1)
 PY
 }
-marketplace_known() { python3 - "$1" <<'PY' 2>/dev/null
+marketplace_known() { CFG="$CFG" python3 - "$1" <<'PY' 2>/dev/null
 import json,os,sys
-p=os.path.expanduser('~/.claude/plugins/known_marketplaces.json')
+p=os.path.join(os.environ['CFG'],'plugins/known_marketplaces.json')
 d=json.load(open(p)) if os.path.exists(p) else {}
 sys.exit(0 if sys.argv[1] in d else 1)
 PY
 }
 
-echo "== agent runtime"
+echo "== agent runtime (config dir: $CFG)"
 req claude claude --version
 if have claude && claude auth status >/dev/null 2>&1; then ok "claude auth" "logged in"; else warn "claude auth" "run: claude  (log in once)"; fi
 req git git --version
@@ -40,16 +44,20 @@ if have gh && gh auth status >/dev/null 2>&1; then ok "gh auth" "logged in"; els
 req jq jq --version
 req python3 python3 --version
 req node node --version
-req uv uv --version
-req pnpm pnpm --version
+if [ $PM -eq 1 ]; then skip uv "PM profile"; skip pnpm "PM profile"; else req uv uv --version; req pnpm pnpm --version; fi
 req memspec memspec --version
 req memspec-mcp true "npm install -g memspec (ships memspec-mcp)"
 [ -d "$HOME/.memspec" ] && ok "~/.memspec store" "$(ls "$HOME/.memspec/memory" 2>/dev/null | wc -l | tr -d ' ') files" || miss "~/.memspec store" "run: memspec init ~/.memspec"
 if have claude && claude mcp list 2>/dev/null | grep -q '^memspec'; then ok "memspec MCP (user scope)"; else miss "memspec MCP (user scope)" "claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp"; fi
-for h in memspec-session-start.js memspec-consolidate.js; do [ -f "$HOME/.claude/hooks/$h" ] && ok "hook $h" || warn "hook $h" "memspec init installs it"; done
+for h in memspec-session-start.js memspec-consolidate.js; do [ -f "$CFG/hooks/$h" ] && ok "hook $h" || warn "hook $h" "memspec init installs it"; done
 
 echo "== plugins (user scope)"
-for p in codex@openai-codex claude-hud@claude-hud; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
+if [ $PM -eq 1 ]; then
+  for p in pm-workspace@software-factory secret-guard@software-factory; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
+  plugin_enabled claude-hud@claude-hud && ok "plugin claude-hud@claude-hud" || warn "plugin claude-hud@claude-hud" "optional for a PM"
+else
+  for p in codex@openai-codex claude-hud@claude-hud secret-guard@software-factory; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
+fi
 plugin_enabled consort@consort && ok "plugin consort@consort" || { [ $PM -eq 1 ] && skip "plugin consort@consort" "PM profile" || miss "plugin consort@consort" "claude plugin marketplace add siimvene/consort && claude plugin install consort@consort"; }
 marketplace_known software-factory && ok "marketplace software-factory" || miss "marketplace software-factory" "claude plugin marketplace add <path>/software-factory/deploy/marketplace"
 marketplace_known chisle && ok "marketplace chisle" || { [ $PM -eq 1 ] && skip "marketplace chisle" "PM profile" || warn "marketplace chisle" "registered per project by the scaffold (pinned tag)"; }
@@ -66,7 +74,7 @@ else
   if have gcloud && gcloud auth application-default print-access-token >/dev/null 2>&1; then ok "gcloud ADC" "token minted"; else
     if [ -n "${CONSORT_GCP_CREDENTIALS:-}" ] && [ -r "$CONSORT_GCP_CREDENTIALS" ]; then ok "gcloud credentials" "CONSORT_GCP_CREDENTIALS file"; else miss "gcloud ADC" "gcloud auth application-default login (or CONSORT_GCP_CREDENTIALS)"; fi; fi
   for v in CONSORT_REVIEWERS CONSORT_GCP_PROJECT; do
-    if python3 -c "import json,os,sys;d=json.load(open(os.path.expanduser('~/.claude/settings.json')));sys.exit(0 if d.get('env',{}).get('$v') else 1)" 2>/dev/null || [ -n "${!v:-}" ]; then ok "env $v"; else miss "env $v" "set in ~/.claude/settings.json env (see 01-workstation-macos.md)"; fi
+    if python3 -c "import json,os,sys;d=json.load(open(os.path.join('$CFG','settings.json')));sys.exit(0 if d.get('env',{}).get('$v') else 1)" 2>/dev/null || [ -n "${!v:-}" ]; then ok "env $v"; else miss "env $v" "set in ~/.claude/settings.json env (see 01-workstation-macos.md)"; fi
   done
   [ -d "$HOME/git/consort/scripts" ] && ok "consort checkout" "$(git -C "$HOME/git/consort" rev-parse --short HEAD 2>/dev/null)" || miss "consort checkout" "git clone https://github.com/siimvene/consort ~/git/consort (the panel script runs from it)"
 

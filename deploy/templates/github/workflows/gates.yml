@@ -61,8 +61,8 @@ jobs:
     permissions:
       contents: read
     env:
-      ENOLA_VERSION: 0.4.15
-      ENOLA_SHA256: bf21cf08cc054ed3a3d12b1cc706b06d3098953444077d267b8da681ee9a8d9d
+      ENOLA_VERSION: 0.4.19
+      ENOLA_SHA256: 189125c37ae1e66a498b0bafe79a5a6a5612b45c975ab4431e13f58cbef31397   # enola-0.4.19-linux-amd64.tar.gz; keep equal to the workstation pin
     steps:
       - name: Checkout (full history)
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

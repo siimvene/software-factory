@@ -3,11 +3,13 @@
 # anywhere inside the repo. One line per artifact, exit 1 if a REQUIRED one is absent.
 # Read-only. Pair with deploy/02-scaffold-a-project.md, which says how each is created.
 set -u
+NOTRACKER=0; [ "${1:-}" = "--no-tracker" ] && NOTRACKER=1   # the tracker was skipped as a named shortcut (ADR 0001)
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)" || exit 1
 fail=0
 ok()   { printf 'OK       %-44s %s\n' "$1" "${2:-}"; }
 miss() { printf 'MISSING  %-44s %s\n' "$1" "${2:-}"; fail=1; }
 warn() { printf 'OPTIONAL %-44s %s\n' "$1" "${2:-}"; }
+skip() { printf 'SKIP     %-44s %s\n' "$1" "${2:-}"; }
 f()  { [ -f "$1" ] && ok "$1" "${2:-}" || miss "$1" "${2:-}"; }
 fo() { [ -f "$1" ] && ok "$1" "${2:-}" || warn "$1" "${2:-}"; }
 g()  { grep -qE "$2" "$1" 2>/dev/null && ok "$1: $3" || miss "$1: $3"; }
@@ -51,21 +53,33 @@ fo scripts/git-hooks/commit-msg "provenance trailer"
 fo scripts/git-hooks/post-commit "memspec reconciliation"
 if git log -1 --format=%B | grep -qE '^Provenance: (human|agent:)'; then ok "provenance trailer on HEAD"; else warn "provenance trailer on HEAD" "absent (hook not installed, or a merge commit)"; fi
 if command -v gh >/dev/null 2>&1 && gh repo view >/dev/null 2>&1; then
-  n="$(gh api 'repos/{owner}/{repo}/rulesets' --jq 'map(select(.enforcement=="active"))|length' 2>/dev/null || echo 0)"
-  [ "${n:-0}" -gt 0 ] && ok "branch ruleset" "$n active" || miss "branch ruleset" "gh api repos/{owner}/{repo}/rulesets --input deploy/templates/github/ruleset.json"
+  # An active BRANCH ruleset whose required status checks name the three gate jobs; any other
+  # ruleset (a tag rule, a push rule, a ruleset missing a gate) does not count.
+  ctx="$(for id in $(gh api 'repos/{owner}/{repo}/rulesets' --jq '.[] | select(.enforcement=="active" and .target=="branch") | .id' 2>/dev/null); do
+           gh api "repos/{owner}/{repo}/rulesets/$id" --jq '.rules[] | select(.type=="required_status_checks") | .parameters.required_status_checks[].context' 2>/dev/null; done | sort -u | tr '\n' ' ')"
+  missing_ctx=""; for c in cleat enola trivy; do case " $ctx " in *" $c "*) ;; *) missing_ctx="$missing_ctx $c" ;; esac; done
+  if [ -n "$ctx" ] && [ -z "$missing_ctx" ]; then ok "branch ruleset" "required checks: $ctx"
+  elif [ -n "$ctx" ]; then miss "branch ruleset" "required checks lack:$missing_ctx (have: $ctx)"
+  else miss "branch ruleset" "no active branch ruleset with required status checks: gh api repos/{owner}/{repo}/rulesets --input deploy/templates/github/ruleset.json"; fi
 fi
 
 echo "== CI and ledger"
-if [ -f .github/workflows/gates.yml ]; then ok ".github/workflows/gates.yml" "cleat + enola + trivy jobs"
-elif grep -lE '^  (cleat|enola|trivy):' .github/workflows/*.yml >/dev/null 2>&1; then ok "gate jobs" "in $(grep -lE '^  cleat:' .github/workflows/*.yml | head -1)"
-else miss ".github/workflows/gates.yml" "cleat + enola + trivy as required checks"; fi
-f .github/workflows/jira-sync.yml
-f .github/workflows/pr-ticket-key.yml
-f scripts/ci/jira_sync.py
-f tests/unit/test_ci_jira_sync.py
-if command -v gh >/dev/null 2>&1 && gh repo view >/dev/null 2>&1; then
-  for s in JIRA_API_TOKEN JIRA_USER_EMAIL; do gh secret list 2>/dev/null | grep -q "^$s" && ok "secret $s" || miss "secret $s" "gh secret set $s"; done
-  gh variable list 2>/dev/null | grep -q '^JIRA_BASE_URL' && ok "variable JIRA_BASE_URL" || miss "variable JIRA_BASE_URL" "gh variable set JIRA_BASE_URL"
+# All three gate JOBS must exist somewhere under .github/workflows/ (a file name proves nothing).
+missing_jobs=""; for j in cleat enola trivy; do grep -qE "^  $j:" .github/workflows/*.yml 2>/dev/null || missing_jobs="$missing_jobs $j"; done
+if [ -z "$missing_jobs" ]; then ok "gate jobs cleat, enola, trivy" "in $(grep -lE '^  (cleat|enola|trivy):' .github/workflows/*.yml 2>/dev/null | sort -u | tr '\n' ' ')"
+else miss "gate jobs" "no workflow defines:$missing_jobs (deploy/templates/github/workflows/gates.yml)"; fi
+if [ $NOTRACKER -eq 1 ]; then
+  skip "ledger (jira-sync, pr-ticket-key, jira_sync.py, vars)" "--no-tracker: the shortcut must be named in the team repo's ADR 0001"
+else
+  f .github/workflows/jira-sync.yml
+  f .github/workflows/pr-ticket-key.yml
+  f scripts/ci/jira_sync.py
+  f tests/unit/test_ci_jira_sync.py
+  if command -v gh >/dev/null 2>&1 && gh repo view >/dev/null 2>&1; then
+    for s in JIRA_API_TOKEN JIRA_USER_EMAIL; do gh secret list 2>/dev/null | grep -q "^$s" && ok "secret $s" || miss "secret $s" "gh secret set $s"; done
+    gh variable list 2>/dev/null | grep -q '^JIRA_BASE_URL' && ok "variable JIRA_BASE_URL" || miss "variable JIRA_BASE_URL" "gh variable set JIRA_BASE_URL"
+    gh variable list 2>/dev/null | grep -q '^JIRA_PROJECT_KEY' && ok "variable JIRA_PROJECT_KEY" || warn "variable JIRA_PROJECT_KEY" "unset = the script's default project key"
+  fi
 fi
 
 echo "== verify gate"

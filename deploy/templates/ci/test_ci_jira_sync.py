@@ -356,6 +356,14 @@ def test_keys_command_reads_stdin_for_dash(monkeypatch, capsys):
     assert capsys.readouterr().out.split() == ["KVART-7", "KVART-4"]
 
 
+def test_main_treats_empty_project_key_as_default(monkeypatch, capsys):
+    """An exported-but-empty JIRA_PROJECT_KEY (unset repository variable) must not
+    yield the empty project, which makes `KVART-12` extract as `-12`."""
+    monkeypatch.setenv("JIRA_PROJECT_KEY", "")
+    assert js.main(["keys", "--text=feat/KVART-12-x"]) == 0
+    assert capsys.readouterr().out.split() == ["KVART-12"]
+
+
 @pytest.mark.parametrize("base", ["http://example.atlassian.net", "https://jira.invalid", "https://example.atlassian.net.evil.example"])
 def test_request_refuses_wrong_scheme_or_host(base):
     j = js.Jira(base, "e", "t")
