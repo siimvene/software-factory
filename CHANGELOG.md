@@ -20,10 +20,11 @@ Design before the plan; red-first becomes a gate.
 - `docs/14-pm-surface.md`: what the program design note needs from the ticket, section by section,
   the sizing signals only the PM can write, the prototype as a readiness condition for UI work,
   what the PM must not write, and the evaluator's question order on a sized ticket.
-- `templates/skills/readiness-evaluator/SKILL.md`: the "Sized tickets" section: detection from the
-  ticket text only (score-neutral), the four-step question order, what the evaluator never asks for
-  and flags when present, the sizing signals only the author can write; step 5 and the output
-  format carry it. Not yet run on a sized ticket.
+- `templates/skills/readiness-evaluator/SKILL.md`: the "Bigger tickets: one extra question"
+  section, written for the person who maintains the skill rather than for the design: when it
+  applies (from the ticket text only, score-neutral), the four questions in order, the plain-words
+  line the author sees, what the skill never asks for and points out as misplaced. Not yet run on
+  such a ticket.
 - `docs/10-measurement.md`: rework after the first review as the instrument that decides whether
   the note pays; a design-quality row in the instruments table.
 - `evidence/field-evidence.md` §7: the talk the two gaps trace to, what is taken and what is not.
