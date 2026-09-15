@@ -24,6 +24,12 @@ CONF="${FACTORY_JIRA_ENV:-$HOME/.config/factory/jira.env}"
 [[ -r "$CONF" ]] && set -a && . "$CONF" && set +a
 : "${JIRA_BASE_URL:?set JIRA_BASE_URL in $CONF}"
 : "${JIRA_USER_EMAIL:?set JIRA_USER_EMAIL in $CONF}"
+# Same host guard as jira_sync.py: the Basic credential goes to whatever this names, so it is
+# pinned to https on Atlassian Cloud; a mistyped or replaced config cannot send the token elsewhere.
+case "$JIRA_BASE_URL" in
+  https://*.atlassian.net|https://*.atlassian.net/) ;;
+  *) echo "jira: JIRA_BASE_URL must be https://<site>.atlassian.net (got: $JIRA_BASE_URL)" >&2; exit 2 ;;
+esac
 REPO="${FACTORY_REPO:-$PWD}"
 SCRIPT="$REPO/scripts/ci/jira_sync.py"
 [[ -f "$SCRIPT" ]] || { echo "jira: $SCRIPT not found (set FACTORY_REPO in $CONF)" >&2; exit 1; }
