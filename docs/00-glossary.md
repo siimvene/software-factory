@@ -31,6 +31,12 @@ in business language plus a technical-references sibling. Derived, never hand-ed
 **Ticket.** The delta: what should change, with numbered observable examples. The only
 hand-written intent artifact. See [templates/ticket.md](../templates/ticket.md).
 
+**Program design note.** The BUILD-stage artifact between the architecture and the code for a
+sized ticket: modules and lanes, types, signatures and call paths, shape decisions with the
+rejected option, slices in landing order, and the tests that must be red on the merge base.
+Written by the head, reviewed before the first brief, read by the panel as a pack. See
+[templates/program-design.md](../templates/program-design.md).
+
 **Decision record (ADR).** A dated record of a live architectural decision with its
 rejected alternatives and consequences. Repo-level ones sit in the code repo, cross-repo ones
 in the team-context repo.
@@ -74,6 +80,11 @@ Humans approve and merge; they do not author. A trailer-less commit is rejected.
 and self-provisioning test infrastructure that make lights-out changes safe on a given core.
 Coverage says a line ran; the kill rate says a test would notice it changing; the net needs both.
 On a legacy core, building it is turn 1.
+
+**Fail-on-base check.** The gate that runs every new or changed test at the merge base with the
+branch's tests applied and requires it to fail there and pass on the branch. Declared
+characterization and refactor tests are the only tests allowed to pass on both. The mechanical
+form of "tests first, red on the unfixed code".
 
 **Characterization test.** A test that locks current behaviour, bugs included, so that a
 refactor or port can be judged against it. A refactor net, not a correctness proof.

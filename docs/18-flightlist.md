@@ -16,6 +16,9 @@ Three rules for using it:
   session runs before trusting any of it.
 
 Legend: `[ ]` not started, `[x]` done with evidence, `[~]` skipped, shortcut recorded.
+The commands that execute the D0, G and M legs, with the files they copy, are in
+[deploy/02-scaffold-a-project.md](../deploy/02-scaffold-a-project.md); the machine they run on is
+[deploy/01-workstation-macos.md](../deploy/01-workstation-macos.md).
 "Human" in the who column means the leg cannot be delegated to an agent by this design.
 
 ## P. Pre-flight: decide before anything is created
@@ -65,6 +68,7 @@ Legend: `[ ]` not started, `[x]` done with evidence, `[~]` skipped, shortcut rec
 | G5 | Receipt-checked pre-push | Browser pass scoped by routes; static analysis; the spec delta once KVART-23 ships; each writes a receipt keyed by tree id | a diff reaching a surface without its receipt is refused; with it, passes | both push attempts | Agent | [06](06-verify-gate.md), [adr/0009](../adr/0009-the-spec-is-a-gate-input.md) |
 | G6 | Merge authority | Branch protection or the pre-push hook; provenance trailer on every commit | a push without the trailer is rejected; a dry-run push to the default branch is blocked | both refusals | Agent | [adr/0005](../adr/0005-humans-approve-never-author.md), [adr/0006](../adr/0006-pr-gated-output-human-release.md) |
 | G7 | Every gate made to fail once | Planted escape, planted secret, planted drift, planted layer crossing | each red observed | one line per gate | Agent | [01](01-principles.md), test the test |
+| G8 | Fail-on-base check | Wire the check on the Stop hook or as a receipt; plant a test that passes on the base, run a real red-first test, declare one characterization test | the first is refused, the second passes, the third passes with its label in the receipt | the three runs | Agent | [05](05-sensor-stack.md), [adr/0010](../adr/0010-program-design-before-the-plan.md) |
 
 ## S. Sandbox and identity
 
@@ -88,7 +92,7 @@ Legend: `[ ]` not started, `[x]` done with evidence, `[~]` skipped, shortcut rec
 
 | # | Leg | Do | Check | Evidence | Who | Where |
 |---|---|---|---|---|---|---|
-| C1 | One small ticket end to end | A one-line fix; PM hat and dev hat in two sessions; every stage timed; tokens per agent; what the gate caught; every skipped step named | the cycle report exists and the sister spec delta and memory promote PR are open or merged | `templates/dogfood-cycle-report.md` filled | Agent, **Human** merges and releases | [02](02-loop.md), [06](06-verify-gate.md) |
+| C1 | One small ticket end to end | A one-line fix (one-shot, so no design note; the plan says so); PM hat and dev hat in two sessions; every stage timed; tokens per agent; what the gate caught; every skipped step named | the cycle report exists and the sister spec delta and memory promote PR are open or merged | `templates/dogfood-cycle-report.md` filled | Agent, **Human** merges and releases | [02](02-loop.md), [06](06-verify-gate.md) |
 | C2 | Verify on arrival | A fresh session runs the block below before trusting any of the above | six commands, six expected outputs | the transcript | Agent | [17 §9](17-onboarding.md) |
 | C3 | Compare | Against the reference: 12 to 19 min to PR, under 30 min to live without required CI, 41 min with it | the deltas recorded | the cycle report | Agent | [10](10-measurement.md), [STATUS](../STATUS.md) |
 

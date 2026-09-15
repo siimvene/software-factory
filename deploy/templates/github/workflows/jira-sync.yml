@@ -1,0 +1,189 @@
+# Jira ledger sync — the KVART ticket follows what GitHub observed.
+#
+# Before this workflow the ticket states were set by hand by whoever ran the
+# flywheel, at whatever moment they remembered (KVART-8 read "Ready for LIVE"
+# 14 minutes before its checks were green). Now:
+#
+#   PR opened / reopened / edited / ready    ->  In Progress -> In Test, and a
+#                                                remote link to the PR on the ticket
+#   `ci` completed on a PR, success          ->  forward to Ready for LIVE (from In
+#                                                Test, or from In Progress after a red run)
+#   `ci` completed on a PR, failure          ->  back to In Progress, with the run URL
+#   PR merged                                ->  forward to Ready for LIVE (a merge past
+#                                                the ruleset implies green checks, and the
+#                                                checks event can lose the race with the
+#                                                merge) plus a comment with the sha. Done
+#                                                is the deploy's call: deploy/deploy.sh
+#                                                runs `jira_sync.py deployed`
+#
+# Ticket keys come from the head branch name and the PR title only (`KVART-N`,
+# word-bounded; the parenthesised title form `(KVART-5/6/7)` names three, a
+# bare `KVART-8/4` anywhere is KVART-8 alone), never the body: bodies cite
+# other tickets ("epic KVART-4", "filed as KVART-9") that must not move. Epics
+# are linked but never moved. A PR that names no ticket is ignored. Every
+# transition is conditional on the ticket's current status, so replays are
+# no-ops (scripts/ci/jira_sync.py, unit-tested at tests/unit/test_ci_jira_sync.py).
+#
+# Who picks a ticket up is NOT this workflow's business: the operator runs
+# `jira pickup KVART-N` (~/.memspec/bin/jira -> the same script) which assigns
+# the ticket to the token's own account and walks it to In Progress.
+#
+# Identity: the Jira calls run as the account behind JIRA_USER_EMAIL +
+# JIRA_API_TOKEN (repository secrets) against the JIRA_BASE_URL repository
+# variable. Not a required check: a Jira outage must never block a merge.
+#
+# Both jobs run MAIN's copy of scripts/ci/jira_sync.py, never the PR's: the
+# pull-request job checks out `main` explicitly, so an unmerged branch cannot
+# hand a modified script the Jira token (a Codex finding on the first draft).
+# Consequence: the whole workflow is exercised only after the introducing PR
+# merges, and a PR that changes the script is tested by the NEXT PR. Fork PRs
+# get no secrets; the script then exits with a notice, not a failure. The
+# checks job runs only for same-repo PRs, by `if:` and by the PR lookup.
+# Every third-party action is pinned to a full commit SHA (supply-chain rule).
+name: jira-sync
+
+on:
+  pull_request:
+    types: [opened, reopened, edited, ready_for_review, closed]
+    branches: [main]
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+
+permissions:
+  contents: read
+
+# One job at a time per head branch: two jobs on the same ticket (an edited PR
+# and a green run, say) would otherwise race between reading the ticket's
+# transitions and posting one. Never cancel: every event must be applied.
+concurrency:
+  group: jira-sync-${{ github.event.pull_request.head.ref || github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
+env:
+  JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
+  JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+  JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+  JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}   # jira_sync.py's key regex; default KVART when unset
+
+jobs:
+  pull-request:
+    name: pull-request
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read   # the latest completed `ci` verdict for the head (edited PRs)
+    steps:
+      - name: Checkout main's copy of the script (never the PR's)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: main
+          sparse-checkout: scripts/ci
+          persist-credentials: false
+
+      - name: Sync the ticket
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          ACTION: ${{ github.event.action }}
+          MERGED: ${{ github.event.pull_request.merged }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -euo pipefail
+          if [ -z "${JIRA_API_TOKEN}" ]; then
+            echo "::notice::no Jira credentials in this context (fork PR?); nothing synced"
+            exit 0
+          fi
+          if [ ! -f scripts/ci/jira_sync.py ]; then
+            echo "::notice::scripts/ci/jira_sync.py is not on main yet; nothing synced"
+            exit 0
+          fi
+          # `--flag=value` throughout: a title or branch beginning with '-' must
+          # not read as an option.
+          keys="$(python3 scripts/ci/jira_sync.py keys --text="${HEAD_REF} ${PR_TITLE}" | paste -sd, -)"
+          if [ -z "$keys" ]; then
+            echo "::notice::no ticket key in branch or title; nothing synced"
+            exit 0
+          fi
+          case "$ACTION" in
+            opened|reopened|edited|ready_for_review)
+              python3 scripts/ci/jira_sync.py pr-opened --keys="$keys" --pr-url="$PR_URL" --pr-title="$PR_TITLE" --sha="$HEAD_SHA"
+              # A title edit (a key added late) or a reopen must not present a
+              # head whose `ci` already ran as "In Test" without its verdict:
+              # apply the latest completed run for this exact head, if any.
+              verdict="$(gh run list --repo "$REPO" --workflow ci --event pull_request --commit "$HEAD_SHA" \
+                           --status completed --limit 1 --json conclusion,url --jq '.[0] | select(.) | "\(.conclusion) \(.url)"')"
+              if [ -n "$verdict" ]; then
+                python3 scripts/ci/jira_sync.py checks --keys="$keys" --conclusion="${verdict%% *}" --run-url="${verdict#* }" --sha="$HEAD_SHA"
+              fi ;;
+            closed)
+              if [ "$MERGED" = "true" ]; then
+                python3 scripts/ci/jira_sync.py merged --keys="$keys" --pr-url="$PR_URL" --sha="$MERGE_SHA"
+              else
+                echo "::notice::PR closed without merge; ticket left as is"
+              fi ;;
+          esac
+
+  checks:
+    name: checks
+    # Only the PR-path `ci` runs carry a verdict on a ticket; main pushes and the
+    # nightly are backend-full's business (revert-on-red).
+    if: >-
+      ${{ github.event_name == 'workflow_run'
+          && github.event.workflow_run.event == 'pull_request'
+          && github.event.workflow_run.head_repository.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read   # title of the PR behind the run
+    steps:
+      - name: Checkout (script only)
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          sparse-checkout: scripts/ci
+          persist-credentials: false
+
+      - name: Sync the ticket
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+        run: |
+          set -euo pipefail
+          if [ -z "${JIRA_API_TOKEN}" ]; then
+            echo "::notice::no Jira credentials; nothing synced"
+            exit 0
+          fi
+          # The PR behind the run, by head sha AND head branch (two PRs can share
+          # a commit). Same-repo only (a fork's branch name must not steer a
+          # ticket); open preferred, but a PR merged in the seconds between the
+          # run's end and this job still counts, otherwise a green verdict lost
+          # to that race would strand the ticket.
+          pr="$(gh api "/repos/${REPO}/commits/${HEAD_SHA}/pulls" \
+                --jq '[.[] | select(.head.repo.full_name == env.REPO and .head.ref == env.HEAD_BRANCH)] | (map(select(.state == "open")) + .)[0].number // empty')"
+          if [ -z "$pr" ]; then
+            echo "::notice::no same-repo PR for ${HEAD_SHA}; nothing synced"
+            exit 0
+          fi
+          # A rerun of an OLD run (older head) must not overwrite the verdict of
+          # the PR's current head.
+          head_now="$(gh pr view "$pr" --repo "$REPO" --json headRefOid --jq .headRefOid)"
+          if [ "$head_now" != "$HEAD_SHA" ]; then
+            echo "::notice::run is for ${HEAD_SHA} but PR #${pr} is at ${head_now}; stale verdict ignored"
+            exit 0
+          fi
+          title="$(gh pr view "$pr" --repo "$REPO" --json title --jq .title)"
+          keys="$(python3 scripts/ci/jira_sync.py keys --text="${HEAD_BRANCH} ${title}" | paste -sd, -)"
+          if [ -z "$keys" ]; then
+            echo "::notice::no ticket key on PR #${pr}; nothing synced"
+            exit 0
+          fi
+          python3 scripts/ci/jira_sync.py checks --keys="$keys" --conclusion="$CONCLUSION" --run-url="$RUN_URL" --sha="$HEAD_SHA"

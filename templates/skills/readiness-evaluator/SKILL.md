@@ -131,6 +131,69 @@ Is the title a clear, actionable one-liner that stands alone?
 
 ---
 
+## Bigger tickets: one extra question
+
+Some tickets are more than a quick fix. Once they are Ready, the build side writes its own short
+design from the ticket before any code (docs/02-loop). It can only write what the ticket gives it.
+A ticket can score 85 and still leave that design with nothing to work from, and then the build
+bounces the ticket back to the author after pickup. Asking here is the same question, an hour
+earlier, before anyone has started building.
+
+**When this applies.** Only if the ticket's own text says one of these:
+
+- money is moved, charged, refunded, or shown as an amount people pay on
+- login, identity, permissions, or keeping one customer's data away from another's
+- something new gets stored
+- someone else consumes it: a mobile app, another system, an external API
+- an existing feature or path is removed
+- more than one existing feature spec is touched
+
+Nothing about the score changes. This only decides which question you ask first and what you
+point out as misplaced.
+
+**The one question, in this order.** Ask for the first thing on the list that the ticket does not
+already have. One question, then stop.
+
+1. **What must never break, and how would we know?** Also: is there a speed or volume limit
+   (a number, or "none"), and what happens on the bad case (wrong person, duplicate, expired,
+   malformed input) including what must stay unchanged.
+2. **What exactly does the user see or type?** Exact names, amounts, dates, messages, field
+   labels. For anything with a screen: is the agreed clickable prototype attached to the
+   ticket? Without it the build cannot know the fields and states, whatever the score.
+3. **What has to exist or ship before this?** Including which other ticket this depends on.
+4. **Who does this, and where?** Which role, on which page, button, endpoint, job, or message,
+   for each example.
+
+Put it at the top of the gaps list, in plain words, like this:
+
+```
+This one is bigger than a quick fix. Before the build can plan it, I need:
+[the one thing, as a question the author can answer in a sentence or two]
+```
+
+Ask it at Good scores too. A high score means the ticket is well written, not that the build has
+what it needs.
+
+**Never ask for, and point out if you find:** file or module names, database tables, function
+names, the order engineering will build things in, or technical choices such as streaming versus
+buffering, batch sizes, retry rules. Those are decided downstream. If the ticket contains them,
+add one gap line, no score change:
+
+```
+This belongs to the build's design, not the ticket; you can drop it: [what was found]
+```
+
+and say why in one sentence: once implementation detail is in the acceptance criteria, the
+criteria are no longer the requester's (docs/07-roles-and-authority).
+
+**The lines only the author can write.** Whether money, identity, or customer isolation is
+involved; whether something new is stored; whether another system consumes it; whether a path is
+being removed. The build cannot find these out from code it has not written yet. If the text
+shows one of them but the ticket never states it as a constraint, ask for that line first,
+before anything else in the order above.
+
+---
+
 ## Context lookup
 
 Before scoring, attempt to find relevant context. Finding context does **not** change the ticket's score (the score still reflects only what is written in the ticket) but it makes gap feedback actionable by pointing to the exact file where the missing context already exists.
@@ -182,7 +245,7 @@ Search recursively across `features/`, `reference/`, and `<tickets>/` for filena
 2. Score each criterion independently using the rubric above, based only on what is written in the ticket.
 3. Sum the scores. State the total and label (Good / Decent / Bad).
 4. For each criterion scored below its midpoint, output one specific, actionable gap statement referencing only content (or its absence) within the ticket. Where the workspace lookup found relevant spec content, append a `[available in features/X.md § N]` citation.
-5. If the ticket is Decent or Bad, identify the **single highest-impact question** to ask the author that would unlock the most score improvement, scoped to what the ticket already covers, not to topics outside it.
+5. If the ticket is Decent or Bad, identify the **single highest-impact question** to ask the author that would unlock the most score improvement, scoped to what the ticket already covers, not to topics outside it. For a bigger ticket (see "Bigger tickets" above) the question follows that section's order and is asked at Good scores too, as the first line under gaps.
 5b. **Auto-transition to improver.** If the total score is below 85, immediately invoke the `task-improver` skill without waiting for the user to ask. Pass the ticket content and the full evaluation output (score, gaps, top clarifying question) as context so the improver starts from the first gap question rather than re-evaluating from scratch.
 5c. **Good score: offer three paths.** If the total score is 85 or above, always present all three options before taking any action:
 
@@ -242,6 +305,8 @@ Score is [X]/100, Good. What would you like to do?
 
 > Context: [features or reference path] matched, gaps annotated with workspace citations.
 > (omit this line if no workspace file was found)
+> Bigger ticket: [why, e.g. money is charged; something new is stored]. One extra question below.
+> (omit this line otherwise)
 
 | Criterion                   | Score | Max |
 |-----------------------------|-------|-----|
@@ -255,6 +320,7 @@ Score is [X]/100, Good. What would you like to do?
 
 ### Gaps
 - [criterion]: [specific gap and what's missing] [available in features/X.md § N, if applicable]
+- This one is bigger than a quick fix. Before the build can plan it, I need: [the one question] (bigger tickets only, no score effect)
 
 ### Top clarifying question
 [Single most impactful question to ask the author]

@@ -1,0 +1,9 @@
+# Replace the placeholder with your team's GitHub team (or the lead's handle);
+# owners must have write access to this repo. Do this BEFORE enabling branch
+# protection, or every PR into the gated paths will be unmergeable.
+# The PM is never in this file: PM review of business truth flows through the
+# code owner, not the merge button.
+
+/specs/     @<org>/[team-github-team]
+/.memspec/  @<org>/[team-github-team]
+/CODEOWNERS @<org>/[team-github-team]

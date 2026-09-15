@@ -1,0 +1,15 @@
+{
+  "name": "solo-review",
+  "displayName": "Solo Review",
+  "version": "0.1.2",
+  "description": "A quick one-AI code review for when the fuller two-AI review isn't available. It points out issues and never changes your code.",
+  "author": {
+    "name": "Siim Vene"
+  },
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "rule-packs",
+    "fallback"
+  ]
+}

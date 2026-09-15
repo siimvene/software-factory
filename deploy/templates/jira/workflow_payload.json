@@ -1,0 +1,194 @@
+{
+  "scope": {
+    "type": "GLOBAL"
+  },
+  "statuses": [
+    {
+      "statusReference": "e0475954-b37a-482b-98ea-511248d0367e",
+      "id": "10004",
+      "name": "Backlog",
+      "statusCategory": "TODO"
+    },
+    {
+      "statusReference": "264004d8-1fa2-4f64-bdbc-484250474abe",
+      "id": "10005",
+      "name": "Ready",
+      "statusCategory": "TODO"
+    },
+    {
+      "statusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a",
+      "id": "3",
+      "name": "In Progress",
+      "statusCategory": "IN_PROGRESS"
+    },
+    {
+      "statusReference": "384360a7-d8f8-489a-9e8e-2fb1b9baad2a",
+      "id": "10006",
+      "name": "In Test",
+      "statusCategory": "IN_PROGRESS"
+    },
+    {
+      "statusReference": "fb477272-34fb-4603-9c7b-8e74a5dec22c",
+      "id": "10007",
+      "name": "Ready for LIVE",
+      "statusCategory": "IN_PROGRESS"
+    },
+    {
+      "statusReference": "29c58393-6d70-4926-82e2-17fde500b74b",
+      "id": "10008",
+      "name": "Done",
+      "statusCategory": "DONE"
+    }
+  ],
+  "workflows": [
+    {
+      "name": "KVART flywheel",
+      "description": "Kvart flywheel ladder: Backlog -> Ready -> In Progress -> In Test -> Ready for LIVE -> Done, with test-failed and rejected-at-acceptance loopbacks to In Progress and a Ready -> Backlog demotion.",
+      "startPointLayout": {
+        "x": -160.0,
+        "y": 0.0
+      },
+      "statuses": [
+        {
+          "statusReference": "e0475954-b37a-482b-98ea-511248d0367e",
+          "layout": {
+            "x": 0.0,
+            "y": 0.0
+          }
+        },
+        {
+          "statusReference": "264004d8-1fa2-4f64-bdbc-484250474abe",
+          "layout": {
+            "x": 160.0,
+            "y": 0.0
+          }
+        },
+        {
+          "statusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a",
+          "layout": {
+            "x": 320.0,
+            "y": 0.0
+          }
+        },
+        {
+          "statusReference": "384360a7-d8f8-489a-9e8e-2fb1b9baad2a",
+          "layout": {
+            "x": 480.0,
+            "y": 0.0
+          }
+        },
+        {
+          "statusReference": "fb477272-34fb-4603-9c7b-8e74a5dec22c",
+          "layout": {
+            "x": 640.0,
+            "y": 0.0
+          }
+        },
+        {
+          "statusReference": "29c58393-6d70-4926-82e2-17fde500b74b",
+          "layout": {
+            "x": 800.0,
+            "y": 0.0
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "id": "1",
+          "name": "Create",
+          "type": "INITIAL",
+          "toStatusReference": "e0475954-b37a-482b-98ea-511248d0367e",
+          "links": []
+        },
+        {
+          "id": "11",
+          "name": "Ready",
+          "type": "DIRECTED",
+          "toStatusReference": "264004d8-1fa2-4f64-bdbc-484250474abe",
+          "links": [
+            {
+              "fromStatusReference": "e0475954-b37a-482b-98ea-511248d0367e"
+            }
+          ]
+        },
+        {
+          "id": "21",
+          "name": "Start",
+          "type": "DIRECTED",
+          "toStatusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a",
+          "links": [
+            {
+              "fromStatusReference": "264004d8-1fa2-4f64-bdbc-484250474abe"
+            }
+          ]
+        },
+        {
+          "id": "31",
+          "name": "To test",
+          "type": "DIRECTED",
+          "toStatusReference": "384360a7-d8f8-489a-9e8e-2fb1b9baad2a",
+          "links": [
+            {
+              "fromStatusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a"
+            }
+          ]
+        },
+        {
+          "id": "41",
+          "name": "Passed test",
+          "type": "DIRECTED",
+          "toStatusReference": "fb477272-34fb-4603-9c7b-8e74a5dec22c",
+          "links": [
+            {
+              "fromStatusReference": "384360a7-d8f8-489a-9e8e-2fb1b9baad2a"
+            }
+          ]
+        },
+        {
+          "id": "51",
+          "name": "Go LIVE",
+          "type": "DIRECTED",
+          "toStatusReference": "29c58393-6d70-4926-82e2-17fde500b74b",
+          "links": [
+            {
+              "fromStatusReference": "fb477272-34fb-4603-9c7b-8e74a5dec22c"
+            }
+          ]
+        },
+        {
+          "id": "61",
+          "name": "Test failed",
+          "type": "DIRECTED",
+          "toStatusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a",
+          "links": [
+            {
+              "fromStatusReference": "384360a7-d8f8-489a-9e8e-2fb1b9baad2a"
+            }
+          ]
+        },
+        {
+          "id": "71",
+          "name": "Rejected at acceptance",
+          "type": "DIRECTED",
+          "toStatusReference": "faac131b-ea7b-4f47-80a1-a9606e2fb72a",
+          "links": [
+            {
+              "fromStatusReference": "fb477272-34fb-4603-9c7b-8e74a5dec22c"
+            }
+          ]
+        },
+        {
+          "id": "81",
+          "name": "Back to backlog",
+          "type": "DIRECTED",
+          "toStatusReference": "e0475954-b37a-482b-98ea-511248d0367e",
+          "links": [
+            {
+              "fromStatusReference": "264004d8-1fa2-4f64-bdbc-484250474abe"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

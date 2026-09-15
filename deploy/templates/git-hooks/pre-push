@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+# Quality ratchets before code leaves the machine (cleat).
+# Active for every clone via `git config core.hooksPath scripts/git-hooks` — the same
+# setting that enables the pre-commit tripwires and the memspec post-commit hook.
+# Bypass: git push --no-verify — only when a human explicitly asks.
+#
+# Why here and not .git/hooks/pre-push (which is what `cleat attach.py --git-hooks`
+# writes): core.hooksPath is set on this repo, and when it is, git ignores .git/hooks
+# entirely. A hook installed there would silently never run.
+#
+# Each gate is a ratchet: the debt present when the gate was adopted is recorded in
+# quality/*-baseline.json and accepted; NEW debt fails. Loosening a baseline is a
+# reviewed commit by a person, never an agent's way past a red gate.
+#
+# The full gate is ~2s on this repo, so it runs unscoped.
+#
+# Coverage is conditional, deliberately. coverage.xml is gitignored, and the
+# changed-coverage gate does NOT self-skip when it is missing — it fails with
+# "no coverage report matches coverage.xml". Running --postflight unconditionally
+# would therefore block every push from a checkout that had not just run the tests,
+# which trains people to --no-verify. So it is included only when the report exists
+# AND is newer than the newest source file: a stale report judges today's changed
+# lines against yesterday's run, which is worse than not judging them.
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+command -v python3 >/dev/null 2>&1 || exit 0   # no python, no gate — do not block a push
+[ -f quality/bin/gate.py ] || exit 0           # cleat not attached in this checkout
+
+args=()
+if [ -f coverage.xml ]; then
+  newest_src=$(find src -name '*.py' -newer coverage.xml -print -quit 2>/dev/null)
+  if [ -z "$newest_src" ]; then
+    args+=(--postflight)
+  else
+    echo "pre-push: coverage.xml is older than $newest_src — skipping the coverage gate." >&2
+    echo "          Refresh it with: uv run pytest --cov --cov-report=xml" >&2
+  fi
+else
+  echo "pre-push: no coverage.xml — skipping the coverage gate locally (CI's cleat job re-runs it on the PR against the backend coverage artifact; scripts/validate.sh is the full local wheel)." >&2
+fi
+
+if ! python3 quality/bin/gate.py "${args[@]+"${args[@]}"}"; then
+  echo "" >&2
+  echo "pre-push: BLOCKED — a quality ratchet is red (see the gate output above)." >&2
+  echo "  Fix the finding, or if it is genuinely acceptable debt, accept it in a" >&2
+  echo "  reviewed commit — not by editing quality.json or the baselines to pass." >&2
+  echo "  Bypass only on an explicit human decision: git push --no-verify" >&2
+  exit 1
+fi
+
+# Buffer the pushed refs once: BOTH the scoped-strict pass and the receipt loop
+# below read them, and stdin can only be consumed once. Each consumer reads from a
+# here-doc (never a pipe), so it stays in this shell and an `exit 1` still stops the
+# push.
+_push_refs="$(cat)"
+
+# CI runs the gate with --strict, where a baseline LOOSER than the code fails too
+# (e.g. after you extract a function BELOW its baselined complexity, leaving its
+# entry stale). The unscoped pass above is non-strict on purpose, so baseline drift
+# another merge left behind never blocks your push. This pass applies CI's --strict
+# to the files THIS push changed (--changed), so an improvement YOU made surfaces
+# the one-line fix here instead of after a push -> CI-red -> tighten -> receipts ->
+# force-push round-trip.
+#
+# It runs ONLY in the unambiguous normal case: you are pushing your checked-out
+# branch (a non-delete ref whose sha is HEAD), the working tree is clean, and the
+# diff is not enormous. Every other shape — a branch delete, `feature:main` while
+# another branch is out, a multi-ref or non-HEAD push, a dirty tree, or a diff so
+# large it would blow argv on the scoped checks — is left to CI's full --strict, so
+# this can never false-block a push or crash the hook. It also only covers what
+# --changed scopes (complexity/escapes/conventions over changed files); duplication
+# drift and a deleted file's stale entry stay CI's to catch.
+_head_sha="$(git rev-parse --quiet --verify HEAD 2>/dev/null || true)"
+_pushing_head=0
+if [ -n "$_head_sha" ]; then
+  while read -r _l _lsha _r _rsha; do
+    case "$_lsha" in ""|0000000000000000000000000000000000000000) continue ;; esac
+    [ "$_lsha" = "$_head_sha" ] && _pushing_head=1
+  done <<REFS
+$_push_refs
+REFS
+fi
+if [ "$_pushing_head" = 1 ] && git diff --quiet 2>/dev/null && git diff --cached --quiet 2>/dev/null; then
+  _changed_n="$(git diff --name-only origin/main...HEAD 2>/dev/null | wc -l | tr -d '[:space:]')"
+  if [ "${_changed_n:-0}" -gt 400 ]; then
+    echo "pre-push: $_changed_n changed files — skipping the scoped strict baseline check (CI's --strict runs it)." >&2
+  elif ! python3 quality/bin/gate.py --strict --changed; then
+    echo "" >&2
+    echo "pre-push: BLOCKED — a baseline is looser than your changed code; CI's --strict would fail here." >&2
+    echo "  Run the tighten the gate named above (python3 quality/bin/check-complexity.py --tighten)," >&2
+    echo "  commit the result, and push again. Tighten only lowers a baseline; it never accepts new debt." >&2
+    echo "  Bypass only on an explicit human decision: git push --no-verify" >&2
+    exit 1
+  fi
+fi
+
+# The receipt gates BEFORE the PR: the browser pass (scripts/e2e-gate.sh, KVART-15)
+# and the SonarQube analysis (scripts/sonar-gate.sh, KVART-16). Every ref being
+# pushed is judged on ITS OWN commit (never HEAD: `git push origin other:main` must
+# not ride on HEAD's receipt): each gate decides from that commit's diff whether it
+# applies (pages and API modules for the browser; src/kvart, tests and the frontend
+# app for Sonar) and, if so, demands a passing receipt for exactly that commit's
+# tree. Neither check runs anything itself. Deletions (all-zero local sha) have
+# nothing to judge.
+# The gate scripts are mandatory: a missing or unreadable one blocks, it never
+# skips (a commit that deletes one, or drops its executable bit, does not
+# disable that gate).
+for gate in scripts/e2e-gate.sh scripts/sonar-gate.sh; do
+  if [ ! -f "$gate" ]; then
+    echo "pre-push: BLOCKED — $gate is missing; restore it (it is part of the repository)." >&2
+    exit 1
+  fi
+done
+while read -r _local_ref local_sha _remote_ref _remote_sha; do
+  case "$local_sha" in
+    ""|0000000000000000000000000000000000000000) continue ;;
+  esac
+  for gate in scripts/e2e-gate.sh scripts/sonar-gate.sh; do
+    if ! bash "$gate" --check "$local_sha"; then
+      echo "" >&2
+      echo "pre-push: BLOCKED — $gate has no passing receipt for $local_sha (see above)." >&2
+      exit 1
+    fi
+  done
+done <<REFS
+$_push_refs
+REFS
