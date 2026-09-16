@@ -75,11 +75,16 @@ push the branch, open the PR; the owner merges.
 gh api -X PUT repos/<org>/<team>-team-context/branches/main/protection \
   --input - <<'EOF'
 {"required_status_checks":null,"enforce_admins":true,"restrictions":null,
- "required_pull_request_reviews":{"require_code_owner_reviews":true,"required_approving_review_count":1}}
+ "required_pull_request_reviews":null}
 EOF
 ```
 
-Check: the same endpoint with GET returns `require_code_owner_reviews: true`. Where the plan
+Under adr 0011 the team-context repo is agent-managed and its PRs auto-merge, so it carries **no
+required review** (`required_pull_request_reviews: null` above) - a required code-owner review would
+physically block the auto-merge. `enforce_admins` and status checks stay. A code repository is the
+opposite case and keeps `require_code_owner_reviews: true`.
+
+Check: the same endpoint with GET returns `required_pull_request_reviews: null` on the context repo. Where the plan
 refuses (HTTP 403 on a free private repo, as kvart hit on 2026-09-07), write the refusal into
 ADR 0001 with the date and move on: the gate is a habit until the plan changes.
 
