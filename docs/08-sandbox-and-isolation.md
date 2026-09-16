@@ -45,6 +45,38 @@ checkout (6,222 escapes, 286 functions) until its walkers were taught to skip th
 complexity analyzer sees paths without a leading slash, so the glob `*/.claude/*` never
 matched `[measured 2026-09-07]`.
 
+**Gates must be worktree-safe; three of them were not.** Measured on the reference
+implementation `[measured 2026-09-16]`, each a gate that ran and reported without judging the
+change:
+
+- *Hook roots.* After a mid-session worktree switch the agent runtime's hooks run with the
+  working directory in the worktree but `CLAUDE_PROJECT_DIR` still naming the main checkout.
+  A Stop hook rooted on that variable graded main while the agent edited the worktree, and
+  reported clean 344 times. Rule: a hook takes its root from the hook input's `cwd`, then the
+  repository top-level; never from the launch-directory variable.
+- *Per-checkout gate state.* Baselines, coverage reports and gate receipts are gitignored, so
+  a fresh worktree has none. A gate that needs them either fails to run on every stop (the
+  architecture gate exited 2 and blocked once per turn under a worktree launch) or cannot be
+  satisfied from the checkout that pushes (a receipt earned in the station worktree was not
+  found by the pre-push hook in the main checkout after the merge). Rule: state the gate
+  reads is shared across worktrees, keyed by content (receipts keyed by tree id live under the
+  main checkout root, found via `git rev-parse --git-common-dir`), or seeded from the main
+  checkout when missing (the architecture check grades against main's pinned baseline). A
+  gate that cannot find its state still blocks; it never passes.
+- *Git hook path.* `core.hooksPath` set to an absolute path runs the main checkout's copy of
+  the pre-commit and pre-push hooks in every worktree, so a branch that changes a hook cannot
+  exercise it until merged. Rule: the path is relative (`scripts/git-hooks`); the project
+  checker should verify that, not just that it is set.
+
+**Worktrees are never collected.** The runtime creates its worktrees locked and removes only
+the untouched ones; stations placed by hand are forgotten once their PR merges; worktrees
+created inside a session's temporary directory die with the session and leave dangling
+metadata. 18 were hanging across the operator's repositories, 9 of them removable
+`[measured 2026-09-16]`. Rule: stations live beside the checkout (`<repo>.worktrees/<name>`),
+never inside a temporary directory, and a scheduled collector removes every worktree whose
+head is an ancestor of the default branch or whose branch has a merged PR, provided its tree
+is clean; everything else it lists with the reason it stays. Ghost entries are pruned.
+
 **Two config directories.** A plain-terminal agent and a canvas-runtime agent on the same
 machine use different config directories; a plugin, an MCP server or a marketplace registered
 in one is absent in the other. Register in both or expect a silent no-op.
