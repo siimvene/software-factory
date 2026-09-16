@@ -22,7 +22,10 @@ replays past incidents against the changed contract.
 ## 2. Write paths
 
 - Agents propose; humans merge. Never push to a default branch, never merge your own proposal,
-  never approve a PR.
+  never approve a PR. Exception: a pull request into an agent-managed context/spec repository
+  (`*-team-specs`, `*-team-context`, `*-context-repo`) auto-merges on open - that layer is
+  agent-managed and unread, so no human decision is being made or laundered (adr 0011). Code
+  repositories are unchanged.
 - Team memory reaches the team store only by promote PR. Specs are derived artifacts; hand
   edits are forbidden.
 - Never `git add .` or `git add -A`. Stage by explicit path. Before committing, list the staged
@@ -132,6 +135,10 @@ replays past incidents against the changed contract.
 - Search before substantive work. Write at the moment of discovery: a fixed bug corrects the
   claim about old behaviour; a changed config supersedes the stale claims; an established
   workflow becomes a procedure.
+- Refresh shared context continuously. Pull the memory store and the team-context at session
+  start and again before relying on shared context mid-run, so concurrent agents' and
+  stakeholders' commits are visible; a once-per-session snapshot goes stale under a long run
+  (adr 0011). Pulls are fast-forward-only so a diverged local never stalls the run.
 - Supersede, do not duplicate. A claim contradicted by code defers to the code. No secrets, no
   personal data, no session noise in a promoted claim.
 - Pre-claim search is mandatory for: costs and quotas, architecture and versions, prior
