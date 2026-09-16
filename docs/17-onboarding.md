@@ -123,8 +123,10 @@ defects, dead or unreachable surface, design docs behind the code, governance fa
 code. This is the audit the bootstrap produces for free and it became the entire ticket
 backlog for the first cycles. Cross out rows as cycles resolve them, with the PR that did.
 
-The specs enter through a PR the owner reads for business truth. They are not truth until
-merged.
+The specs enter through a PR. Under adr 0011 the context repo auto-merges that PR rather than
+waiting on a human read; the earlier "the owner reads for business truth before merge" model is
+superseded for this agent-managed layer, and the state-check (14-pm-surface) is where a proposal
+mislabelled as current state is caught.
 
 ## 6. Mine and write the decision records
 
