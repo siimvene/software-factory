@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Public-CLI fixtures for deploy/bin/check-workstation.sh. No real HOME or network."""
 from __future__ import annotations
 
 import hashlib

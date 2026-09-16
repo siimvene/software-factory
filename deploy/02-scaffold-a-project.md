@@ -45,6 +45,9 @@ whose input is blank.
 | PM workspace location and the PM's machine | `~/git/<product>-pm` | M0 |
 | Bot identity: may a GitHub App be created on the org (needs an admin)? | `kvart-factory`, contents + pull-requests write | G6, S2 |
 | Supervision level for the first cycles | interactive on the operator's machine | P5 |
+| Reviewer route | reference Vertex, or existing local Pi with explicit provider and model ids | G1 to G3, factory-reviewer-setup |
+| Consort root the caller will invoke | `~/git/consort` at `5f68ef6`, or the installed plugin scripts directory | G1 to G3 |
+| Caller that will run the panel | a Claude session that inherits user-scope env, or a shell with the same exports | G1 to G3 |
 
 ## D0. Repositories
 
@@ -241,23 +244,40 @@ Evidence: the settings diff, the two gate outputs, one line per planted failure.
 
 ### G1 to G3 The verify gate (Agent)
 
-Nothing to install in the repo beyond rule packs: consort picks up `.claude/rules/*.md` as the
+Nothing to install in the repo beyond rule packs. Consort picks up `.claude/rules/*.md` as the
 reviewer's brief when `CONSORT_RULE_PACKS` is unset, and the group's adopted packs come with
-the `plg-rules` plugin. The machine-side configuration is in the workstation guide, section 3
-and 7. Prove it here, on this repo's first real diff (the G4 branch is a fine subject):
+the `plg-rules` plugin. Keep reviewer env out of tracked project settings. Follow
+[factory-reviewer-setup](../templates/skills/factory-reviewer-setup/SKILL.md) for the route
+choice, then the workstation guide sections 3 and 7 for the machine-side keys. Use the Consort
+root and caller recorded in section 0. A shell panel does not read Claude settings.
+
+Prove it here, on this repo's first real diff (the G4 branch is a fine subject). Export the same
+env the caller will use. `$CONSORT_ROOT` is that recorded checkout or plugin scripts parent.
+
+Vertex route:
 
 ```
-bash ~/git/consort/scripts/consort-panel.sh origin/main           # both legs; read the [label] lines and seconds
-bash ~/git/consort/scripts/consort-scan.sh .                      # scanner tier; every SKIPPED line goes in the report
-CONSORT_REVIEWERS=codex,pi:google-vertex CONSORT_GCP_PROJECT=does-not-exist bash ~/git/consort/scripts/consort-panel.sh origin/main; echo "exit=$?"
+bash "$CONSORT_ROOT/scripts/consort-panel.sh" origin/main
+bash "$CONSORT_ROOT/scripts/consort-scan.sh" .
+CONSORT_REVIEWERS=codex,pi:google-vertex:this-model-does-not-exist CONSORT_GCP_PROJECT=does-not-exist bash "$CONSORT_ROOT/scripts/consort-panel.sh" origin/main; echo "exit=$?"
 ```
 
-Check: the first run produces two findings files with one `[label] started` line each and a
-wall-clock proportional to the diff; the third run exits 3 (a leg failed, the gate did not run),
-not 0 with one leg. Then the blind security side-pass: spawn consort's `agents/security-reviewer`
-brief in a fresh session with no context from this one, on the same diff, and plant one fake
-credential in a scratch file first; the plant must be found. Record both outputs. The design's
-three axes and the no-re-run rule are in [docs/06](../docs/06-verify-gate.md).
+Local Pi route. Do not export `CONSORT_GCP_PROJECT`. Do not invent `CONSORT_PI_BIN`.
+
+```
+bash "$CONSORT_ROOT/scripts/consort-panel.sh" origin/main
+bash "$CONSORT_ROOT/scripts/consort-scan.sh" .
+CONSORT_REVIEWERS='codex,pi:<provider-id>:this-model-does-not-exist' bash "$CONSORT_ROOT/scripts/consort-panel.sh" origin/main; echo "exit=$?"
+```
+
+Check. The first run produces two findings files with one `[label] started` line each and a
+wall-clock proportional to the diff. The fail-closed run exits 3 (a syntactically valid leg
+failed at runtime). Exit 2 for malformed configuration is not that test. The gate must not
+return 0 with one leg dropped. Then the blind security side-pass. Spawn consort's
+`agents/security-reviewer` brief in a fresh session with no context from this one, on the same
+diff, and plant one fake credential in a scratch file first. The plant must be found. Record
+both outputs. The design's three axes and the no-re-run rule are in
+[docs/06](../docs/06-verify-gate.md).
 
 ### G5 Receipt-checked pre-push gates (Agent, later)
 
