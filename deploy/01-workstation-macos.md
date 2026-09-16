@@ -42,10 +42,18 @@ gcloud auth login                          # only if the Gemini leg runs on Vert
 
 ```
 claude                                     # first run logs you in; then exit
-npm install -g memspec@0.11.0
+npm install -g memspec@0.11.0 --min-release-age=0
 memspec init ~/.memspec                    # the personal scratch store; installs the two session hooks
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 ```
+
+`--min-release-age=0` is there for one reason: a workstation that already carries the
+supply-chain setting `min-release-age=30` in `~/.npmrc` (the operator's machines have it; a
+fresh Mac does not) refuses to install a version published less than 30 days ago, and a
+pinned memspec release is exactly that for its first month (0.11.0 shipped 2026-09-16). The flag lifts the
+gate for this single install and nothing else; the pin, not the age, is the trust decision
+here (the package is ours). Leave it in place even on a machine without the setting, it is a
+no-op there.
 
 `memspec init` writes `memspec-session-start.js` and `memspec-consolidate.js` under
 `~/.claude/hooks/` and wires them into `~/.claude/settings.json`; the MCP registration gives
@@ -221,7 +229,7 @@ PM rows of 6, and the Jira rows of 8. Concretely:
 ```
 brew install git gh jq node && brew install --cask claude-code
 claude; gh auth login
-npm install -g memspec@0.11.0 && memspec init ~/.memspec
+npm install -g memspec@0.11.0 --min-release-age=0 && memspec init ~/.memspec
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"
 claude plugin install pm-workspace@software-factory && claude plugin install secret-guard@software-factory
@@ -251,6 +259,10 @@ It proves presence and login state. Three things it cannot prove and you should,
 
 ## Known traps, from the reference machine
 
+- `npm install -g memspec@<pin>` fails with `No matching version found` although the version
+  is on npm: `~/.npmrc` has `min-release-age=30` and the pin is younger than that. Add
+  `--min-release-age=0` to that one install (already in sections 2 and 9); the checker prints
+  an OPTIONAL line when the setting is present.
 - No `timeout` on macOS without coreutils. A delegation's wall-clock cap is
   `perl -e 'alarm N; exec @ARGV' <cmd...>`; a bare `timeout` exits 127 before the child starts
   and reads as an instant success.
