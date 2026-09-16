@@ -434,6 +434,9 @@ short and specific.
 5. **The graduate gate as the only write path, plus the state check above.** Solo, the code owner
    and the PM are the same person, and the gate degrades into a habit. With more than one PM it is
    the only thing standing between the team's current-state specs and a swamp of proposals.
+   (adr 0011 knowingly drops this guard for agent-managed context repos, which auto-merge: the
+   layer is treated as derived, not a hand-curated human source of truth, and the state-check
+   below is where a mislabelled proposal is caught, if it is built.)
 6. **The sensitivity classification, filled in.** A solo owner writing about their own product can
    leave the default tier and lose nothing. A team workspace holds stakeholder names, vendor
    material and unreleased plans, and the tier is what decides whether any of it may appear in an
