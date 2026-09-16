@@ -47,6 +47,7 @@ req node node --version
 if [ $PM -eq 1 ]; then skip uv "PM profile"; skip pnpm "PM profile"; else req uv uv --version; req pnpm pnpm --version; fi
 req memspec memspec --version
 req memspec-mcp true "npm install -g memspec (ships memspec-mcp)"
+if grep -qs '^min-release-age=' "$HOME/.npmrc"; then warn "npm min-release-age set" "a memspec pin younger than that needs --min-release-age=0 on the install line (see guide section 2)"; fi
 [ -d "$HOME/.memspec" ] && ok "~/.memspec store" "$(ls "$HOME/.memspec/memory" 2>/dev/null | wc -l | tr -d ' ') files" || miss "~/.memspec store" "run: memspec init ~/.memspec"
 if have claude && claude mcp list 2>/dev/null | grep -q '^memspec'; then ok "memspec MCP (user scope)"; else miss "memspec MCP (user scope)" "claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp"; fi
 for h in memspec-session-start.js memspec-consolidate.js; do [ -f "$CFG/hooks/$h" ] && ok "hook $h" || warn "hook $h" "memspec init installs it"; done
