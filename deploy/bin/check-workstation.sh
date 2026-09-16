@@ -3,10 +3,33 @@
 # OK / MISSING / SKIP, and exit 1 if a REQUIRED item is missing. Read-only: it changes
 # nothing. Pair with deploy/01-workstation-macos.md, which says how to install each item.
 #
-# Usage: bash deploy/bin/check-workstation.sh [--pm]
-#   --pm   the PM profile: skips the engineer-only items (sensors, reviewers, scanners)
+# Usage: bash deploy/bin/check-workstation.sh [--pm] [--consort-root PATH]
+#   --pm            the PM profile: skips the engineer-only items (sensors, reviewers, scanners)
+#   --consort-root  Consort checkout or plugin root the caller will invoke (default: ~/git/consort)
 set -u
-PM=0; [ "${1:-}" = "--pm" ] && PM=1
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PM=0
+CONSORT_ROOT=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --pm) PM=1; shift ;;
+    --consort-root)
+      if [ $# -lt 2 ]; then
+        echo "check-workstation: --consort-root needs a path" >&2
+        echo "usage: bash deploy/bin/check-workstation.sh [--pm] [--consort-root PATH]" >&2
+        exit 1
+      fi
+      CONSORT_ROOT="$2"
+      shift 2
+      ;;
+    *)
+      echo "check-workstation: unknown argument: $1" >&2
+      echo "usage: bash deploy/bin/check-workstation.sh [--pm] [--consort-root PATH]" >&2
+      exit 1
+      ;;
+  esac
+done
+[ -n "$CONSORT_ROOT" ] || CONSORT_ROOT="$HOME/git/consort"
 fail=0
 # The runtime's config directory: a canvas or multiplexer runtime may set CLAUDE_CONFIG_DIR, and a
 # plugin or marketplace registered under one directory is absent under the other. Run the checker
@@ -57,7 +80,7 @@ if [ $PM -eq 1 ]; then
   for p in pm-workspace@software-factory secret-guard@software-factory; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
   plugin_enabled claude-hud@claude-hud && ok "plugin claude-hud@claude-hud" || warn "plugin claude-hud@claude-hud" "optional for a PM"
 else
-  for p in codex@openai-codex claude-hud@claude-hud secret-guard@software-factory; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
+  for p in claude-hud@claude-hud secret-guard@software-factory; do plugin_enabled "$p" && ok "plugin $p" || miss "plugin $p" "claude plugin install $p"; done
 fi
 plugin_enabled consort@consort && ok "plugin consort@consort" || { [ $PM -eq 1 ] && skip "plugin consort@consort" "PM profile" || miss "plugin consort@consort" "claude plugin marketplace add siimvene/consort && claude plugin install consort@consort"; }
 marketplace_known software-factory && ok "marketplace software-factory" || miss "marketplace software-factory" "claude plugin marketplace add <path>/software-factory/deploy/marketplace"
@@ -67,17 +90,8 @@ if [ $PM -eq 1 ]; then
   echo "== PM profile: engineer-only sections skipped (sensors, reviewers, scanners, containers)"
 else
   echo "== second vendor (verify gate)"
-  req codex codex --version
-  if have codex && [ -f "$HOME/.codex/auth.json" ]; then ok "codex auth" "~/.codex/auth.json present"; else miss "codex auth" "run: codex login"; fi
-  req gemini gemini --version
-  req pi pi --version "npm install -g @earendil-works/pi-coding-agent"
-  req gcloud gcloud --version
-  if have gcloud && gcloud auth application-default print-access-token >/dev/null 2>&1; then ok "gcloud ADC" "token minted"; else
-    if [ -n "${CONSORT_GCP_CREDENTIALS:-}" ] && [ -r "$CONSORT_GCP_CREDENTIALS" ]; then ok "gcloud credentials" "CONSORT_GCP_CREDENTIALS file"; else miss "gcloud ADC" "gcloud auth application-default login (or CONSORT_GCP_CREDENTIALS)"; fi; fi
-  for v in CONSORT_REVIEWERS CONSORT_GCP_PROJECT; do
-    if python3 -c "import json,os,sys;d=json.load(open(os.path.join('$CFG','settings.json')));sys.exit(0 if d.get('env',{}).get('$v') else 1)" 2>/dev/null || [ -n "${!v:-}" ]; then ok "env $v"; else miss "env $v" "set in ~/.claude/settings.json env (see 01-workstation-macos.md)"; fi
-  done
-  [ -d "$HOME/git/consort/scripts" ] && ok "consort checkout" "$(git -C "$HOME/git/consort" rev-parse --short HEAD 2>/dev/null)" || miss "consort checkout" "git clone https://github.com/siimvene/consort ~/git/consort (the panel script runs from it)"
+  echo "reviewer contract: process environment (Claude settings are not the panel env)"
+  python3 "$HERE/check-reviewers.py" --consort-root "$CONSORT_ROOT" || fail=1
 
   echo "== sensors"
   req enola enola --version "release binary from github.com/enola-labs/enola"
