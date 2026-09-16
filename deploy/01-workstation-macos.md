@@ -1,19 +1,21 @@
 # Workstation setup, macOS
 
 One machine, set up so that a session started in any wired repository has the whole line
-available: the agent runtime with its memory, the second and third vendor for the verify gate,
-the four sensors, the scanners, the plugins, and the credentials each of them needs. Apple
-silicon assumed; Intel differs only in the enola archive name.
+available. That includes the agent runtime with its memory, the verify-gate reviewers, the four
+sensors, the scanners, the plugins, and the credentials each of them needs. Apple silicon
+assumed. Intel differs only in the enola archive name.
 
 Two profiles. The **engineer** profile is everything below. The **PM** profile is section 1,
-section 2, the PM lines of section 6 and section 8, and nothing else: a PM's agent reads specs
-and drafts tickets, it never runs a gate. The checker knows both: `bin/check-workstation.sh`
-and `bin/check-workstation.sh --pm`. Run it first on a machine you think is done; the lines
-it prints are the list of what is not.
+section 2, the PM lines of section 6 and section 8, and nothing else. A PM's agent reads specs
+and drafts tickets. It never runs a gate. The checker knows both.
+`bin/check-workstation.sh` and `bin/check-workstation.sh --pm`. Run it first on a machine you
+think is done. The lines it prints are the list of what is not.
 
-Order matters in two places only: the memory engine before the agent hooks that call it, and
-the second vendor's CLI before the consort plugin that wraps it. Everything else can be
-installed in any order.
+Pick the reviewer route in section 3 before you install Google tooling. The reference route is
+Codex plus Gemini through Pi on Vertex. An existing local Pi provider and model is a first-class
+alternative. It does not need gcloud. Order matters in two other places only. Install the memory
+engine before the agent hooks that call it, and install Codex before the consort plugin that
+wraps it. Everything else can be installed in any order.
 
 ## 1. Base toolchain
 
@@ -21,21 +23,27 @@ installed in any order.
 xcode-select --install                     # once; git and the compilers
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew install git gh jq uv node pnpm tmux shellcheck actionlint ast-grep trivy sonar-scanner playwright-cli
-brew install --cask claude-code codex gcloud-cli orbstack
+brew install --cask claude-code codex orbstack
 ```
 
-Why these: `uv` runs every Python tool in its own environment (cleat's helper, the ledger
-script); `node` carries memspec, the Gemini CLI and Pi; `pnpm` is the frontend package manager
-the reference project uses; `ast-grep` feeds two optional cleat gates; `trivy` is the scanner
-tier; `sonar-scanner` and `playwright-cli` serve the static-analysis and browser legs;
-`orbstack` is the Docker daemon (Docker Desktop works identically). Python itself comes with uv;
-do not manage a system Python.
+If section 3 uses the Vertex route, also install Google Cloud:
 
-Sign in to the two hosts now, because later steps assume it:
+```
+brew install --cask gcloud-cli
+```
+
+`uv` runs every Python tool in its own environment (cleat's helper, the ledger
+script). `node` carries memspec, the Gemini CLI and Pi. `pnpm` is the frontend package manager
+the reference project uses. `ast-grep` feeds two optional cleat gates. `trivy` is the scanner
+tier. `sonar-scanner` and `playwright-cli` serve the static-analysis and browser legs.
+`orbstack` is the Docker daemon (Docker Desktop works identically). Python itself comes with uv.
+Do not manage a system Python.
+
+Sign in to GitHub now, because later steps assume it. Sign in to Google only for the Vertex route:
 
 ```
 gh auth login                              # GitHub, the account that will own PRs and merges
-gcloud auth login                          # only if the Gemini leg runs on Vertex (section 3)
+gcloud auth login                          # Vertex route only (section 3)
 ```
 
 ## 2. Agent runtime and memory
@@ -58,29 +66,52 @@ read-only. Nothing in this section is per project.
 
 ## 3. Second and third vendor: the verify gate's reviewers
 
-The gate is a two-leg panel, both legs required, hard-fail if either is unreachable
-([docs/06](../docs/06-verify-gate.md)). Leg one is Codex; leg two is Gemini through Pi on
-Vertex. Install the runtimes, then the plugin that drives them.
+The gate is a two-leg panel. Both legs are required. The panel hard-fails if either is
+unreachable ([docs/06](../docs/06-verify-gate.md)). Leg one is Codex. Leg two is either Gemini
+through Pi on Vertex, or an existing local Pi provider and model. Choose one route before you
+install Google tooling. An agent-led deploy should load
+[factory-reviewer-setup](../templates/skills/factory-reviewer-setup/SKILL.md) and stop for that
+choice.
+
+Install missing tools for the chosen panel. Keep an existing compatible Pi installation and
+its credentials. Do not run the pinned npm install below over that installation. Check the
+installed Consort backend's minimum Pi version first.
 
 ```
 codex login                                # ChatGPT subscription or API key; writes ~/.codex/auth.json
 codex exec 'Reply with exactly: CODEX_ALIVE' < /dev/null     # reachability, not budget
-npm install -g @google/gemini-cli@0.58.0 @earendil-works/pi-coding-agent@0.84.1
-gcloud auth application-default login      # ADC for the Vertex leg; or a service-account key file
+npm install -g @earendil-works/pi-coding-agent@0.84.1
 git clone https://github.com/siimvene/consort ~/git/consort && git -C ~/git/consort checkout 5f68ef6
 claude plugin marketplace add openai/codex-plugin-cc && claude plugin install codex@openai-codex
 claude plugin marketplace add siimvene/consort   && claude plugin install consort@consort
 ```
 
-Why both a plugin and a checkout of consort: the plugin provides the `/consort:*` commands and
-the companion-runtime integration; the panel script and the merge tool are run from the
+For the reference Pi Vertex leg, configure ADC or a readable credentials file. Install gcloud
+if you use its ADC login flow. The Gemini CLI is not required for a Pi leg. Install it only if
+you choose Consort's separate native Gemini transport.
+
+```
+npm install -g @google/gemini-cli@0.58.0
+gcloud auth application-default login      # ADC for the Vertex leg; or a service-account key file
+```
+
+If you use an existing local Pi provider, skip gcloud. Discover the exact provider and model ids
+from that Pi install (`pi --list-models` only after you have checked that this Pi version
+supports it). Write `pi:<provider-id>:<model-id>`. Do not invent `CONSORT_PI_BIN`. Consort runs
+the `pi` command on PATH. A local Pi CLI still calls a remote model and can bill. Say so before
+any paid probe.
+
+Why both a plugin and a checkout of consort. The plugin provides the `/consort:*` commands and
+the companion-runtime integration. The panel script and the merge tool are run from the
 checkout (`~/git/consort/scripts/consort-panel.sh`, `merge-findings.mjs`), which is how the
-reference machine runs the gate. `codex exec` always reads stdin: redirect it from `/dev/null`
+reference machine runs the gate. `codex exec` always reads stdin. Redirect it from `/dev/null`
 or it waits forever, which is the 2h08m stall in the trial report.
 
-The panel configuration lives in the `env` block of `~/.claude/settings.json` so every session
-inherits it (section 7). A review of a multi-hundred-line diff that returns in seconds did not
-run; the panel's `[label]` stderr lines and its `seconds` are the evidence that it did.
+The panel reads process environment, not Claude settings files. For a Claude session, merge the
+keys in section 7 into user-scope `~/.claude/settings.json` so the session inherits them. For a
+shell panel, export the same keys in that shell. A review of a multi-hundred-line diff that
+returns in seconds did not run. The panel's `[label]` stderr lines and its `seconds` are the
+evidence that it did.
 
 ## 4. Sensors
 
@@ -168,8 +199,17 @@ directory is absent in the other, silently. Register in both, or run the checker
 
 ## 7. Settings that every session inherits
 
-Merge this into `~/.claude/settings.json` (the memspec hooks are already there after section 2).
-Values in angle brackets are yours; nothing here is a secret.
+Merge the block for your chosen route into user-scope `~/.claude/settings.json` (the memspec
+hooks are already there after section 2). Values in angle brackets are yours. Nothing here is a
+secret. Do not put executable paths, `PI_CODING_AGENT_DIR`, credentials, or reviewer keys into
+tracked project `.claude/settings.json`.
+
+A direct shell run of `consort-panel.sh` does not read this file. Export the same keys in the
+shell that will invoke the panel, or run the panel from a Claude session that inherited them.
+The workstation checker also reads process environment only. Settings that are not in the
+process are reported as inactive.
+
+Reference Vertex route:
 
 ```json
 {
@@ -184,13 +224,26 @@ Values in angle brackets are yours; nothing here is a secret.
 }
 ```
 
-Why each line: `CONSORT_REVIEWERS` makes the gate a two-leg panel instead of whichever backend
-is reachable; the model override is the worker-tier decision in
+Existing local Pi route. Provider and model are discovered ids, not display names. Paths and
+auth stay in the user environment:
+
+```json
+{
+  "env": {
+    "CONSORT_REVIEWERS": "codex,pi:<provider-id>:<model-id>"
+  },
+  "modelOverrides": { "claude-opus-5": "claude-opus-4-8" },
+  "statusLine": { "type": "command", "command": "<what claude-hud:setup wrote>" }
+}
+```
+
+`CONSORT_REVIEWERS` makes the gate a two-leg panel instead of whichever backend is reachable.
+The model override is the worker-tier decision in
 [docs/03](../docs/03-operating-contract.md) (build stations on the mid tier, the top tier for
-debugging and verification, and the alias that resolves to the unstable tier remapped); the
+debugging and verification, and the alias that resolves to the unstable tier remapped). The
 status line shows the served model, context and cost. Run `/claude-hud:setup` once and let it
 write the status line entry. The reference machine also sets
-`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`; it is not required by anything in this directory.
+`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. It is not required by anything in this directory.
 
 ## 8. Credentials and identities
 
@@ -200,7 +253,7 @@ None of these go into a repo, a settings file or a memory record.
 |---|---|---|
 | GitHub, your own account | `gh` keyring | `gh auth login` (section 1) |
 | Codex | `~/.codex/auth.json` | `codex login` |
-| Google ADC, or a key file | `~/.config/gcloud/` | `gcloud auth application-default login`, or `CONSORT_GCP_CREDENTIALS` |
+| Google ADC, or a key file (Vertex route) | `~/.config/gcloud/` | `gcloud auth application-default login`, or `CONSORT_GCP_CREDENTIALS` |
 | Jira API token (engineer and PM) | login keychain, service `factory-jira-api-token` | `security add-generic-password -s factory-jira-api-token -a <email> -w '<token>'` |
 | Jira site, email, project key, code repo | `~/.config/factory/jira.env` | four lines, see `templates/bin/jira` header |
 | Sonar token | `~/.config/sonar/env`, mode 600 | section 5 |
@@ -240,14 +293,25 @@ bash ~/git/software-factory/deploy/bin/check-workstation.sh          # engineer
 bash ~/git/software-factory/deploy/bin/check-workstation.sh --pm     # PM
 ```
 
-It proves presence and login state. Three things it cannot prove and you should, once:
+Pass `--consort-root` when the caller invokes a Consort tree other than `~/git/consort`. The
+checker is route-aware. A Vertex panel still requires a project and a local credential route. A
+non-Vertex Pi panel does not require gcloud, ADC, or a GCP project. Mixed panels are checked per
+leg. `--pm` skips reviewer parsing even when reviewer env is present or malformed.
+
+It proves local presence and cheap status. It does not send a model request. Exit 0 means the
+checked prerequisites passed, not that reviewers authenticated or answered. Treat `OPTIONAL`
+lines that say `UNVERIFIED` as limits, not success. Prove these separately, once:
 
 - **Budget, not reachability.** `CODEX_ALIVE` proves the CLI answers. The first real panel run
   on a real diff, with its wall-clock in the report, proves the account can pay for one.
+- **The served model is the one you named.** Consort attests this at probe and panel time. The
+  checker does not.
 - **The Vertex leg bills to the project you named.** The first run of the panel logs to that
-  project; look once.
+  project. Look once.
+- **Isolation.** Consort read-only Pi keeps `--no-extensions` and loads `pi-fence.mjs`. That
+  fence is a tool hook, not an OS sandbox. Do not disable the isolation flags.
 - **The two config directories** (section 6). Run the checker under the second directory if a
-  canvas runtime is in use.
+  canvas runtime is in use. Run the panel in the same process environment you just checked.
 
 ## Known traps, from the reference machine
 
