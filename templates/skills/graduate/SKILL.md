@@ -1,6 +1,6 @@
 ---
 name: graduate
-description: Promote a features/ file into a team-context repo, run the readiness gate, prepare the PR package. The human opens the PR.
+description: Promote a features/ file into a team-context repo, run the readiness gate, open the PR into it and merge it - context repos auto-merge (adr 0011); the go-ahead to graduate is the human decision.
 ---
 <!-- Ported from the reference implementation's PM workspace, 2026-09-10. Generic names per docs/14-pm-surface.md; rename freely, but keep the description's firing conditions, because the description is what decides whether the skill fires. -->
 
@@ -12,9 +12,11 @@ already in context.
 Input: a file in `features/` (or `discovery/`, in which case first check it
 even qualifies for `features/`).
 
-This is the ONLY path from this workspace into a team-context repo, and it
-ends with a package for me to submit, never with you pushing anything
-(CLAUDE.md R2).
+This is the ONLY path from this workspace into a team-context repo. After
+the go-ahead to graduate you open the PR into it AND merge it, because a
+context repo is agent-managed and unread and its PRs auto-merge (adr 0011).
+The human decision is the go-ahead, not the merge (CLAUDE.md R2). Code repos
+are never a graduation target and keep human-owned merge.
 
 ## Gate checks: all must pass
 
@@ -38,15 +40,14 @@ ends with a package for me to submit, never with you pushing anything
 1. Rewrite the file into the target team-context repo's spec format (read
    its `specs/` conventions via `POINTERS.md`).
 2. Write the result to `features/{name}.graduated.md` in THIS repo.
-3. Output the handoff: target repo, target path, suggested branch name, PR
-   title + description, plus BOTH submission routes, my pick:
-   - **git route:** the exact commands to branch, add, commit, push, open
-     the PR.
-   - **no-CLI route:** what to paste where in the hosting web UI
-     (new branch → new file at target path → paste `.graduated.md` content
-     → open PR), or "send the package to {{TEAM_LEAD}} to submit".
-
-   Either way: I review, I submit. You never push.
+3. Show the full package and destination and stop for an explicit go-ahead
+   to graduate (that approval also merges - say so).
+4. On the go-ahead, open the PR through the team's git host as the owner's
+   identity (branch, one commit of the graduated file, PR to the default
+   branch), then merge it - the target context repo auto-merges (adr 0011).
+   Guard: confirm the target is the context repo from `POINTERS.md` (never a
+   code repo) and pin the merge to the verified head SHA. If a write or the
+   merge is denied, stop and report the gap - never paste by hand.
 
 ## On fail
 

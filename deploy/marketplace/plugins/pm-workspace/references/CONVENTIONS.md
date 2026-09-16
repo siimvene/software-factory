@@ -1,6 +1,6 @@
 # PM Workspace Conventions
 
-Convention version: 2.5.0
+Convention version: 2.6.0
 
 This file defines how a **Product Manager Workspace** is organised: which folders exist, what goes
 into each of them, how documents are named and structured, and how they link to each other.
@@ -327,7 +327,7 @@ notes, never content. A local checkout path may be added where one already exist
 - **Pointer, not copy.** Reading the live repository keeps a single source of truth. Copying spec or
   code content into the workspace forks the truth and lets it go stale.
 - **Entries come from discovery, not the owner.** `pm-workspace-setup` fills the repository section by
-  searching the GitHub connector for the team's `*-team-context` / `*-team-specs` repository and
+  searching the GitHub connector for the team's `*-team-context`, `*-team-specs` or `*-context-repo` repository and
   reading the code repositories its `CLAUDE.md` names; the owner only confirms their team. A blank
   placeholder is the fallback for when the connector sees nothing, not the default.
 
@@ -338,9 +338,9 @@ Two hard rules govern how pointer repositories are used:
   the code is unreachable or unclear, mark the claim **unverified** rather than presenting a guess as
   current behaviour. Unverified claims become specific questions for the delivery team.
 - **R2 - Read/write contract.** Repositories in `POINTERS.md` are read-only. Never write, commit,
-  push, or open a pull request against them autonomously. Graduation is the one exception, and it is
-  human-reviewed: the agent opens the PR only after an explicit go-ahead, and the human owns the
-  merge.
+  push, or open a pull request against them autonomously. Graduation is the one exception: the agent
+  opens the PR only after an explicit go-ahead, and then merges it, because the target context repo
+  auto-merges (software-factory adr 0011). The human decision is the go-ahead, not the merge.
 
 ### 13.1 TRACKER.md
 
@@ -393,9 +393,11 @@ The sensitivity gate runs in **both directions**:
 
 Graduation is the single gate out of the workspace. A matured `Features/` document leaves the
 personal workspace only as a **pull request into a team-context repository** (`*-team-specs` /
-`*-team-context`), and that pull request is human-reviewed: the agent opens the PR only after an
-explicit go-ahead, and the human owns the merge. This is what keeps the team's canonical context
-clean: the PM is not locked out, but half-formed material is.
+`*-team-context`, `*-context-repo`). The go-ahead to graduate is the human decision: the agent
+opens the PR only after an explicit go-ahead, and then merges it automatically, because a context
+repo is agent-managed and unread and its PRs auto-merge (software-factory adr 0011). The gate that
+keeps half-formed material out of the team layer is the go-ahead plus the checks below, not a human
+merge click. Human-owned merge stays the rule for code repositories, which graduation never targets.
 
 Reads out, writes stay in. The agent reads the target repository's spec conventions through
 `POINTERS.md`, rewrites the feature into that format, and produces the package. It never pushes
@@ -418,11 +420,12 @@ a second feature document.
 
 On pass, the agent writes the graduated document into the target repository's format, shows the full
 package and its destination, and - only after an explicit go-ahead - opens a pull request through the
-GitHub MCP server as the owner's own identity: a feature branch, a single commit of the graduated
-file, and the PR against the repository's default branch. There is no local-git or copy-paste route.
-If the write is denied, or the MCP server is unavailable, the agent stops and reports the gap - it
-never pastes content by hand and never claims a PR it did not open. The `graduate` skill carries the
-full procedure.
+GitHub MCP server as the owner's own identity (a feature branch, a single commit of the graduated
+file, the PR against the default branch) and then merges it, since the target is an agent-managed
+context repo whose PRs auto-merge (adr 0011). There is no local-git or copy-paste route. If the
+write or the merge is denied, or the MCP server is unavailable, the agent stops and reports the gap -
+it never pastes content by hand and never claims a PR or merge it did not make. The `graduate` skill
+carries the full procedure.
 
 ## 16. Links between documents
 
@@ -467,3 +470,4 @@ These are the defaults:
 | 2.4.0 | Section 9: `type` gains `Technical Development` (the group standard's type for work with nothing visible; Task where a project lacks it). Section 13.1: `TRACKER.md` holds the tracker's project, issue types, epic-folder mapping, label table and working language, written once and corrected from ticket previews. Section 9: staged issue files may carry `labels` and `links`; type, epic, labels and links are deduced by the new `ticket` skill and approved with the draft, never asked for as bare values. | Create `TRACKER.md` from the plugin template when missing (`pm-workspace-setup` fills the project and issue-type rows from the tracker connector where it can and leaves the rest for the owner); never overwrite an existing one. Existing `Jira/` files need no change; `labels` and `links` are optional. |
 | 2.3.0 | Section 13: `POINTERS.md` repository entries are populated by discovery. `pm-workspace-setup` searches the GitHub connector for the team's `*-team-context` / `*-team-specs` repository and reads the code repositories its `CLAUDE.md` names; the owner confirms their team rather than pasting slugs. The blank placeholder is the fallback for when the connector sees nothing. | None for existing workspaces. A workspace with an empty `POINTERS.md` gets its repository section offered by discovery on the next setup run. |
 | 2.5.0 | Section 9: staged `Jira/` files may carry an optional `readiness` field (0 to 100), written by the new `readiness-evaluator` skill; `status: ready` is set only at a readiness score of 85 or above with the owner's approval. New skills `readiness-evaluator`, `task-improver`, and `task-splitter` score, refine, and split staged tickets without ever writing to Jira. | None; the field is optional. |
+| 2.6.0 | Sections 13 and 15: graduation into an agent-managed context repo (`*-team-specs`, `*-team-context`, `*-context-repo`) opens the PR and then **merges it automatically** - the human decision is the go-ahead to graduate, not a merge click (software-factory adr 0011). Human-owned merge unchanged for code repositories. | None for existing workspaces. |
