@@ -62,7 +62,7 @@ Encoded as team decision records and enforced where a mechanism exists:
 
 - Never move money, vote, or delete. Read-only tool access to the product excludes money and
   governance operations `[measured: decision records 0008, 0009]`.
-- Never push to a default branch, merge their own proposal, or approve a PR.
+- Never push to a default branch, merge their own proposal, or approve a PR. The one exception is an agent-managed context/spec repo (`*-team-specs`, `*-team-context`, `*-context-repo`), whose PRs auto-merge because no human review is claimed for that layer (adr 0011); code merges stay human.
 - Never edit a ratchet baseline, the quality policy, or the hooks (guarded).
 - Never install a dependency without a named-version proposal (human-only blocker unattended).
 - Never write a secret anywhere, echo one, or paste a personal token into a shared volume.
