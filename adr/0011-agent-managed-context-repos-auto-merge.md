@@ -26,9 +26,15 @@ a session that only pulled once operates on stale context - the measured stale-m
    review is claimed for this layer, so no human decision is misrepresented.
 2. **Human merge is unchanged for code repositories** and any human-read layer. 0005/0006 stand
    there in full; agents still never merge their own code proposals.
-3. **Agents refresh shared context continuously.** A session pulls the memory store and its
-   team-context often enough to see concurrent commits - at session start and again before relying
-   on shared context mid-run - not once per session.
+3. **Agents sync shared memory on a start/finish contract.** A session fast-forwards the local
+   memory store from origin at start (before it reads any memory) and pushes its writes back at
+   finish (after end-of-session memory management). This is mechanical - a SessionStart pull/ff hook
+   and a Stop push hook (`~/.memspec/bin/sync-pull.sh`, `sync-push.sh`), not agent behaviour - so
+   freshness never depends on the agent remembering. Pull is fast-forward-only (a diverged local
+   no-ops and the finish-push reconciles); push is a bounded pull-rebase-retry for concurrent
+   sessions on one store; both are non-blocking, so a network failure never stalls a session. A
+   team-context read through the GitHub connector is already live; a locally-checked-out context
+   repo follows the same start-sync.
 
 ## Mechanism
 
@@ -37,11 +43,11 @@ a session that only pulled once operates on stale context - the measured stale-m
   The scaffold (`deploy/02-scaffold-a-project.md` D0.2) drops the required review on the
   team-context repo under this ADR - the merge gate for that layer is removed on purpose, not left
   half-configured. Code repos keep their protection.
-- **Continuous refresh applies to what is writable.** The pull in decision 3 is the operator's
-  memory store and any writable clone; a team-context mounted read-only and cloned at boot
-  (`deploy/standard/context-standard/STANDARD.md`) cannot be `git pull`ed mid-run, so refreshing
-  it mid-session is a mechanism follow-up (a re-clone or a writable cache), not a guarantee this
-  ADR delivers today.
+- **The start/finish sync applies to what is writable.** The pull/push in decision 3 is the
+  operator's memory store and any writable clone. A team-context mounted read-only and cloned at
+  boot (`deploy/standard/context-standard/STANDARD.md`) re-syncs at boot, not by a mid-run pull;
+  its live-read path is the GitHub connector. Making a read-only mount refresh mid-session is a
+  re-clone, a mechanism follow-up, not a guarantee this ADR delivers today.
 
 ## Consequences
 
