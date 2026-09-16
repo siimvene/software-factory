@@ -10,7 +10,7 @@ document says what the layers are for in a software factory and what the kvart a
 |---|---|---|---|
 | Operating contract | one managed file, vendored into every repo | the organisation, by reviewed PR | auto-loaded at session start |
 | Repo layer | the code repo: agent instructions, path-scoped rule files, decision records, current-state docs | the code owner, in the same PR as the code | auto-loaded; rule files load when a matching path is read |
-| Team layer | the team-context repo: specs, cross-repo decision records, memory store, review rubric | agents by promote PR; humans merge | read-only binding from each code repo |
+| Team layer | the team-context repo: specs, cross-repo decision records, memory store, review rubric | agents by promote PR; auto-merged (agent-managed, unread; adr 0011) | read-only binding from each code repo |
 | Working memory | local scratch store on the operator's machine | the agent, at the moment of discovery | search at session start; disposable |
 
 Conformance is graded (L0: instructions, memory binding, decision records, current-state docs
