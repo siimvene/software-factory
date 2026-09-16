@@ -10,7 +10,7 @@ document says what the layers are for in a software factory and what the kvart a
 |---|---|---|---|
 | Operating contract | one managed file, vendored into every repo | the organisation, by reviewed PR | auto-loaded at session start |
 | Repo layer | the code repo: agent instructions, path-scoped rule files, decision records, current-state docs | the code owner, in the same PR as the code | auto-loaded; rule files load when a matching path is read |
-| Team layer | the team-context repo: specs, cross-repo decision records, memory store, review rubric | agents by promote PR; humans merge | read-only binding from each code repo |
+| Team layer | the team-context repo: specs, cross-repo decision records, memory store, review rubric | agents by promote PR; auto-merged (agent-managed, unread; adr 0011) | read-only binding from each code repo |
 | Working memory | local scratch store on the operator's machine | the agent, at the moment of discovery | search at session start; disposable |
 
 Conformance is graded (L0: instructions, memory binding, decision records, current-state docs
@@ -101,7 +101,7 @@ Rules that make it work as infrastructure rather than as a diary:
 
 Topology: the code repo carries no store of its own, only a config binding it read-only to the
 team store. Local writes land in the operator's scratch store under the project's scope.
-Durable team knowledge travels by promote PR that the code owner reviews. kvart's 316-record
+Durable team knowledge travels by promote PR; into an agent-managed context repo that PR auto-merges rather than waiting on a human (adr 0011). kvart's 316-record
 store moved out of the code repo into the team-context repo with history preserved
 `[measured 2026-09-07]`.
 
