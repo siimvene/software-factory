@@ -163,7 +163,7 @@ any repository you discover (R2).
    once it is connected. Do not guess why - only report "connector not available" when that is what
    you observed.
    If the connector is available, search the `Piletilevi` organization for repositories whose names
-   end in `-team-context` or `-team-specs`. List only what the connector actually returns - never
+   end in `-team-context`, `-team-specs` or `-context-repo`. List only what the connector actually returns - never
    invent or guess a repository name.
    - Search succeeded but returned no match: the owner's team is not onboarded yet. Leave a blank
      placeholder when the file is missing, say plainly that a developer sets up the team-context
