@@ -135,10 +135,12 @@ replays past incidents against the changed contract.
 - Search before substantive work. Write at the moment of discovery: a fixed bug corrects the
   claim about old behaviour; a changed config supersedes the stale claims; an established
   workflow becomes a procedure.
-- Refresh shared context continuously. Pull the memory store and the team-context at session
-  start and again before relying on shared context mid-run, so concurrent agents' and
-  stakeholders' commits are visible; a once-per-session snapshot goes stale under a long run
-  (adr 0011). Pulls are fast-forward-only so a diverged local never stalls the run.
+- Refresh shared context continuously. Pull the writable shared context - the memory store, and
+  any writable clone - at session start and again before relying on it mid-run, so concurrent
+  agents' and stakeholders' commits are visible; a once-per-session snapshot goes stale under a
+  long run (adr 0011). Pulls are fast-forward-only so a diverged local never stalls the run. A
+  team-context mounted read-only cannot be pulled mid-run; refreshing it is a re-clone, and doing
+  that mid-session is a mechanism follow-up, not a guarantee today.
 - Supersede, do not duplicate. A claim contradicted by code defers to the code. No secrets, no
   personal data, no session noise in a promoted claim.
 - Pre-claim search is mandatory for: costs and quotas, architecture and versions, prior
