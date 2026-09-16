@@ -30,10 +30,29 @@ a session that only pulled once operates on stale context - the measured stale-m
    team-context often enough to see concurrent commits - at session start and again before relying
    on shared context mid-run - not once per session.
 
+## Mechanism
+
+- **Branch protection must not require review on a context repo.** Auto-merge is a runtime
+  contract; a repo whose branch protection sets `require_code_owner_reviews` physically blocks it.
+  The scaffold (`deploy/02-scaffold-a-project.md` D0.2) drops the required review on the
+  team-context repo under this ADR - the merge gate for that layer is removed on purpose, not left
+  half-configured. Code repos keep their protection.
+- **Continuous refresh applies to what is writable.** The pull in decision 3 is the operator's
+  memory store and any writable clone; a team-context mounted read-only and cloned at boot
+  (`deploy/standard/context-standard/STANDARD.md`) cannot be `git pull`ed mid-run, so refreshing
+  it mid-session is a mechanism follow-up (a re-clone or a writable cache), not a guarantee this
+  ADR delivers today.
+
 ## Consequences
 
 - Positive: the context layer keeps pace with the code and the fleet without a human bottleneck no
   reader was using; sessions work from fresh shared context.
+- Accepted tradeoff, second axis: with no human at the merge, the bytes that land get no
+  diff-level human review - the human approved the package shown in chat, and the agent merges what
+  it committed. For a code repo that would be unacceptable (a tampered or hallucinated payload
+  merging unseen); for an agent-managed context repo the blast radius is a markdown spec that is
+  treated as derived and rewritten from code, and the operator accepts it. This is why the carve-out
+  is context repos only and code merges stay human.
 - Accepted tradeoff, named: auto-merge removes the guard that 14-pm-surface calls "the only thing
   standing between the current-state specs and a swamp of proposals". A graduated *proposal* can now
   land in a context repo with no human between it and merge. The operator accepts this: the layer is

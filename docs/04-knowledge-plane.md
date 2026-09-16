@@ -101,7 +101,7 @@ Rules that make it work as infrastructure rather than as a diary:
 
 Topology: the code repo carries no store of its own, only a config binding it read-only to the
 team store. Local writes land in the operator's scratch store under the project's scope.
-Durable team knowledge travels by promote PR that the code owner reviews. kvart's 316-record
+Durable team knowledge travels by promote PR; into an agent-managed context repo that PR auto-merges rather than waiting on a human (adr 0011). kvart's 316-record
 store moved out of the code repo into the team-context repo with history preserved
 `[measured 2026-09-07]`.
 
