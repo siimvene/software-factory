@@ -1,6 +1,6 @@
 ---
 name: graduate
-description: Use this skill when the user wants to promote a matured feature out of their PM workspace into a team repository - e.g. "graduate this feature", "prepare the PR for the payments team", "this spec is ready, package it for team-context", "promote Features/Localized Emails.md". Runs the readiness gate, checks the sensitivity gate in both directions, resolves the target repository via POINTERS.md, and prepares the pull request package. It never pushes or opens a PR without an explicit go-ahead, and after that go-ahead it opens the PR through the GitHub MCP server as the owner's own identity (no local git, no copy-paste). Do not use it to write or mature a feature - that is done in Discovery/ and Features/ by hand or with the `ingest` skill.
+description: Use this skill when the user wants to promote a matured feature out of their PM workspace into a team repository - e.g. "graduate this feature", "prepare the PR for the payments team", "this spec is ready, package it for team-context", "promote Features/Localized Emails.md". Runs the readiness gate, checks the sensitivity gate in both directions, resolves the target repository via POINTERS.md, and prepares the pull request package. It never pushes or opens a PR without an explicit go-ahead, and after that go-ahead it opens the PR through the GitHub MCP server as the owner's own identity and merges it (context/spec repos auto-merge; adr 0011), with no local git or copy-paste. Do not use it to write or mature a feature - that is done in Discovery/ and Features/ by hand or with the `ingest` skill.
 version: 1.1.0
 ---
 
@@ -8,16 +8,19 @@ version: 1.1.0
 
 Graduation is the single gate out of the workspace. A matured `Features/` document leaves the
 personal PM workspace only as a **pull request into a team-context repository** (`*-team-specs` /
-`*-team-context`), and that pull request is human-reviewed: the agent opens the PR only after an
-explicit go-ahead, and the human owns the merge. This skill runs the readiness gate, prepares the
-package, and stops there unless the owner explicitly says to open the PR.
+`*-team-context`, `*-context-repo`), and the go-ahead to graduate is the human decision: the agent
+opens the PR only after an explicit go-ahead, and then merges it automatically, because a context
+repo is agent-managed and unread and its PRs auto-merge (software-factory adr 0011). This skill runs
+the readiness gate, prepares the package, and stops there unless the owner explicitly says to
+graduate.
 
-Reads out; the only writes are the ones that open a pull request. You read the target repository to
-learn its spec format, and you never push to its protected branch or merge anything yourself. After
-the owner's go-ahead you open a PR - which is three writes onto a side branch (create the branch,
-commit the graduated file, open the PR), none of them a review and none of them a merge. The
-repository's review gate holds that branch until a human approves and merges. The owner reviews the
-package, gives the go-ahead, and owns the merge.
+Reads out; the writes are the ones that open a pull request and, into a context repo, merge it. You
+read the target repository to learn its spec format. After the owner's go-ahead you open a PR - three
+writes onto a side branch (create the branch, commit the graduated file, open the PR) - and then
+merge it, because the target is an agent-managed context/spec repo whose PRs auto-merge (adr 0011).
+The owner reviews the package and gives the go-ahead to graduate; the merge follows automatically,
+so the human decision is at graduation, not at the merge click. Human-owned merge stays the rule for
+code repositories, which graduation never targets.
 
 ## Workspace layout and rules
 
@@ -88,6 +91,9 @@ the ticket skill ask at drafting time.
 
 ## Step 3 - Show the full package and destination, then wait
 
+The go-ahead you ask for authorizes opening the PR **and merging it** - the target is a context repo,
+which auto-merges (adr 0011), so approval lands the change in the team layer. Say this in the ask.
+
 Present, and stop for an explicit go-ahead:
 
 ```
@@ -145,8 +151,11 @@ order; if any check or write fails, stop and follow "If a write fails" below.
    commit ahead of the default branch and touches only the target path. Then open the PR from the
    branch into the default branch with the package's title and description, and report the PR URL.
 
-You open the PR; you never merge it. The repository's own review gate (required PR + code-owner
-approval) is what lands the change, and a human owns that click.
+You open the PR and, into a context repo, merge it - the go-ahead to graduate was the human
+decision, and the merge is a mechanical consequence for a layer no human reviews (adr 0011). Guard
+before merging: confirm the target matches the `*-team-specs` / `*-team-context` / `*-context-repo`
+shape (never auto-merge a code repo) and pin the merge to the head SHA you just verified. Human-owned
+merge stays the rule for code repositories.
 
 **If a write fails** - a denied push (no write access, or a read-only MCP grant), or a failure partway
 through - stop and say plainly what happened: which operation failed, and exactly what already landed
