@@ -61,3 +61,15 @@ Decided by the operator the same evening:
 ## Evidence
 
 - `docs/07-roles-and-authority.md`, "PM acceptance before PR-gate delegation".
+
+## Open reference for the delegated-merge trial (2026-09-16, not decided)
+
+An internal-systems diagram of OpenAI's own loop (sourced from OpenAI engineers, via Gergely
+Orosz, 2026-09-15) shows a concrete shape for the narrowly qualified pattern this decision
+already leaves room for: a low-risk change goes straight from agent review to an agent-babysat,
+feature-flagged deploy with no per-change human wait, backstopped by two agents this design does
+not yet have, a regression detector and an incident responder, both with a cheap rollback path.
+Logged as two proposed rows in `STATUS.md` (production-feedback agents; risk-tiered deploy
+autonomy). Read together: the missing piece is not appetite for delegation, which this decision
+already grants a path to, it is the continuous production safety net that would make removing
+the per-change wait a bounded bet rather than a wider one. Sequence the safety net first.
