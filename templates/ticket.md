@@ -33,6 +33,15 @@ implementation instructions.>
 - Out of scope: <thing a reader would reasonably assume is included, and is not>
 - Out of scope: <second one, if any>
 
+## Prototype views (UI work only; otherwise "none")
+
+<!-- One line per screen this ticket changes or introduces: `<prototype file>#<view id>`.
+     A route this ticket's screens open must have a named view here or in another Ready
+     ticket, or it is a missing story. The verifier compares the build's screenshot with
+     the named view; "opens the X list" without a view is satisfiable by the old screen. -->
+
+- <screen name>: `<prototype file>#<view id>`
+
 ## Examples
 
 <!-- Numbered examples are the contract. Each one names a starting state, an action, and
