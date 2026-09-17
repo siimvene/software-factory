@@ -36,6 +36,7 @@
 | cross-vendor review | `<review command>` | <n findings> | wall-clock <mm:ss>, reachability probe <result>, `<log path>` |
 | blind security side-pass | `<side-agent invocation>` | <n findings> | non-inheriting context, `<log path>` |
 | browser QA | `<qa command>` | <n surfaces, n findings> | `<screenshot directory>` |
+| native client QA | `<harness command, named routes>` | <n views shot, n drift from prototype> | `<screenshot directory>`, prototype views compared by `<verifier>`; FAILED if the diff touches a native surface and no runtime ran |
 
 <!-- Two entries on the cross-vendor row are load-bearing. The reachability probe proves a
      reviewer was actually reached, because an unreachable reviewer and a clean review look
