@@ -73,6 +73,7 @@ table; the entries here are the ones that apply to any adoption.
 | a review finding contradicts the spec's role table (2026-09-09) | the reviewer widened scope from the code's shape, not the product's | dismiss with the spec cited, and escalate the dismissal (§11) so a PM can overrule |
 | the author's scoping accepted by the author's model | same-vendor, inheriting review | cross-vendor, non-inheriting; the cycle-2 HIGH is the proof |
 | a probe succeeds, the real call trips a spend cap | reachability is not budget | a second backend; hard-fail, never degrade |
+| seven PRs green on every gate; the owner opens the native app to the old screen under a new card, a misused monogram, a scrolling help footer (2026-09-17) | every gate read a diff, none rendered a screen; the surface QA step had no native runtime and was skipped silently; the story's criterion "opens the announcement list" named no prototype view, so the old screen satisfied it | native harness shoots the named routes, screenshots travel with the PR, a verifier above the builder's tier compares each to its named prototype view; a touched platform with no runtime is a FAILED gate line; a UI ticket names `<prototype>#<view>` per screen (06-verify-gate "Native client QA", 14-pm-surface) |
 
 ## Testing and coverage
 
