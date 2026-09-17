@@ -2,7 +2,7 @@
   "name": "pm-workspace",
   "displayName": "Product Manager",
   "version": "1.7.0",
-  "description": "Runs your product-management workspace in a plain folder: file meeting notes and documents with a click, take a feature from rough idea to spec-ready, draft the Jira story or epic with its type, epic and labels worked out for your approval, and keep your decisions, action points and open questions tracked for you. It stages team hand-offs and Jira changes for your review, and never sends anything on its own.",
+  "description": "Runs your product-management workspace in a plain folder: file meeting notes and documents with a click, take a feature from rough idea to spec-ready, draft the Jira story or epic with its type, epic and labels worked out for your approval, and keep your decisions, action points and open questions tracked for you. It stages team hand-offs and Jira changes for your review; nothing leaves the workspace without your go-ahead. Graduating a feature into an agent-managed context/spec repo opens the PR and merges it on that go-ahead (adr 0011); code repositories are never auto-merged.",
   "author": {
     "name": "Siim Vene",
     "email": "siim.vene@piletilevi.ee"
