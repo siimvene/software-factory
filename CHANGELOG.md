@@ -243,8 +243,6 @@ the first full day and where each fix landed.
   formatter pass is not a change, a gate that cannot fail is not a gate, a pre-push gate must
   read the ref list), the fork-and-PR path for a third party's tool, and the layer-4 Stop hook
   replaced by a check that blocks once, with its planted cases.
-- `case-studies/kvart-reference-implementation.md`: the afternoon section, kvart #22 to #24,
-  the worktree and branch pile with its root cause.
 - `STATUS.md`: the ratchet and architecture rows carry the fix references; the pre-push and
   worktree rows carry the open defect and the pile.
 

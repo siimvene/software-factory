@@ -38,5 +38,5 @@ Adoption order from nothing: ratchets, architecture diff, then the two pre-write
 
 ## Evidence
 
-- `docs/05-sensor-stack.md`; `case-studies/kvart-reference-implementation.md`, "the sensor
-  stack wiring".
+- `docs/05-sensor-stack.md`; `STATUS.md`, the quality-ratchet, architecture-diff and cross-vendor
+  review rows.
