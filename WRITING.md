@@ -46,9 +46,8 @@ Every claim carries its class, because the difference is the whole point of the 
 ## Files
 
 - `docs/` is the design, numbered in reading order.
-- `case-studies/` is what happened, with dates and numbers.
-- `evidence/` holds source reports copied close to verbatim (anonymised), so the case studies
-  can be checked against them.
+- `evidence/` holds source reports copied close to verbatim (anonymised), so the claims in
+  `docs/` and `STATUS.md` can be checked against them.
 - `templates/` are the artifacts a team copies on day one.
 - `templates/skills/` are the agent skills a team copies on day one, anonymised from the
   reference implementation, one directory per skill with its scripts beside it.

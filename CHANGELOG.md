@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.12 (2026-09-19)
+
+The README says what the line is, and where the PM half of it lives.
+
+- `README.md`: the opening states the three human decisions the measured line keeps (ticket
+  Ready, merge, release) and places lights-out on the scaling ladder rather than in the present
+  tense. New section "Before the code: the PM surface": the intake-to-ticket mechanisms with
+  their skills and evidence classes (ingest, ticket, readiness-evaluator, task-improver,
+  task-splitter, graduate, the three spec skills, the program design note, the spec as a gate
+  input) and where each lives in this repository (`templates/skills/`, `deploy/marketplace/`).
+  The line diagram and the layer table gain the ticket as layer 0; a "Where the humans are"
+  table names each decision, who takes it and what they read. The measured table points at
+  `STATUS.md` rows instead of narrative files.
+- `docs/00-glossary.md`: the software-factory definition matches the README (no "runs
+  lights-out", no "dark").
+- `STATUS.md`: two rows said "Dark-factory"; the design has been called software factory since
+  0.2.0.
+
 ## 0.2.11 (2026-09-16)
 
 The setup becomes a runbook a second engineer can execute.
@@ -225,8 +243,6 @@ the first full day and where each fix landed.
   formatter pass is not a change, a gate that cannot fail is not a gate, a pre-push gate must
   read the ref list), the fork-and-PR path for a third party's tool, and the layer-4 Stop hook
   replaced by a check that blocks once, with its planted cases.
-- `case-studies/kvart-reference-implementation.md`: the afternoon section, kvart #22 to #24,
-  the worktree and branch pile with its root cause.
 - `STATUS.md`: the ratchet and architecture rows carry the fix references; the pre-push and
   worktree rows carry the open defect and the pile.
 
