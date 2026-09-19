@@ -360,8 +360,8 @@ Three defences, cheapest first:
 
 ## What the reference product adoption measured
 
-Two cycles on 2026-09-07, both PM stage through to production, both reported in
-[the case study](../case-studies/refapp-reference-implementation.md).
+Two cycles on 2026-09-07, both PM stage through to production, both in the
+[status ledger](../STATUS.md).
 
 | What | Cycle 1 | Cycle 2 |
 |---|---|---|

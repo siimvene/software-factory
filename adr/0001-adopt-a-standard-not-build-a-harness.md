@@ -36,4 +36,4 @@ third-party tools are the minimum, and they are adopted as they are, not re-impl
 
 ## Evidence
 
-- `case-studies/legacy-java-core-flywheel.md`, "design v0 and the re-base".
+- `docs/09-legacy-adoption.md`; `STATUS.md`, the legacy-core rows (verification net, money tiering, layering as lint).
