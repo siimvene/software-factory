@@ -42,4 +42,5 @@ implemented state.
 
 ## Evidence
 
-- `docs/04-knowledge-plane.md`; `case-studies/kvart-reference-implementation.md`, "Day 1".
+- `docs/04-knowledge-plane.md`; `docs/17-onboarding.md`; `STATUS.md`, the spec retro-generation
+  and Day 1 onboarding rows.

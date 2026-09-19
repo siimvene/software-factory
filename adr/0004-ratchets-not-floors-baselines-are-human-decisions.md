@@ -51,8 +51,8 @@ onto a newer main is one deliberate re-cut by a person, recording main's real da
 
 ## Evidence
 
-- `docs/05-sensor-stack.md`; `case-studies/kvart-head-hands-trial.md`, "the complexity gate,
-  and a correction".
+- `docs/05-sensor-stack.md`; `STATUS.md`, the quality-ratchets row and the head-and-hands
+  delegation row.
 
 ## Implementation note (2026-09-09, late evening)
 
