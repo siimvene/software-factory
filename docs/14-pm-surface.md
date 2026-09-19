@@ -268,7 +268,14 @@ Two things the PM writes that the head cannot recover from code:
   These are what put a ticket in the full tier, where the owner reads the note before the build.
 - **The prototype, for UI work.** Sections 2 and 5 of the note are read off it: the fields, the
   states, the order screens land in. A UI ticket without the agreed prototype attached is not
-  Ready for the note, whatever its score.
+  Ready for the note, whatever its score. Attached is not enough: each screen the ticket changes
+  or introduces names its view in the prototype (`<file>#<view id>`, one per screen, in the
+  acceptance criteria), and every route a card, row or button opens has a named view in this
+  ticket or in another Ready ticket. An acceptance criterion of the form "X opens the Y list" with
+  no view named is satisfiable by the old screen and was, on kvart, 2026-09-17: the new hub cards
+  landed on the pre-ramp destination screens and every code gate passed
+  ([06-verify-gate](06-verify-gate.md), "Native client QA"). The verifier reads the named view,
+  not the ticket prose, when it judges the screenshot.
 
 What the PM does not write, and the evaluator must not ask for: types, signatures, module names,
 slice order, shape decisions. Those are the note's job. A ticket that carries them stops being the

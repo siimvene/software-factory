@@ -15,9 +15,17 @@ Before any push containing code changes:
    author's session. Findings classified CRITICAL / SERIOUS / MINOR.
 3. **Blind security side-pass**: a security-only reviewer on the same diff, non-inheriting. Same
    vendor as the author is allowed here because it is additive; it never satisfies axis (a).
-4. **Browser QA pass** on every UI surface the diff touches, as the right persona, in a real
-   browser, checking rendering, console, interactions and locales; findings with screenshots.
-   Now a receipt-checked pre-push gate (see below), scoped to the routes the diff can reach.
+4. **Surface QA pass** on every UI surface the diff touches, as the right persona, on the
+   platform's real runtime: a browser for the web client, a simulator or emulator through the
+   platform harness for a native client. Rendering, console, interactions and locales; findings
+   with screenshots. Two rules that the 2026-09-17 kvart-app incident added (below, "Native
+   client QA"): a platform the diff touches with no runtime available is a **FAILED** line in the
+   gate report, never a skipped one; and where the ticket names a prototype view for a surface,
+   the surface's screenshot is placed next to that view and compared, and a mismatch is a
+   **SERIOUS** finding with the same weight as a cross-vendor HIGH. Prototype conformance is a
+   verifier's job, above the builder's tier, never the builder's own check.
+   The web pass is a receipt-checked pre-push gate (see below), scoped to the routes the diff
+   can reach.
 5. **Adjudication.** Spot-verify every CRITICAL and SERIOUS claim against code. Fix those before
    push. Log MINOR with a disposition. Disbelieve at least one rejected finding per panel.
 
@@ -77,6 +85,25 @@ the pass refuses to start when the runtime is missing instead of writing a scrip
 the running kvart stack `[measured 2026-09-10]`: persona login through the dev-login redirect chain,
 state saved after the callback restores a logged-in session in a fresh browser, console and network
 extracts as text, recording and trace per surface, teardown leaves no process.
+
+**Native client QA.** The gate list above was written for a web client, and a native client
+walked through it without step 4 for a whole release train `[measured 2026-09-17]`. The kvart
+mobile overhaul (seven stacked PRs, four Suhtlus stories) passed scanners, cross-vendor review by
+two vendors, a blind security pass, a three-lens verify panel and every ratchet, and the owner
+still opened the app to the old notice-board screen under a new hub card, a colour monogram
+misused for a role slot and a help screen whose human routes scrolled away under the chat. Every
+gate had read a diff; no gate had looked at a screen. The clickable prototype was attached to each
+ticket as the design input; no PR carried a single screenshot as the build's output; the device
+harness that shoots one launch screenshot as smoke evidence existed and was never a gate. Two
+causes, both of process: a story's acceptance criterion read "Teadetetahvel opens the announcement
+list", which the old screen satisfied, so the destination screens behind the new cards were never
+anyone's story; and the gate report's browser-QA row had nothing to say for a native client, so it
+said nothing. The rules: a UI ticket names the prototype view per screen (14-pm-surface), every
+route a card or row opens has a named view in some Ready ticket, the native harness shoots the
+named routes into a screenshot directory the PR links, and the verifier compares each shot to its
+view. The receipt shape is the same as the browser gate's once the harness can be scoped by route;
+until then the screenshots are attached evidence and a PR without them for a UI story is not
+ready for review.
 
 **Static analysis.** The same shape wraps a local static-analysis scan `[designed 2026-09-09]`.
 `scripts/sonar-gate.sh` runs a SonarQube scan scoped to the changed sources, computes the verdict
