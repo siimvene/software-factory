@@ -122,12 +122,11 @@ needs nothing else. 2 applies to every diff that touches a test file.
 
 ## Evidence
 
-- [case-studies/kvart-head-hands-trial.md](../case-studies/kvart-head-hands-trial.md): the
-  rounds table (round 3 redesign), the SERIOUS and the MINOR.
+- [STATUS.md](../STATUS.md), head-and-hands delegation: the round 3 redesign, the SERIOUS and
+  the MINOR `[measured 2026-09-05]`.
 - [docs/06-verify-gate.md](../docs/06-verify-gate.md), "What the gate caught": cycle 2's
   planning-document MEDIUM.
-- [case-studies/kvart-reference-implementation.md](../case-studies/kvart-reference-implementation.md),
-  cycle 4: contract-first stations; the planted field name.
+- [STATUS.md](../STATUS.md), contract-first parallel stations: cycle 4, the planted field name.
 - [docs/05-sensor-stack.md](../docs/05-sensor-stack.md), layer 3: the mutation subsection this
   check sits next to, and the fail-on-base design.
 - [evidence/field-evidence.md](../evidence/field-evidence.md) §7: the public argument and the

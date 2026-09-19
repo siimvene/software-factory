@@ -360,8 +360,8 @@ Three defences, cheapest first:
 
 ## What the kvart adoption measured
 
-Two cycles on 2026-09-07, both PM stage through to production, both reported in
-[the case study](../case-studies/kvart-reference-implementation.md).
+Two cycles on 2026-09-07, both PM stage through to production, both in the
+[status ledger](../STATUS.md).
 
 | What | Cycle 1 | Cycle 2 |
 |---|---|---|

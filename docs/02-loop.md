@@ -233,4 +233,4 @@ stops; it does not improvise.
 
 All `[measured 2026-09-05..09]`. Of the 13 PRs merged on kvart on 2026-09-09, 8 were the
 factory fixing its own line and 5 were product; see [10-measurement](10-measurement.md) for
-the metric. Details in the [case studies](../case-studies/).
+the metric. Per-cycle detail is in the [status ledger](../STATUS.md).

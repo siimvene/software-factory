@@ -2,9 +2,11 @@
 
 Terms are defined once, here, in the sense this design uses them.
 
-**Software factory.** A delivery line that runs lights-out: humans specify outcomes and
-constraints, machines build, inspect and ship, and people inspect output rather than process.
-"Dark" describes where the humans are not, not the absence of supervision on risk.
+**Software factory.** A delivery line where humans specify outcomes and constraints, machines
+build, verify and open the pull request behind mechanical gates, and people decide on evidence
+rather than inspect process. Three decisions stay human on the measured line: the ticket is
+Ready, the PR is merged, the release goes out. Lights-out for a qualified class of change is
+the top rung of the scaling ladder, not the line's current state.
 
 **Flywheel.** The property that makes a software factory accelerate rather than merely automate:
 the substrates (verification net, knowledge plane, gates, pattern library) compound with every
