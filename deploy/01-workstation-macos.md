@@ -188,7 +188,7 @@ catalog at pinned versions ([README.md](README.md) has the pins). Install per ro
 
 | Role | Install | Why |
 |---|---|---|
-| PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, graduate skills |
+| PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, apply and graduate skills (apply from pm-workspace 1.8.0) |
 | PM | `claude plugin install secret-guard@software-factory` | a pre-tool hook that refuses reads of credential files; a deterrent, not a boundary (it fails open without `jq`, and a renamed file passes) |
 | Engineer | `secret-guard`, `spec-repos`, `team-memory`, `plg-rules`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |
@@ -293,6 +293,43 @@ The PM never runs git themselves ([docs/14](../docs/14-pm-surface.md) says why);
 who sets the machine up also clones the specs repo and the code repos read-only next to the
 workspace and fills `POINTERS.md`, which is leg M0 of the scaffold runbook. Since 2026-09-15 the
 PM reads repositories through those local clones, not through a hosted connector.
+
+### 9.1 What the first external PM run met, and the answer to each
+
+Measured on a group PM's machine, 16 to 17 Sep 2026, one small admin feature from intake to a
+merge request in about a day `[measured 2026-09-17]`. Three things the profile above did not
+cover.
+
+**The PM workstation is CI-first.** It has no compiler or build toolchain for the product's
+stack (no JVM for a Kotlin service, for instance), so nothing staged or pushed from it is
+verified locally. That is the profile, not a gap: the pipeline verifies, and a merge request
+opened from a PM machine says so in its description ("not verified locally; CI is the check").
+A team that wants local verification on a PM machine gives it the engineer profile and its
+devcontainer, not a partial toolchain.
+
+**SSH key, by hand, two minutes.** `secret-guard` refuses the agent any read under the SSH key
+directory, by design, so the agent cannot create or inspect a key for the PM. The PM does it in
+the terminal (the `!` prefix runs a line in the agent session; a separate Terminal window works
+the same):
+
+```
+ssh-keygen -t ed25519 -C "<work email>" -f ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub        # paste into the git host: Settings, SSH keys
+ssh -T git@<git host>            # expect a greeting with the account name
+```
+
+The private key is never pasted anywhere, never read by the agent, and never lands in the
+workspace. Needed only when the PM has been granted an owner-authorised write remote
+(pm-workspace conventions, section 13); a read-only PM needs no key.
+
+**Company admin interfaces are blocked for the agent's browser.** UI verification comes from the
+PM's own screenshots. Those stay out of the workspace under `SENSITIVITY.md`; the PM describes
+what the screenshot shows, the agent does not store it.
+
+**Hosted mirrors lag.** Where the hosted repository is a read-only mirror of a GitLab (or other)
+development remote, the engineer setting up the machine clones the development remote, not the
+mirror, and records it as the `development remote:` line of the `POINTERS.md` entry. The mirror
+was five commits behind on the measured run.
 
 ## 10. Check, and what the checker cannot see
 
