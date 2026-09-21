@@ -95,7 +95,7 @@ anywhere is the sensitivity decision below. `[decided 2026-09-15, not yet measur
 
 ## The skill catalogue
 
-Seventeen skills, in the shape the kvart adoption ran them. Names here are generic: rename freely,
+Nineteen skills, in the shape the kvart adoption ran them. Names here are generic: rename freely,
 but keep the firing conditions in the description, because the description is what decides whether
 the skill fires at all. Inputs are given in read order, and the order is itself a rule from the
 workspace contract: check the spec first, grep the code when the spec is unclear or silent, ask
@@ -115,10 +115,12 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 |---|---|---|---|---|---|
 | `ingest` | Pull a source into the workspace and, first, find what the workspace already says about it | the source (file, wiki page, tracker item, URL, code grep), then the whole workspace for existing coverage | an entry in `Ingest Log.md` plus writes into `discovery/`, `reference/` or the tracking files, after confirmation | SPEC intake | gated: shows the plan and writes only on confirmation |
 | `analyze` | Produce an exhaustive verified picture of an existing feature or flow, not a partial slice | specs, then code entry points, input classes, configuration types, validators, message bundles, feature flags, then workspace notes | an analysis document in the workspace, every claim citing a path or class | SPEC intake | advisory |
+| `prototype-diverge` | When `task-improver`-style conversation cannot converge because the proposal itself is not yet known, not just underspecified: build a small number of throwaway candidates and force a kill, before writing a spec for any of them | the discovery notes' open questions, then the design standards, then the code for any behaviour a candidate mirrors | N self-contained throwaway builds under `demo`'s own three rules (visible banner, fake data only, never lands in the team layer), plus a one-page kill record naming which survived and why | SPEC intake, upstream of `analyze` | gated by `demo`'s three rules; a candidate count above five or a round with nothing killed is refused and returned as a scoping problem, not a build problem |
 | `architect-review` | Senior-engineer adversarial pass over draft tickets before build starts | the domain's specs, workspace reference and open questions, then the frontend and backend code | findings as BLOCKER, MAJOR or MINOR, each with evidence and a concrete fix | SPEC readiness | advisory, but a BLOCKER is a stop |
 | `ticket` | Draft a story or an epic from a source spec, with its tracker fields | the source file, then the story and epic templates plus the skill's own style rules, then `TRACKER.md`, then code for gap resolution | a ticket file under the tickets folder with type, project, epic parent, labels and links proposed with a reason each, saved only on approval | SPEC intake | gated: refuses an epic without a `features/` spec, blocks on unresolved product decisions, never writes to the tracker; never proposes assignee, priority, sprint or points |
 | `readiness-evaluator` | Score a ticket against a 7-criterion rubric out of 100; on a bigger ticket (money, identity, new data, another consumer, a removal) it asks one extra question, in a fixed order, that the build's design will need | the ticket text, then the domain spec folders, then the workspace notes | a score table, per-criterion gaps with citations, and one highest-impact question | SPEC readiness | gated: below the threshold it hands off to the improver |
 | `task-improver` | Conversational refinement loop that raises a weak ticket to the threshold, one question at a time | the ticket, the evaluation output, then the same context sources as the evaluator | a polished ticket, a drift check, and a session log with score progression | SPEC readiness | advisory, with a gated write-back |
+| `grill-me` | Adversarial one-question-at-a-time interview into the requester's actual intent, offered as a fourth path at every readiness-evaluator decision point, including a ticket that already scores 85+; stress-tests assumptions the rubric cannot see because the document is internally consistent and still wrong | the ticket, then the requester's own answers, each one probed for the assumption behind it rather than accepted as a fact to record | a log of assumptions surfaced and either confirmed or retracted, and an updated ticket only where an answer changed the text | SPEC readiness | advisory, offered not triggered; never runs without the requester choosing it; never fires the improver's gap-filling questions, only "why" and "what if that's wrong" on what is already there |
 | `task-splitter` | Split a ticket that is over about 2 person-days into independently deliverable sub-tasks | the polished ticket only | a split proposal with a coverage check, the parent promoted to an epic | SPEC readiness | gated: proposal, then explicit confirmation before any write |
 | `task-degrader` | Degrade a good ticket into a bad one to test the scoring pipeline | a good ticket | a synthetic bad ticket for calibration | LEARN | advisory, test fixture only |
 | `improver-optimizer` | Mine the session logs for bottlenecks, drift and stagnation, then propose edits to the improver skill itself | `session-logs/` in bulk | a diagnostic report plus numbered recommendations against the improver's own instructions | LEARN | advisory, applies edits only on request |
@@ -131,7 +133,7 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 | `wrap-up` | Persist the session's outcomes so nothing agreed dies in the transcript | the conversation | updates to the four tracking files plus a five-line summary of what landed where | daily ops and LEARN | advisory, but capture is mechanical by rule |
 | `onboard` | Set up a new PM's workspace and clone the read-only repositories | answers from the PM, one question at a time | a personalised workspace instruction file and the clones | day 0 | advisory |
 
-Three observations about the catalogue as a whole.
+Five observations about the catalogue as a whole.
 
 - Only three skills are true gates: `ticket` refuses to draft outside the pipeline, `graduate`
   refuses to package a file that fails any of six checks, and any tracker write is preview and
@@ -141,6 +143,22 @@ Three observations about the catalogue as a whole.
 - The pipeline is enforced for epics and relaxed for single stories. An epic drafted from
   unresolved research is refused with a proposed alternative path; a one-story request from chat
   is allowed. Enforcing the full ladder on every one-liner is how a process gets routed around.
+- **Conversation is not the only way to converge, and insisting on it has a cost `[proposed
+  2026-09-21]`.** `task-improver` closes gaps by asking; `prototype-diverge` exists because some
+  proposals are not underspecified, they are unknown, and a question cannot surface a shape nobody
+  has tried yet. Anthropic's own Claude Code team runs the loop this way for exploratory work: idea
+  to several small builds to a forced kill to the spec, written only for the survivor, not before
+  it `[field: Boris Cherny, via Product Growth interview, 2026-03-13]`. The distinction that keeps
+  this from swallowing the ordinary path: `prototype-diverge` fires only where discovery's own
+  open-question conversation has stalled, not as a default, and its refusal rule (five candidates,
+  or a round that kills nothing) is what stops divergence from becoming its own kind of stalling.
+- **Readiness and rightness are different questions, and the rubric only asks the first one
+  `[proposed 2026-09-21]`.** A ticket can score 85 by being internally consistent and still rest on
+  an assumption nobody said out loud. `grill-me` is the adversarial half of the readiness gate: it
+  never fills a gap, it only asks why the thing already written is true, and it is a choice the
+  requester makes, never a score-triggered branch. Offering it at every readiness decision, not
+  only below threshold, is the point: a document that reads as complete is exactly the one nobody
+  double-checks.
 - Two skills exist only to improve the skills. The degrader manufactures bad input, and the
   optimizer reads the session logs and proposes edits to the refinement loop. That is the LEARN
   write-back of [02-loop](02-loop.md) applied to the PM surface rather than to code, and it is the
@@ -303,6 +321,8 @@ flowchart LR
     S["source: finding, request,<br/>meeting, backlog row"] --> I["ingest<br/>cross-reference first"]
     I --> D["discovery/<br/>open questions"]
     D --> A["analyze<br/>verified current state"]
+    D -->|"scope will not converge<br/>by conversation"| X["prototype-diverge<br/>N throwaway builds, kill most"]
+    X --> A
     A --> F["features/<br/>spec, blockers closed"]
     F --> T["ticket<br/>draft from template"]
     T --> R["readiness-evaluator<br/>score /100"]
@@ -310,6 +330,8 @@ flowchart LR
     M --> R
     R -->|"85+, too big"| P["task-splitter"]
     P --> R
+    R -->|"any score, optional"| GR["grill-me<br/>adversarial intent interview"]
+    GR --> R
     R -->|"85+"| B["BUILD: size the ticket;<br/>program design note<br/>for one-note and full"]
     F --> G["graduate<br/>six gate checks"]
     G --> H["human submits the PR"]
