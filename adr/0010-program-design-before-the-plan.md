@@ -59,7 +59,8 @@ a gate.
    parallel stations, or a money, tenant or identity path), the head writes
    [templates/program-design.md](../templates/program-design.md) before the first brief:
    modules and lanes, types, signatures and call paths, shape decisions with the rejected
-   option, slices in landing order, and the tests that must be red on the merge base. One
+   option and each one's cost to verify, slices in landing order, and the tests that must be
+   red on the merge base. One
    cross-vendor leg reviews the note before any brief (the panel and the owner for a full
    ticket); the reviewer flags and never edits. The note travels to the review panel as one more
    injected pack, so drift from it is a `spec-drift` finding citing the section and intended
