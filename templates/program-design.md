@@ -56,8 +56,10 @@ Migration: <none | forward-only | reversible | data backfill>; row-level policy 
 
 <!-- The choices a builder would otherwise make alone on its way past: streaming or buffered,
      batch size, idempotency key, error format, transaction boundary, retry policy, locale
-     handling, pagination. One line each, with the rejected option. The head-and-hands trial
-     spent one of four rounds on a shape choice (per-fragment sends) the brief had left open. -->
+     handling, pagination, and how the choice is verified: a seam to inject a fake, a fixture
+     that needs a live dependency, or a state a test can only reach by chance. One line each,
+     with the rejected option. The head-and-hands trial spent one of four rounds on a shape
+     choice (per-fragment sends) the brief had left open. -->
 
 | Decision | Chosen | Rejected | Why |
 |---|---|---|---|
