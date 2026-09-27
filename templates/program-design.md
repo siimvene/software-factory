@@ -99,3 +99,24 @@ Migration: <none | forward-only | reversible | data backfill>; row-level policy 
 - Every row of section 4 is implemented as chosen, or the drift is a finding.
 - Slices landed in the order of section 5, or the PR says why not.
 - Every test in section 6 was red on the merge base (mechanical: the fail-on-base check).
+- On the money lane, every hop the diff changes is declared in section 8, and the map diff is in
+  the same PR (mechanical: the money path resolver; declaration: a `spec-drift` finding if not).
+
+## 8. Money paths touched
+
+<!-- Full-size money tickets only (adr/0012); write "none" otherwise. The entries of the
+     repository's money-paths.yaml this change touches, the hops it changes, adds or retires,
+     and the figure expected at every exit on the numbered example, before and after. A hop the
+     change retires names what replaces it, or shows the state it advanced is closed elsewhere:
+     cycle 2's poller was the only hop that closed a rejected payment, and the ticket scoped it
+     out. The entries travel to the review panel with this note. -->
+
+| Entry | Hop changed | Change (new, alter, retire) | Replaced by, if retired |
+|---|---|---|---|
+| | | | |
+
+| Entry | Exit | Expected before | Expected after | Example |
+|---|---|---|---|---|
+| | | | | AC-<n> |
+
+Map diff: <in this PR | none, and why no hop changed>

@@ -16,3 +16,4 @@ The design's own decisions, in the format it asks adopters to use
 | [0009](0009-the-spec-is-a-gate-input.md) | The spec is a gate input; scope drift is a finding with its own disposition | proposed |
 | [0010](0010-program-design-before-the-plan.md) | Program design before the plan on sized tickets; red-first becomes a gate (fail-on-base) | proposed |
 | [0011](0011-agent-managed-context-repos-auto-merge.md) | Agent-managed context repos auto-merge; agents refresh shared context continuously | accepted |
+| [0012](0012-money-paths-are-mapped-and-agree.md) | Money paths are mapped end to end, and every exit agrees | proposed |
