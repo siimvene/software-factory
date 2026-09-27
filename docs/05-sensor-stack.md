@@ -344,13 +344,17 @@ the ticket and caught only by the cross-vendor reviewer in the diff `[measured 2
 
 Design, `[proposed]`:
 
-- **The resolver self-tests, then checks.** Every hop's file, symbol and test id resolves; every
-  exit has an assertion in the agreement test; every transaction-tier file is a hop or declared
+- **The resolver self-tests, then checks.** Every location's file and symbol resolve; every hop
+  test and every exit's own test case is collected by the runner; every registration line a job
+  or route is `wired_by` still exists; every transaction-tier file is a location or declared
   off-path with a reason. A planted misclassification withholds all output, as the surface
   predicate does ([09-legacy-adoption](09-legacy-adoption.md) §d).
-- **A deleted or unwired hop fails the resolver** until the same diff updates the map entry.
-- **The diff selects the path.** A diff touching a mapped hop adds the entry's hop tests and its
-  agreement test to the pre-push receipt as must-pass. The fail-on-base check reads them as
+- **A deleted hop, a removed registration or a dropped exit case fails the resolver** until the
+  same diff updates the map entry. The registration is the part a file-and-symbol check misses: a
+  poller whose code and unit test survive while nothing schedules it closes nothing.
+- **The diff selects the path.** A diff touching any mapped location, entry, hop, exit or
+  registration, adds the entry's hop tests and every exit case of its agreement test to the
+  pre-push receipt as must-pass. The fail-on-base check reads them as
   declared characterization tests, because they exist before the change.
 - **Agreement plus an expected value.** Exits that only agree with each other pass a figure that
   is wrong at its source; the numbered example's hand-computed value is part of the assertion.
