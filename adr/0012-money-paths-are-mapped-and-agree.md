@@ -44,27 +44,36 @@ money-lane input of the program design note and of the review.
    shape of [templates/money-paths.yaml](../templates/money-paths.yaml). One entry per figure or
    payment state people pay on: an invoice total, a per-unit charge, a payment's status. Each
    entry lists its entry points, its hops in order, and its exits. A hop is anything that reads,
-   transforms, advances or displays the figure, scheduled jobs included. Each hop names its file
-   and symbol, what it does to the figure, its rounding rule where it rounds, and the test that
-   holds it.
-2. **The agreement test.** One per entry. One input, then the figure asserted at every exit: the
-   stored value, the API response, the view, the rendered document, the outbound file. The exits
-   are asserted equal to each other and to a hand-computed expected value taken from a numbered
-   example. Agreement between exits alone is not enough, because a calculation that is wrong at
+   transforms, advances or displays the figure, scheduled jobs included. Every location, entry,
+   hop and exit alike, names its file and symbol, so a diff anywhere on the path can be matched
+   to it. A hop also names what it does to the figure, its rounding rule where it rounds, and the
+   test that holds it. A hop that runs only because something registers it (a scheduled job, a
+   route, a queue consumer) names that registration too, as `wired_by`: the file and the line
+   that wires it.
+2. **The agreement test.** One per entry, parametrised by exit. One input, then the figure
+   asserted at every exit: the stored value, the API response, the view, the rendered document,
+   the outbound file. Each exit names its own test node id (the agreement test's case for that
+   exit), so the map binds every exit to an assertion a script can see. The exits are asserted
+   equal to each other and to a hand-computed expected value taken from a numbered example. Agreement between exits alone is not enough, because a calculation that is wrong at
    the source stays consistently wrong at every exit. The money lane's mutation targets apply to
    the hops it covers.
 3. **The resolver.** A script, self-testing like the surface predicate: it withholds all output
-   if a planted case misclassifies. It checks that every hop's file, symbol and test id resolves
-   in the tree, that every exit has an assertion in the agreement test, and that every file on the
-   transaction tier is a hop of some entry or is declared off-path with a reason. It runs on Day 1
-   and on every diff that touches the map or a mapped file.
-4. **Retiring a hop breaks the map.** A diff that deletes or unwires a hop (a symbol, a route, a
-   scheduled job) fails the resolver until the same diff updates the entry: the hop is replaced
-   by a named one, or the state it advanced is shown closed elsewhere. Cycle 2's poller is the
-   case this rule exists for.
-5. **The diff selects the path.** A diff that touches a mapped hop adds that entry's hop tests
-   and agreement test to the selected set of the receipt-checked pre-push gate, as must-pass on
-   the branch. They exist before the change, so the fail-on-base check
+   if a planted case misclassifies. It checks that every location's file and symbol resolve in the
+   tree; that every hop's test and every exit's test node id are collected by the test runner;
+   that every `wired_by` line still exists in its file; and that every file on the transaction
+   tier is a location of some entry or is declared off-path with a reason. A registration that
+   lives outside the repository (a timer unit on a host) is reported as unchecked, never as
+   resolved. The resolver runs on Day 1 and on every diff that touches the map or a mapped file.
+   What it cannot see is whether an assertion is strong; that is the mutation target's job.
+4. **Retiring a hop breaks the map.** A diff that deletes a hop's symbol, removes its
+   registration, or drops an exit's test case fails the resolver until the same diff updates the
+   entry: the hop is replaced by a named one, or the state it advanced is shown closed elsewhere.
+   Cycle 2's poller is the case this rule exists for, and its failure mode was the registration:
+   a poller whose file, function and unit test all survive while nothing schedules it any more
+   closes nothing. `wired_by` is what makes that removal visible.
+5. **The diff selects the path.** A diff that touches any mapped location, entry, hop, exit or
+   registration, adds that entry's hop tests and every exit case of its agreement test to the
+   selected set of the receipt-checked pre-push gate, as must-pass on the branch. They exist before the change, so the fail-on-base check
    ([adr/0010](0010-program-design-before-the-plan.md)) treats them as declared characterization
    tests, never as red-first tests.
 6. **Note and review.** On a full-size money ticket the program design note fills section 8: the
@@ -74,7 +83,9 @@ money-lane input of the program design note and of the review.
    is a `spec-drift` finding on the money lane, classified by the normal severity rule.
 
 Scope: repositories with a tiered money surface. Reporting-tier figures get the map and the
-resolver; the agreement test is required on the transaction tier and advisory on reporting.
+resolver. The agreement test and its per-exit cases are required on the transaction tier; on the
+reporting tier an entry may say `agreement_test: none` with a reason, and the resolver then
+reports its exits as unasserted, advisory, instead of failing.
 
 ## Consequences
 

@@ -6,16 +6,22 @@
 # A hop is anything that reads, transforms, advances or displays the figure: a parser, a
 # calculation, a rounding step, a write, a scheduled job, an API serialiser, a view, a rendered
 # document, an outbound file. A hop without a test is a gap the resolver reports, never a blank.
+# Every location (entry, hop, exit) carries file and symbol, so a diff anywhere on the path
+# selects the path's tests. A hop that runs only because something registers it (a job, a route,
+# a queue consumer) carries wired_by: the file and the exact line that registers it.
 #
-# The resolver checks: every file, symbol and test id below resolves in the tree; every exit has
-# an assertion in the entry's agreement test; every transaction-tier file of the surface is a hop
-# of some entry or is listed under off_path with a reason. Deleting or unwiring a hop fails the
-# resolver until this file says what replaced it.
+# The resolver checks: every file and symbol resolves; every test and every exit's assert node id
+# is collected by the test runner; every wired_by line still exists; every transaction-tier file
+# of the surface is a location of some entry or is listed under off_path with a reason. Deleting a
+# hop, removing its registration or dropping an exit's case fails the resolver until this file
+# says what replaced it. A registration outside the repository is reported as unchecked.
 #
 # The names below are illustrative. Replace them; keep the keys.
 
 version: 1
 surface: money-surface.yaml
+# A reporting-tier entry may carry `agreement_test: none` plus `agreement_reason: <why>`; its
+# exits are then reported as unasserted, advisory. Transaction-tier entries may not.
 
 off_path:
   - file: src/billing/demo_seed.py
@@ -48,16 +54,26 @@ paths:
         test: tests/documents/test_invoice_pdf.py::test_prints_stored_total
     exits:
       - kind: stored
-        where: invoices.total
+        file: src/billing/models.py
+        symbol: Invoice.total
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[stored]
       - kind: api
-        where: GET /invoices/{id} field total
+        file: src/api/invoices.py
+        symbol: get_invoice
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[api]
       - kind: view
-        where: the resident's invoice page
+        file: frontend/pages/invoices/[id].vue
+        symbol: InvoiceTotal
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[view]
       - kind: document
-        where: the invoice PDF
+        file: src/documents/invoice_pdf.py
+        symbol: render
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[pdf]
       - kind: outbound
-        where: the e-invoice file sent to the bank
-    agreement_test: tests/money_paths/test_invoice_total.py::test_every_exit_agrees
+        file: src/einvoice/builder.py
+        symbol: build_einvoice
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[einvoice]
+    agreement_test: tests/money_paths/test_invoice_total.py::test_exit_agrees
     expected_from: the numbered example in the ticket that introduced the figure (AC-3, 128.47)
 
   - id: payment-status
@@ -73,13 +89,20 @@ paths:
       - job: status poller, every 15 minutes
         file: src/payments/poller.py
         symbol: poll_pending
+        wired_by:
+          file: src/tasks/schedule.py
+          line: 'every(minutes=15).do(poll_pending)'
         does: advances initiated to settled or rejected from the bank's answer; the only hop that
           closes an abandoned or rejected payment
         test: tests/payments/test_poller.py::test_rejected_payment_closes
     exits:
       - kind: stored
-        where: payments.state
+        file: src/payments/models.py
+        symbol: Payment.state
+        assert: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry[stored]
       - kind: view
-        where: the payment button's enabled state on the invoice page
-    agreement_test: tests/money_paths/test_payment_status.py::test_rejected_payment_unblocks_retry
+        file: frontend/components/PayButton.vue
+        symbol: PayButton
+        assert: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry[view]
+    agreement_test: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry
     expected_from: the ticket's AC-2, a rejected payment leaves the invoice payable again
