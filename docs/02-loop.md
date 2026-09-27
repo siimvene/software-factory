@@ -86,7 +86,7 @@ Sizing is a rule, not a feeling `[proposed]`:
 |---|---|---|---|
 | one-shot | one module; no new type, column or migration; no money, tenant or identity path | none; the plan names the file and the test | none |
 | one-note | two or more modules, or a new type, column or migration, or parallel stations | the note, sections 1 to 6 | one cross-vendor leg on the note; it is a page, so minutes |
-| full | a money, tenant or identity path, a contract another repository consumes, a retirement | the note plus a decision record per shape decision that outlives the ticket | the panel on the note, and the owner reads it |
+| full | a money, tenant or identity path, a contract another repository consumes, a retirement | the note plus a decision record per shape decision that outlives the ticket; on the money lane, section 8 and the money path map diff ([adr/0012](../adr/0012-money-paths-are-mapped-and-agree.md)) | the panel on the note, and the owner reads it |
 
 Cycle 1 (+47/−1, one module) was one-shot and needed nothing. Cycle 2 (a money-path
 retirement) would have been full, and its planning document carried pseudocode keyed on a

@@ -312,3 +312,26 @@ code review at all; this design never proposed one (the human gate is a decision
 [01-principles](../docs/01-principles.md) §4), so the talk argues for the design's shape rather
 than against it, and its two named gaps are what [adr/0010](../adr/0010-program-design-before-the-plan.md)
 closes.
+
+## 8. Aruannik, "Building a dark software factory: lessons from Aruannik" `[field: Aruannik]`
+
+**What it is.** A public article (published 2026-09-20) by a co-founder of an annual-report
+service whose code, per the article, was written entirely by agents and which is live with paying
+customers. Codex implements from tracked issues through branches and pull requests; the merge
+policy requires reviews from three vendors' agents; CI runs the required checks and deploys a
+green main. Scheduled jobs compare source data with results and replay scenarios. The author
+states that parts run unattended and others still need a session or a decision.
+
+**What this design takes.** One rule, stated in the article: when a product's figures come from
+uploaded bank statements and invoices, they have to be followed through parsing, calculation, the
+browser and the finished report, and they must all agree. Before an accounting change that
+project requires a map of those paths and their tests, so the agent has something concrete to
+preserve. This design's money path map, its resolver and its agreement test
+([adr/0012](../adr/0012-money-paths-are-mapped-and-agree.md)) are the checkable form of that rule.
+
+**Caveats.** The article publishes no measurement: no count of changes the map caught, no cycle
+times, no escape rate. It does not say who merges, and main deploys on green, so whether merge is
+a person's decision cannot be read from it. Its one described incident (a site outage during an
+image build) ends with the root cause unestablished and a regression test for a failed build,
+where the outage came from a build in progress; that is noted here as a caveat on the source, and
+nothing in this design depends on it.
