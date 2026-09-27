@@ -48,8 +48,9 @@ money-lane input of the program design note and of the review.
    hop and exit alike, names its file and symbol, so a diff anywhere on the path can be matched
    to it. A hop also names what it does to the figure, its rounding rule where it rounds, and the
    test that holds it. A hop that runs only because something registers it (a scheduled job, a
-   route, a queue consumer) names that registration too, as `wired_by`: the file and the line
-   that wires it.
+   route, a queue consumer) names every registration too, as a `wired_by` list of file and line
+   pairs. One registration is often not enough: on kvart a job is wired twice, once in the job
+   registry and once in its systemd timer unit, and removing either one stops it.
 2. **The agreement test.** One per entry, parametrised by exit. One input, then the figure
    asserted at every exit: the stored value, the API response, the view, the rendered document,
    the outbound file. Each exit names its own test node id (the agreement test's case for that
@@ -60,7 +61,7 @@ money-lane input of the program design note and of the review.
 3. **The resolver.** A script, self-testing like the surface predicate: it withholds all output
    if a planted case misclassifies. It checks that every location's file and symbol resolve in the
    tree; that every hop's test and every exit's test node id are collected by the test runner;
-   that every `wired_by` line still exists in its file; and that every file on the transaction
+   that every `wired_by` line still exists in its file (each entry of the list); and that every file on the transaction
    tier is a location of some entry or is declared off-path with a reason. A registration that
    lives outside the repository (a timer unit on a host) is reported as unchecked, never as
    resolved. The resolver runs on Day 1 and on every diff that touches the map or a mapped file.
