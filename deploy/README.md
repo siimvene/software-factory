@@ -62,12 +62,13 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 
 The prose in this directory follows [WRITING.md](../WRITING.md): the group is "the group", no
 private hosts, no person names beyond the operator. The vendored trees under `marketplace/` and
-`standard/` are copied verbatim at the pinned commits and are exempt, with one exception: a
-colleague's name and address in an author field or a README is replaced by a role, because that
-is personal data and the exemption is for the group's identity, not a person's. Otherwise a
-scrubbed plugin would be a fork, and a fork would drift from what the PMs actually install. They
-are never edited in place beyond that. To update one, re-vendor from the source at a new pin and change the pin in the table
-above, in the same commit.
+`standard/` are copied at the pinned commits with one mechanical scrub: the group's name, GitHub
+organisation (`<org>`), repository and plugin names (`group-*`), wiki space and page
+identifiers, domains, and every person's name and address (replaced by a role or
+`dev@example.com`). Nothing else changes, so the copy still matches what the PMs install apart
+from those identifiers. They are never edited in place beyond that. To update one, re-vendor
+from the source at a new pin, re-apply the scrub, and change the pin in the table above, in the
+same commit.
 
 ## Findings against the vendored trees, for upstreaming
 

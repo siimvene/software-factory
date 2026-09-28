@@ -71,9 +71,9 @@ Where these live in this repository:
 - [templates/skills/](templates/skills/): 11 skills in the shape a Claude Code project consumes
   them, one directory each, anonymised from the reference implementation. Copy a directory into
   a workspace's or a repository's `.claude/skills/`.
-- [deploy/marketplace/](deploy/README.md): the same skills as installable plugins, verbatim at
-  pinned commits from the group's catalog. `pm-workspace` carries the seven PM skills including
-  workspace setup; `spec-repos` carries the three spec skills; six more plugins cover rule packs,
+- [deploy/marketplace/](deploy/README.md): the same skills as installable plugins, copied at
+  pinned commits from the group's catalog with its identifiers scrubbed. `pm-workspace` carries
+  the seven PM skills including workspace setup; `spec-repos` carries the three spec skills; six more plugins cover rule packs,
   secret guarding, team memory, browser QA, a hygiene pass and a one-model fallback review.
 - [templates/ticket.md](templates/ticket.md), [templates/pm-skill.md](templates/pm-skill.md):
   the ticket shape the skills produce and the skeleton every PM skill follows.
