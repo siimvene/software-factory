@@ -16,11 +16,11 @@ your report.
 1. **Scope** — default `git diff HEAD` (or `<base>...HEAD` when given a base).
    Note each file's role: source / config / test / infra / docs.
 2. **Load the rubric** — resolution order, first match wins:
-   1. `GROUP_RULE_PACKS` or `CONSORT_RULE_PACKS` (colon-separated files/dirs of
+   1. `CONSORT_RULE_PACKS` (colon-separated files/dirs of
       `.md`/`.mdc`)
    2. repo-local `.claude/rules/` (vendored packs)
-   3. the installed group-rules plugin: newest match of
-      `~/.claude/plugins/cache/*/group-rules/*/rules/` — load `common/`,
+   3. the installed rule-packs plugin: newest match of
+      `~/.claude/plugins/cache/*/rule-packs/*/rules/` — load `common/`,
       `security/`, and the dirs matching the repo's `activities:` line in
       `AGENTS.md`
    Also load the repo's `AGENTS.md` itself. The packs are the standard; your

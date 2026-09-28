@@ -110,7 +110,7 @@ Add to the above, in this order:
   parity replay).
 - Module ownership map: who owns which boundary.
 - Whether hand-written-code overrides need a named approver or just the incident log.
-- The retry and fallback policy when a model vendor is down in lights-out mode.
+- The retry and fallback policy when a model vendor is down in unattended mode.
 - The first delegated-merge pattern, if any, and its expiry.
 
 ## Anti-patterns, each observed once

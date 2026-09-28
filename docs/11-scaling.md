@@ -139,7 +139,7 @@ population for per-team thresholds. Keep a hygiene rule on how the programme is 
    benchmark row or it is noise.
 3. Bus factor: it works where architect, operator, reviewer and PM are one head. Transfer to
    teams that lack that is the unproven step; the readiness gate is the honest instrument.
-4. Vendor concentration: no cross-vendor fallback in lights-out mode stops the whole factory
+4. Vendor concentration: no cross-vendor fallback in unattended mode stops the whole factory
    `[field: Pipedrive]`. Two backends at the review tier exist; extend to the builder tier.
 5. Externals set the calendar floor: certifications, third-party integrations, compliance.
    Agents do not accelerate those.

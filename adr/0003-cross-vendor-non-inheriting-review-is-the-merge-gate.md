@@ -28,7 +28,7 @@ fixes do not trigger a re-run.
   own ticket scoping on a money path.
 - Cost: 7 to 20 minutes per turn; a second vendor's account and credentials; the discipline
   to prove the reviewer ran (probe plus wall-clock) every time.
-- Follow-ups: extend cross-vendor to the builder tier for lights-out operation; an F1
+- Follow-ups: extend cross-vendor to the builder tier for unattended operation; an F1
   benchmark set to score the reviewer and choose models on data.
 
 ## Alternatives rejected

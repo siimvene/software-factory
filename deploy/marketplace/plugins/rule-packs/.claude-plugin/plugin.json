@@ -1,0 +1,10 @@
+{
+  "name": "rule-packs",
+  "displayName": "Rule packs",
+  "description": "An organisation's adopted coding-standard rule packs, shipped so pack-aware review (consort, solo-review) and generation load the same rules everywhere. Ships one example pack; replace it with your own.",
+  "version": "1.0.0",
+  "author": {
+    "name": "the plugin catalog maintainer",
+    "email": "dev@example.com"
+  }
+}

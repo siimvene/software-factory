@@ -48,7 +48,7 @@ same shift-left shape as the devcontainer plus a local consort run.
 **Caveats and risks they hit.**
 - Vendor API instability breaks the whole workflow, and they have no cross-vendor fallback: it fails,
   posts "retry", a human re-triggers. This confirms that hard-fail rather than silent degradation is
-  a real requirement, and that a lights-out loop needs an explicit fallback and retry policy.
+  a real requirement, and that an unattended loop needs an explicit fallback and retry policy.
 - Model updates change behaviour unpredictably ("a casino"). One Claude Code update made the review
   agent post an "all done" emoji without submitting the review. They added a hook that verifies the
   review was actually posted. This is the strongest external argument for evals on the agent-config

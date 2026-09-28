@@ -1,6 +1,6 @@
 # Shop team context
 
-We build the group's online shop: the storefront customers buy from and the
+We build an online shop: the storefront customers buy from and the
 catalog service behind it.
 
 ## What we own

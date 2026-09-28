@@ -133,7 +133,7 @@ lost the first time an agent adds a test that asserts nothing.
 
 ### 3. Self-provisioning test infrastructure
 
-"You must have a database running" is a genuine blocker for a lights-out loop, because an
+"You must have a database running" is a genuine blocker for an unattended loop, because an
 agent in a fresh sandbox has no hand-provisioned anything.
 
 The shape that worked, with zero edits to any existing test or base class: a

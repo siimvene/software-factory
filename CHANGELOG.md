@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.13 (2026-09-28)
+
+Lights-on, company-agnostic, and pictures that read.
+
+- `README.md`: the Mermaid line diagram is replaced by a rendered PNG
+  (`docs/img/the-line.png`, source `docs/img/src/the-line.html`, `render.sh`), and three slide
+  images join it: the factory as components, where the cost went (captioned illustrative, with
+  its measured anchor), and the loop, in a new short section.
+- Lights-on: the README and `docs/00-glossary.md` say the factory runs lights-on, as a factory
+  for one or for a team; the glossary gains the term. Every "lights-out" loop or mode in
+  `docs/`, `adr/0003` and `evidence/` is now "unattended", which is what it meant. The public
+  post title in `evidence/field-evidence.md` is quoted as published.
+- `deploy/`: the vendored trees are company-agnostic. The organisation's rule packs, wiki
+  pointers, domain glossary and adoption profile are removed; the `rule-packs` plugin replaces
+  the old one and ships one generic example pack (`rules/common/ci-gates.md`). Identifiers are
+  placeholders (`<org>`, `group-*`, `dev@example.com`). `WRITING.md` and `deploy/README.md`
+  state the rule. History was rewritten to match.
+
 ## 0.2.12 (2026-09-19)
 
 The README says what the line is, and where the PM half of it lives.

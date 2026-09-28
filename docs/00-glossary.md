@@ -5,8 +5,15 @@ Terms are defined once, here, in the sense this design uses them.
 **Software factory.** A delivery line where humans specify outcomes and constraints, machines
 build, verify and open the pull request behind mechanical gates, and people decide on evidence
 rather than inspect process. Three decisions stay human on the measured line: the ticket is
-Ready, the PR is merged, the release goes out. Lights-out for a qualified class of change is
-the top rung of the scaling ladder, not the line's current state.
+Ready, the PR is merged, the release goes out. It runs lights-on, for one person or for a team.
+Skipping the per-change merge wait for a qualified class of change is the top rung of the
+scaling ladder, not the line's current state.
+
+**Lights-on.** The factory's operating mode: people stay on the line at the three decisions and
+read evidence rather than diffs. It holds whether one person holds every role (a factory for
+one) or a team splits them (a factory for teams). A dark, lights-out factory with nobody between
+intent and production is outside this design; the furthest it goes is an unattended merge for a
+narrow, proven class of change.
 
 **Flywheel.** The property that makes a software factory accelerate rather than merely automate:
 the substrates (verification net, knowledge plane, gates, pattern library) compound with every
@@ -79,7 +86,7 @@ every shortcut.
 Humans approve and merge; they do not author. A trailer-less commit is rejected.
 
 **Verification net.** The tests, coverage ratchet, mutation kill rate, characterization suite
-and self-provisioning test infrastructure that make lights-out changes safe on a given core.
+and self-provisioning test infrastructure that make unattended changes safe on a given core.
 Coverage says a line ran; the kill rate says a test would notice it changing; the net needs both.
 On a legacy core, building it is turn 1.
 
