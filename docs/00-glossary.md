@@ -102,6 +102,12 @@ evidence, staged release with auto-revert. See [11-scaling](11-scaling.md).
 **Money-critical / transaction tier.** Code where a wrong change moves wrong money. Requires
 named-human outcome sign-off, always. Tiered per class, not per module.
 
+**Money path map.** For each figure or payment state people pay on: the input that creates it,
+every hop that parses, computes, rounds, stores, advances or renders it, and every exit where a
+person reads or pays it, each hop with its test, plus one agreement test asserting all exits
+against a hand-computed value. The tier says which code is money; the map says how a figure
+travels. See [adr/0012](../adr/0012-money-paths-are-mapped-and-agree.md).
+
 **Dogfood report.** The per-cycle record of wall-clock per stage, tokens per agent, what the
 gate caught, and every skipped or shortcut step. The input to any organisational proposal.
 
