@@ -6,9 +6,12 @@ verification net and a cross-vendor review before a pull request exists, and ope
 person reads the evidence, merges, and presses release.
 
 Three human decisions stay on the line by design: the ticket is Ready, the PR is merged, the
-release goes out. Nothing here removes them. What the design removes is the reading of diffs
-between those decisions, by moving that work onto gates that refuse with a file, a line and a
-reason. Lights-out for a qualified class of change is the last rung of a ladder
+release goes out. Nothing here removes them: the factory runs lights-on, and the same line
+works as a factory for one, where a single person holds every role, or as a factory for a team
+that splits them ([12-adoption-playbook](docs/12-adoption-playbook.md)). What the design removes
+is the reading of diffs between those decisions, by moving that work onto gates that refuse
+with a file, a line and a reason. Skipping the per-change merge wait for a qualified class of
+change is the last rung of a ladder
 ([11-scaling](docs/11-scaling.md), [adr/0006](adr/0006-pr-gated-output-human-release.md)), not
 the measured state of the line: today every code merge is a named human's click, and the ledger
 records who.
@@ -179,8 +182,8 @@ design's own [decision records](adr/).
 
 - Not a tool. It composes tools that exist (cleat, consort, memspec, enola, ripwire, a context
   standard, a devcontainer template) and says where each sits and why.
-- Not lights-out. The ticket, the merge and the release are human decisions on the measured
-  line, and the ledger can tell a human's click from an agent's. Removing the merge wait for a
+- Not a dark factory. It runs lights-on: the ticket, the merge and the release are human
+  decisions on the measured line, and the ledger can tell a human's click from an agent's. Removing the merge wait for a
   narrow, proven class of change is a proposed rung with its preconditions listed in
   `STATUS.md`, not something the line does.
 - Not a claim that review can be removed. It is a claim that review can be moved: from reading

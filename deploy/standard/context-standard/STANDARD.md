@@ -288,7 +288,7 @@ The standard says so rather than pretending otherwise:
 ### 8.4 Review-side wiring (consort)
 
 Codex never reads `CLAUDE.md` or the mounted team-context — consort feeds it composed
-prompts plus rule packs (`CONSORT_RULE_PACKS` → repo `.claude/rules/` → group-rules
+prompts plus rule packs (`CONSORT_RULE_PACKS` → repo `.claude/rules/` → rule-packs
 plugin cache). A team's domain invariants in team-context are therefore invisible to
 cross-vendor review unless wired in. The cheap fix, with zero consort changes: a
 team-context repo MAY carry a `rules/` directory, and devcontainer setup appends
@@ -297,7 +297,6 @@ Generation context and review rubric stay separate concerns; the mount serves bo
 
 ---
 
-*This is the neutral core. The group adoption profile (estate-specific no-touch zones,
-required starter-kit lineages, the L2 CI gate wired to the group's shared workflows) lives
-in `governance/group-profile.md` and is layered on top, so the core stays
-employer-agnostic.*
+*This is the neutral core. An organisation's adoption profile (estate-specific no-touch
+zones, required starter-kit lineages, the L2 CI gate wired to its shared workflows) lives in
+`governance/<org>-profile.md` and is layered on top, so the core stays employer-agnostic.*

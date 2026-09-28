@@ -59,7 +59,7 @@ change centrally, or fork consciously with an ADR. Full matrix and rationale:
 | [`adopt.sh`](adopt.sh) | Seed / `--update` / `--check` / `--force` |
 | [`governance/distribution.md`](governance/distribution.md) | Day-2 design: managed/seeded/referenced, lock, push/pull, fleet report, kit fork story |
 | [`governance/VERSIONING.md`](governance/VERSIONING.md) | What MAJOR/MINOR mean |
-| [`governance/group-profile.md`](governance/group-profile.md) | group-specific overlay |
+| `governance/<org>-profile.md` | the adopting organisation's overlay (no-touch zones, starter-kit lineage, conformance targets); write your own, none is vendored |
 | [`.github/workflows/`](.github/workflows/) | `docs-lint-reusable` (checks), `propagate` (update PRs), `fleet-report` (weekly audit) |
 
 ## Not yet wired

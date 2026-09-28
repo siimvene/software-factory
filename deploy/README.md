@@ -33,7 +33,7 @@ work it points to rather than repeats.
 | `bin/check-workstation.sh` | one line per requirement, exit 1 on a missing required item; `--pm` for the PM profile; route-aware reviewer checks from process env | original checker tested on the operator's Mac; route-aware changes tested with Linux CLI fixtures in `bin/test_check_workstation.py`; macOS rerun pending |
 | `bin/check-project.sh` | one line per scaffold artifact in a code repo, exit 1 on a missing required one | kvart passes except the two items noted in the runbook; an unwired repo fails 30 lines (known-false) |
 | `marketplace/` | a Claude Code plugin marketplace named `software-factory`: the eight plugins from the group's catalog the loop uses | `pm-workspace` 1.6.0 from the group catalog branch `pm-workspace-1.6.0` @ `74e43db` (PR open at vendoring time); the other seven from its `main` @ `f2bc651` |
-| `standard/` | the group standard: `context-standard/` v0.4 with `adopt.sh`, `agents-core.md` (the operating contract every session loads), the team-context and instructions-file templates, references | group standards repo @ `7cb157f` |
+| `standard/` | the group standard: `context-standard/` v0.4 with `adopt.sh`, `agents-core.md` (the operating contract every session loads), the team-context and instructions-file templates | group standards repo @ `7cb157f` |
 | `templates/` | the wiring files kvart runs: tracked agent settings with the sensor hooks, MCP servers, sensor rule files, git hooks, the ledger sync script with its tests, the gate and ledger workflows, the ruleset body, the memory binding, the Jira workflow payload | kvart @ `e6b90e18`; see [templates/README.md](templates/README.md) for per-file notes |
 
 Third-party tools are not vendored; the workstation guide installs them from their own releases
@@ -62,13 +62,14 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 
 The prose in this directory follows [WRITING.md](../WRITING.md): the group is "the group", no
 private hosts, no person names beyond the operator. The vendored trees under `marketplace/` and
-`standard/` are copied at the pinned commits with one mechanical scrub: the group's name, GitHub
-organisation (`<org>`), repository and plugin names (`group-*`), wiki space and page
-identifiers, domains, and every person's name and address (replaced by a role or
-`dev@example.com`). Nothing else changes, so the copy still matches what the PMs install apart
-from those identifiers. They are never edited in place beyond that. To update one, re-vendor
-from the source at a new pin, re-apply the scrub, and change the pin in the table above, in the
-same commit.
+`standard/` are copied at the pinned commits and kept company-agnostic in two steps. First, a
+mechanical scrub: the organisation's name, GitHub organisation (`<org>`), repository and plugin
+names (`group-*`), wiki identifiers, domains, and every person's name and address (replaced by a
+role or `dev@example.com`). Second, content that only describes one organisation's estate is
+left out: its rule packs (the `rule-packs` plugin ships one generic example instead), its wiki
+pointers and domain glossary, and its adoption profile. To update a tree, re-vendor from the
+source at a new pin, re-apply both steps, and change the pin in the table above, in the same
+commit.
 
 ## Findings against the vendored trees, for upstreaming
 

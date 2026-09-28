@@ -250,8 +250,8 @@ Evidence: the settings diff, the two gate outputs, one line per planted failure.
 ### G1 to G3 The verify gate (Agent)
 
 Nothing to install in the repo beyond rule packs. Consort picks up `.claude/rules/*.md` as the
-reviewer's brief when `CONSORT_RULE_PACKS` is unset, and the group's adopted packs come with
-the `group-rules` plugin. Keep reviewer env out of tracked project settings. Follow
+reviewer's brief when `CONSORT_RULE_PACKS` is unset, and an organisation's adopted packs come
+with the `rule-packs` plugin (it ships one example pack; replace it with your own). Keep reviewer env out of tracked project settings. Follow
 [factory-reviewer-setup](../templates/skills/factory-reviewer-setup/SKILL.md) for the route
 choice, then the workstation guide sections 3 and 7 for the machine-side keys. Use the Consort
 root and caller recorded in section 0. A shell panel does not read Claude settings.

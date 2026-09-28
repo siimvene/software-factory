@@ -41,6 +41,6 @@ How this service sits in the wider estate — upstreams, downstreams, shared con
 
 ## Known constraints & risks
 
-Link the relevant ADRs and any `risk register`-style risk items that touch this service.
+Link the relevant ADRs and any risk-register items that touch this service.
 
 <!-- TODO(review): fill from the repo. Keep it current-state only. -->

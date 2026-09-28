@@ -190,7 +190,7 @@ catalog at pinned versions ([README.md](README.md) has the pins). Install per ro
 |---|---|---|
 | PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, apply and graduate skills (apply from pm-workspace 1.8.0) |
 | PM | `claude plugin install secret-guard@software-factory` | a pre-tool hook that refuses reads of credential files; a deterrent, not a boundary (it fails open without `jq`, and a renamed file passes) |
-| Engineer | `secret-guard`, `spec-repos`, `team-memory`, `group-rules`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
+| Engineer | `secret-guard`, `spec-repos`, `team-memory`, `rule-packs`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |
 
 Project scope, written by the scaffold into the repo's tracked settings: `chisle` pinned to tag

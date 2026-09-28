@@ -44,7 +44,7 @@ Classification of the current template:
 | `.memspec/config.yaml`, `.memspec/README.md` | seeded | team tunes retrieval/decay per repo |
 | `.context-standard.lock` *(new)* | managed (generated) | written by `adopt.sh`, never hand-edited |
 | docs-lint check logic | referenced | reusable workflow in this repo, pinned `@v1` |
-| Claude Code skills (adopt/resync helpers) | referenced | group-ai-plugins marketplace (group profile, §10) |
+| Claude Code skills (adopt/resync helpers) | referenced | the org plugin marketplace (org profile, §10) |
 
 Principle order: **reference > managed copy > seeded copy.** Reference when the
 platform supports it (reusable workflows, marketplace plugins, `@` imports); copy
@@ -89,7 +89,7 @@ following agent honors. Everything below the sentinel block is team-owned and is
 never touched by an update.
 
 Why this wins: updates to the org contract are a conflict-free `cp` + lock bump
-(the exact `verify-contract.sh` mechanics already proven in the shop family);
+(the exact `verify-contract.sh` mechanics already proven in an existing repo family);
 merge conflicts with team edits are structurally impossible (different files);
 portability is preserved through the imperative sentence (and the group's primary
 runtime, Claude Code, gets automatic expansion via `@`). The residual in-file
@@ -342,33 +342,32 @@ per channel:
 The rule of thumb: **if a kit improvement must reach every fork, it was never
 kit content — it is standard content.** Move it up a layer and let §8 carry it.
 
-## 10. group profile wiring (layer, not core)
+## 10. Organisation profile wiring (layer, not core)
 
-Everything above is neutral-core mechanism. The group overlay (belongs in
-`group-profile.md` once accepted):
+Everything above is neutral-core mechanism. An organisation's overlay (belongs in
+`<org>-profile.md` once accepted) typically sets:
 
 - Adopter discovery: GitHub topic `context-standard` on org repos, applied at
   adoption (adopt.sh prints the reminder; fleet report treats missing topic +
   present lock as a finding).
-- Propagation credential: a group GitHub App (contents:write, pull-requests:write
+- Propagation credential: an org GitHub App (contents:write, pull-requests:write
   on product repos) installed org-wide; used by `propagate.yml` and read-only by
   the fleet report.
-- group-ai-plugins marketplace ships a `context-standard` plugin: `/adopt-standard` and
+- The org plugin marketplace ships a `context-standard` plugin: `/adopt-standard` and
   `/resync-standard` skills wrapping `adopt.sh`, so MINOR resyncs are a slash
   command; the plugin self-updates via the marketplace (a referenced channel —
   updating the skill needs no repo PRs).
 - Grace window for MAJOR at L2: **2 sprints** from propagate-PR open to
   docs-lint red (recommendation; see open decisions).
-- Legacy repos (phasing out through 2027) stay L0: they receive
-  propagate PRs but docs-lint never blocks them — consistent with
-  `group-profile.md`'s "don't over-invest in decommissioning code".
+- Legacy repos being phased out stay L0: they receive propagate PRs but docs-lint
+  never blocks them, so no effort goes into documenting code that is being decommissioned.
 
 ## 11. Open decisions (org calls, not design choices)
 
 1. **Bot identity** for propagate + fleet report: dedicated GitHub App (recommended:
    scoped, auditable, no personal PAT) vs an existing org machine user. Owner:
    whoever governs org GitHub settings.
-2. **Reusable-workflow home**: this repo vs a dedicated `group-shared-workflows`
+2. **Reusable-workflow home**: this repo vs a dedicated shared-workflows
    repo, and flipping the org Actions access setting for private reuse.
    Recommended: this repo until a second shared workflow exists.
 3. **Enforcement SLA**: confirm the 2-sprint MAJOR grace window and whether
