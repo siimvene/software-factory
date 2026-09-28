@@ -55,6 +55,9 @@ Every claim carries its class, because the difference is the whole point of the 
   adopters to use.
 - `deploy/` is how the design is stood up: two runbooks, two checkers, and vendored copies of
   the plugins, the group standard and the wiring files. The prose follows this file; the
-  vendored trees under `deploy/marketplace/` and `deploy/standard/` are verbatim at a pinned
-  commit and exempt from the anonymisation rule, because a scrubbed plugin is a fork. They are
-  re-vendored, never edited.
+  vendored trees under `deploy/marketplace/` and `deploy/standard/` are copied at a pinned
+  commit with one mechanical scrub and no other edit: the group's name, GitHub organisation,
+  repository names, wiki space and page identifiers, domains and people's addresses are replaced
+  by placeholders (`<org>`, `group-*`, `dev@example.com`). The scrub is a published-repo
+  requirement; everything else in those trees stays as the group ships it. They are re-vendored
+  and re-scrubbed, never hand-edited.
