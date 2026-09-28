@@ -331,6 +331,37 @@ defect); that is the reviewer's job. Cost: the selected tests run twice plus one
 checkout; a handful of unit tests is seconds, the database-coupled ones the testbench's usual
 minute. The check is trusted only after it has refused one real test for passing on the base.
 
+### Money path agreement: the exits of one figure agree `[proposed, adr/0012]`
+
+Mutation and fail-on-base judge tests one module or one change at a time. A figure people pay on
+crosses modules and processes: it is parsed, computed, rounded, stored, advanced by a job and
+rendered into several exits. The money path map
+([templates/money-paths.yaml](../templates/money-paths.yaml)) names those hops, the test holding
+each one, and one agreement test per figure that asserts every exit against the others and
+against a hand-computed value from a numbered example. The measured cost of not having it is
+cycle 2's poller: the only hop that closed a rejected payment, on the money surface, scoped out by
+the ticket and caught only by the cross-vendor reviewer in the diff `[measured 2026-09-07]`.
+
+Design, `[proposed]`:
+
+- **The resolver self-tests, then checks.** Every location's file and symbol resolve; every hop
+  test and every exit's own test case is collected by the runner; every registration line a job
+  or route is `wired_by` still exists; every transaction-tier file is a location or declared
+  off-path with a reason. A planted misclassification withholds all output, as the surface
+  predicate does ([09-legacy-adoption](09-legacy-adoption.md) §d).
+- **A deleted hop, a removed registration or a dropped exit case fails the resolver** until the
+  same diff updates the map entry. The registration is the part a file-and-symbol check misses: a
+  poller whose code and unit test survive while nothing schedules it closes nothing.
+- **The diff selects the path.** A diff touching any mapped location, entry, hop, exit or
+  registration, adds the entry's hop tests and every exit case of its agreement test to the
+  pre-push receipt as must-pass. The fail-on-base check reads them as
+  declared characterization tests, because they exist before the change.
+- **Agreement plus an expected value.** Exits that only agree with each other pass a figure that
+  is wrong at its source; the numbered example's hand-computed value is part of the assertion.
+
+Rehearse it by replaying cycle 2's poller removal against a mapped payment-status entry: the
+resolver must refuse it, and must pass once the entry names the replacement.
+
 ### Rehearse the blocked direction
 
 Rehearse the BLOCKED path of a gate, not only the pass: a gate that cannot fail is not a gate. Check:

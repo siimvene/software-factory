@@ -1,0 +1,111 @@
+# MONEY PATH MAP (adr/0012). Lives in the code repository next to the money surface file
+# (docs/18-flightlist P2). One entry per figure or payment state people pay on. Written on Day 1
+# by a person with an agent; every money-lane change keeps it current in the same diff, and a
+# full-size money ticket's program design note (section 8) carries that diff.
+#
+# A hop is anything that reads, transforms, advances or displays the figure: a parser, a
+# calculation, a rounding step, a write, a scheduled job, an API serialiser, a view, a rendered
+# document, an outbound file. A hop without a test is a gap the resolver reports, never a blank.
+# Every location (entry, hop, exit) carries file and symbol, so a diff anywhere on the path
+# selects the path's tests. A hop that runs only because something registers it (a job, a route,
+# a queue consumer) carries wired_by: a list of every file and exact line that registers it (a
+# job registry entry and a timer unit are two registrations; removing either one stops the job).
+#
+# The resolver checks: every file and symbol resolves; every test and every exit's assert node id
+# is collected by the test runner; every wired_by line still exists; every transaction-tier file
+# of the surface is a location of some entry or is listed under off_path with a reason. Deleting a
+# hop, removing its registration or dropping an exit's case fails the resolver until this file
+# says what replaced it. A registration outside the repository is reported as unchecked.
+#
+# The names below are illustrative. Replace them; keep the keys.
+
+version: 1
+surface: money-surface.yaml
+# A reporting-tier entry may carry `agreement_test: none` plus `agreement_reason: <why>`; its
+# exits are then reported as unasserted, advisory. Transaction-tier entries may not.
+
+off_path:
+  - file: src/billing/demo_seed.py
+    reason: seeding behind a flag that is off in production; never reaches an exit
+
+paths:
+  - id: invoice-total
+    tier: transaction
+    figure: the total one unit is invoiced for one billing period
+    unit: EUR, decimal end to end, 2 places at the exits
+    entry:
+      - file: src/readings/service.py
+        symbol: record_reading
+        does: accepts the meter reading the charge derives from
+        test: tests/readings/test_service.py::test_record_reading_rejects_regression
+    hops:
+      - file: src/billing/charges.py
+        symbol: compute_unit_charge
+        does: tariff times consumption, per line
+        rounds: never; lines stay exact
+        test: tests/billing/test_charges.py::test_unit_charge_per_tariff
+      - file: src/billing/invoices.py
+        symbol: build_invoice
+        does: sums the lines into the invoice total
+        rounds: half-even to cents, once, after the sum
+        test: tests/billing/test_invoices.py::test_total_rounds_once_after_sum
+      - file: src/documents/invoice_pdf.py
+        symbol: render
+        does: prints the stored total, never recomputes it
+        test: tests/documents/test_invoice_pdf.py::test_prints_stored_total
+    exits:
+      - kind: stored
+        file: src/billing/models.py
+        symbol: Invoice.total
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[stored]
+      - kind: api
+        file: src/api/invoices.py
+        symbol: get_invoice
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[api]
+      - kind: view
+        file: frontend/pages/invoices/[id].vue
+        symbol: InvoiceTotal
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[view]
+      - kind: document
+        file: src/documents/invoice_pdf.py
+        symbol: render
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[pdf]
+      - kind: outbound
+        file: src/einvoice/builder.py
+        symbol: build_einvoice
+        assert: tests/money_paths/test_invoice_total.py::test_exit_agrees[einvoice]
+    agreement_test: tests/money_paths/test_invoice_total.py::test_exit_agrees
+    expected_from: the numbered example in the ticket that introduced the figure (AC-3, 128.47)
+
+  - id: payment-status
+    tier: transaction
+    figure: the state of one payment, from initiated to settled or rejected
+    unit: state
+    entry:
+      - file: src/payments/initiate.py
+        symbol: initiate_payment
+        does: creates the payment in state initiated
+        test: tests/payments/test_initiate.py::test_creates_initiated
+    hops:
+      - job: status poller, every 15 minutes
+        file: src/payments/poller.py
+        symbol: poll_pending
+        wired_by:
+          - file: src/tasks/run.py
+            line: '"poll_pending": poll_pending,'
+          - file: deploy/task@poll_pending.timer
+            line: 'Unit=task@poll_pending.service'
+        does: advances initiated to settled or rejected from the bank's answer; the only hop that
+          closes an abandoned or rejected payment
+        test: tests/payments/test_poller.py::test_rejected_payment_closes
+    exits:
+      - kind: stored
+        file: src/payments/models.py
+        symbol: Payment.state
+        assert: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry[stored]
+      - kind: view
+        file: frontend/components/PayButton.vue
+        symbol: PayButton
+        assert: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry[view]
+    agreement_test: tests/money_paths/test_payment_status.py::test_rejected_unblocks_retry
+    expected_from: the ticket's AC-2, a rejected payment leaves the invoice payable again
