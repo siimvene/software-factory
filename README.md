@@ -19,6 +19,8 @@ legacy Java core of 75 modules inside a group of companies. Every mechanism here
 measured in one of those two places or is labelled as designed or proposed. `STATUS.md` is the
 ledger.
 
+![The factory as components: intent from the CEO, PMs and engineers becomes a spec, the agent builds it in a worktree with tests red first, gates (ratchets, architecture diff, cross-vendor review, scanners, CI) verify it, the pull request arrives reviewed and the owner merges, release is separate from merge, and complaints, feature requests and incidents from users and monitoring feed the next spec. Human hours go into writing the ticket and accepting the behaviour; machine time goes into building, verifying and preparing the evidence.](docs/img/factory-components.png)
+
 ## The claim in one paragraph
 
 An agent generates code faster than people can read it. So the review load has to move off
@@ -29,6 +31,19 @@ context). What compounds is not the model, it is the verification net, the team 
 plane and the gates: every feature that lands makes the next one cheaper and safer. That is
 the flywheel. The humans that remain do three things: approve intent, accept behaviour on
 evidence, and press release.
+
+![Where the cost went: before agents, programming was the widest stage; with agents, programming shrinks and verification becomes the widest stage, with requirements, architecture and infrastructure in between.](docs/img/where-the-cost-went.png)
+
+The picture is illustrative, not to scale. The measured anchor: the cross-vendor review alone
+took 52 to 58 % of the time from dev hat on to PR open in cycles 1 and 2 (`STATUS.md`).
+
+## The loop
+
+![The loop: SPEC (a person approves), BUILD (tests red first), VERIFY (sensors, then review), SHIP (the owner merges), LEARN (two write-backs), around a team-context hub of specs, decisions and memory that every turn reads at start and LEARN writes back to. Specs regenerate from merged code and are never hand-edited; memory is written at discovery and promoted by a reviewed PR.](docs/img/the-loop.png)
+
+One turn per ticket. The hub is read at the start of every turn and written back at the end,
+always through a pull request a person reviews, so turn N+1 starts from what turn N learned.
+[02-loop](docs/02-loop.md) is the full document.
 
 ## Before the code: the PM surface
 
@@ -78,43 +93,13 @@ before a pull request exists. Two run after it. The order is an economic argumen
 the reviewer is the most expensive resource on the line, so a review of code that a ratchet
 would have failed is waste.
 
-```mermaid
-flowchart TB
-    subgraph SPEC["before the code: the PM surface"]
-        direction TB
-        L0["Ticket with numbered examples<br/>PM workspace skills · readiness 85 of 100<br/>approved Ready by a person"]
-    end
-    subgraph ERGO["off the critical path: ergonomics, not gates"]
-        direction TB
-        L1["Orientation map · sensor 1<br/>ripwire · pre-write<br/>rank symbols before opening a file"]
-        L2["YAGNI ladder · sensor 2<br/>chisle · during write<br/>7 rungs before code exists"]
-    end
-    subgraph GATES["gates: each refuses with a file, a line and a reason"]
-        direction TB
-        L3["The net<br/>tests, aggregate coverage, mutation, fail-on-base<br/>refuses silent behaviour change"]
-        L4["Quality ratchets · sensor 3<br/>cleat · Stop hook, PreToolUse guard<br/>refuses decay"]
-        L5["Architecture diff · sensor 4<br/>enola · SessionStart snapshot, Stop diff<br/>refuses layer violations, cycles, spillover"]
-        L6["Adversarial review · sensor 5<br/>consort · pre-push, cross-vendor<br/>refuses judgement failures"]
-        L7["Scanners<br/>dependencies, secrets, static analysis<br/>refuses known-bad"]
-    end
-    subgraph AFTER["after the pull request exists"]
-        direction TB
-        L8["CI<br/>mechanical only, no review<br/>refuses a local pass nobody can reproduce"]
-        L9["Human gate<br/>named outcome sign-off, human merge, human release<br/>refuses an outcome nobody accepted"]
-    end
-    L0 --> L1 --> L2 --> L3 --> L4 --> L5 --> L6 --> L7 --> L8 --> L9
+![The line, end to end. Before the code: the ticket, approved Ready by a person (measured). Off the critical path, ergonomics and not gates: the orientation map, sensor 1, ripwire (designed), and the YAGNI ladder, sensor 2, chisle (designed). Gates inside the agent's loop before a pull request exists: the net, tests and mutation (measured); quality ratchets, sensor 3, cleat (measured); architecture diff, sensor 4, enola (designed); adversarial review, sensor 5, consort, cross-vendor (measured); scanners (measured). After the pull request exists: CI, mechanical only (measured), and the human gate, a named person who signs off, merges and releases (measured).](docs/img/the-line.png)
 
-    classDef measured fill:#e8f3ec,stroke:#2f6b3f,stroke-width:1.5px,color:#14181b;
-    classDef designed fill:#fdf1e3,stroke:#c2610c,stroke-width:1.5px,color:#14181b;
-    classDef frame fill:#00000000,stroke:#aab6b8,stroke-width:1px,color:#5d686d;
-    class L0,L3,L4,L6,L7,L8,L9 measured;
-    class L1,L2,L5 designed;
-    class SPEC,ERGO,GATES,AFTER frame;
-```
-
-Fill is the evidence class, never the severity: green is **measured**, amber is **designed**
-(wired, not yet exercised end to end). `STATUS.md` is the ledger and wins any disagreement with
-this picture.
+Colour is the evidence class, never the severity: green is **measured**, amber is **designed**
+(wired, not yet exercised end to end), and a dashed card is ergonomics rather than a gate.
+`STATUS.md` is the ledger and wins any disagreement with this picture. The picture is rendered
+from [docs/img/src/the-line.html](docs/img/src/the-line.html) by `docs/img/src/render.sh`;
+edit the HTML and re-render, never the PNG.
 
 | Layer | Tool | When | Refuses | Class |
 |---|---|---|---|---|
