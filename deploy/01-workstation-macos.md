@@ -141,7 +141,7 @@ shasum -a 256 -c "enola-$V-$A.sha256" && tar -xzf "enola-$V-$A.tar.gz" && instal
 # RIPWIRE_NO_ACTIVATE=1 keeps it from editing your agent config.
 git clone https://github.com/redhat-et/ripwire /tmp/ripwire && git -C /tmp/ripwire checkout e663ca8f8
 less /tmp/ripwire/skills/install.sh && RIPWIRE_NO_ACTIVATE=1 bash /tmp/ripwire/skills/install.sh
-# sensor 2: chisle is a marketplace plugin registered PER PROJECT by the scaffold, pinned to tag v3.0.0; nothing to do here
+# sensor 2: chisle is a plugin, installed at user scope in the plugins section below
 ```
 
 Make sure `~/.local/bin` is on PATH in `~/.zshrc`. The reference machine keeps lizard in its own
@@ -193,8 +193,15 @@ catalog at pinned versions ([README.md](README.md) has the pins). Install per ro
 | Engineer | `secret-guard`, `spec-repos`, `team-memory`, `rule-packs`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |
 
-Project scope, written by the scaffold into the repo's tracked settings: `chisle` pinned to tag
-v3.0.0. Do not install it at user scope; the pin is the point and the pin lives in the repo.
+`chisle` (sensor 2) is installed at user scope and enabled per project by the scaffold. Pin its
+marketplace first: add an `extraKnownMarketplaces` entry `chisle` with source
+`{"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}` to `~/.claude/settings.json`,
+then run `claude plugin install chisle@chisle --scope user`, and check that the `gitCommitSha`
+recorded in `~/.claude/plugins/installed_plugins.json` is the tag's commit
+(`git ls-remote https://github.com/JayPokale/Chisle refs/tags/v3.0.0`). Do not rely on the project
+scope: a project-scope install is keyed to one exact directory, so every new worktree runs
+without the plugin. On the reference implementation it stopped loading for a week that way
+([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)).
 
 The `claude plugin marketplace add` commands above track each source's default branch, and a
 plugin runs code. Where the source has tags, pin it the way the scaffold pins chisle: an

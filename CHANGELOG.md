@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.14 (2026-09-29)
+
+Sensors 1, 2 and 4 on the ledger: what a trial could measure and what it could not.
+
+- `evidence/kvart-sensor-trial-2026-09-29.md`: five instruments on kvart. The ripwire index
+  across worktrees (4 of 4 cases). chisle's install scope and an audit of its output elisions (67,
+  1 suspected silent loss). An enola backtest over 201 merges (0 regressions, planted control
+  caught) with the live false-block record. One brief built three times with one sensor varied
+  per run, and a two-vendor review of each.
+- `STATUS.md`: ripwire and chisle move to measured for the index and the elision; their effect on
+  a build stays designed. enola's catch stays designed, with the backtest and false-block record
+  in the note.
+- `docs/05-sensor-stack.md`: the measured results in layers 1, 2 and 4 and the wiring table;
+  plugins install at user scope and are enabled per project.
+- `deploy/01-workstation-macos.md`, `deploy/02-scaffold-a-project.md`: chisle installs at user
+  scope behind a pinned marketplace. `deploy/bin/check-workstation.sh` checks the plugin instead
+  of the marketplace, and a missing plugin now fails the check.
+
 ## 0.2.13 (2026-09-28)
 
 Lights-on, company-agnostic, and pictures that read.
