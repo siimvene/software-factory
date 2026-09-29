@@ -71,10 +71,10 @@ What is wired where, as of 2026-09-07:
 
 | # | Layer | Checks in use | kvart | The legacy core |
 |---|---|---|---|---|
-| 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired, index unverified across worktrees | not wired |
-| 2 | chisle | plugin at project scope, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail), no trial on a complex task yet | not wired |
+| 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired; index correct per worktree `[measured 2026-09-29]`; unused by a headless builder | not wired |
+| 2 | chisle | plugin installed at user scope and off there, switched on per project, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
-| 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once | not wired |
+| 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once; backtest 201 merges, 0 regressions `[measured 2026-09-29]` | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
 | 5a | e2e receipt gate | scoped browser QA, receipt per git tree, pre-push check | wired `[measured 2026-09-09]` | not wired |
 | 5b | sonar receipt gate | local SonarQube scoped by changed sources, receipt per tree plus project set | built, not yet exercised end to end `[designed 2026-09-09]` | not wired |
@@ -96,9 +96,15 @@ Reflexes it installs: rank before reading; expand one symbol rather than open it
 for an exemplar before writing a new helper; run a quality delta before calling work done.
 
 Caveats before production adoption: keyword retrieval can miss domain vocabulary (verify on real
-tasks with the project's identifiers); confirm the index behaves in a worktree-per-agent
-layout, because that is exactly the 3 to 5 trees-per-operator pattern the factory runs
-`[designed]`.
+tasks with the project's identifiers). The worktree-per-agent layout is safe: the MCP server
+indexes the root it runs in, finds a symbol planted only in that worktree and not on the main
+checkout, re-indexes an edit made mid-session in about 10 s, drops a deleted symbol, and does not
+read worktrees nested under the main checkout `[measured 2026-09-29]`. What is not measured is
+the effect on a build. A headless builder with the server available made 0 calls to it and did
+128 of its 138 calls in the shell, while interactive sessions reach for it routinely. A tool the
+builder does not call orients nothing: the rule file has to make it the first move, and a trial
+has to count the calls before it counts the savings
+([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)).
 
 ## Layer 2: YAGNI ladder (during write)
 
@@ -131,8 +137,24 @@ is the tag v3.0.0 (released 2026-07-28), and the cached plugin content was verif
 tag's commit rather than the branch head; a tag can move, so a fork or the organisation's vetted
 catalog remains the real pin. Tool-output elision is a context-cost mechanism, not a sensor: it
 changes what the model reads, and a compressed result that hid an error line the agent needed
-would be a new failure class, not yet observed `[designed; trial on one complex multi-file task
-before rollout]`.
+would be a new failure class. The audit so far: 67 elisions in kvart sessions, none followed by a
+re-fetch that the elision caused, and 1 suspected silent loss, where an orchestrator was shown
+ticket briefs with 19 lines elided and its next turn called them complete `[measured 2026-09-29]`.
+
+Trial on a complex ticket (KVART-256, one build per arm, same brief and base): with the plugin
+$19.53 and $26.30, without it $31.03. The two runs with it differed only in a tool neither
+called, so their 35 % gap is the run-to-run spread, and the saving sits inside it. The cheapest
+run was the one that redefined an acceptance example and said so only under assumptions. n = 1
+per arm; the effect needs several runs per arm `[measured 2026-09-29]`.
+
+Install it at user scope, switch it off there, and switch it on per project. A project-scope
+plugin install is keyed to one exact directory, so in a worktree-per-agent layout every new
+worktree runs without it; on kvart it had silently stopped loading for a week before anyone
+looked `[measured 2026-09-29]`. The user-scope install writes the switch as on for every
+repository, and an output hook that reads every tool result should run only where a project
+opted in, so the user-level switch is set to off and the project's tracked settings turn it on
+(verified by the plugin list at session start: on in kvart, off in another repository, off where
+a local settings file disables it).
 
 ## Layer 3: quality ratchets (post-write)
 
@@ -409,6 +431,16 @@ planted cases, clean tree 11 s. The first cut was a one-liner; the cross-vendor 
 three real problems in that one line (no continuation handling, so an infinite block; tool
 exit codes swallowed; the directory bug) `[measured 2026-09-07]` (kvart #24).
 
+What it has caught since: nothing, and nothing was there to catch. A backtest graded all 201
+merges since the configuration landed, each against a baseline pinned at its first parent: 199
+clean, 0 regressions, 2 incomparable because the merge changed the ignore globs; a planted
+models-to-entry import was caught. Over the same 13 days the live hook blocked 12 times, all
+false positives from working-tree state the committed code does not have: a cycle between the
+frontend and its generated `.nuxt` directory, and worktrees nested inside the checkout being
+scanned as source. It also reported 10 times that it could not run, mostly because the baseline
+was not comparable. Put generated output and nested worktrees in the ignore globs from the start, and
+count a gate's false blocks next to its catches `[measured 2026-09-29]`.
+
 ## Wiring, as measured on kvart
 
 - Hooks live in the tracked agent settings file: PreToolUse guard, Stop (ratchet gate on changed
@@ -420,7 +452,10 @@ exit codes swallowed; the directory bug) `[measured 2026-09-07]` (kvart #24).
 - The settings file is a supply-chain tripwire, so it is tracked and its diff reviewed. The
   attach step wrote exactly two hooks, both invoking the gate; verified by diff.
 - Two agent config directories exist on one machine (plain terminal vs the canvas runtime);
-  a plugin registered in one is absent in the other.
+  a plugin registered in one is absent in the other. Install plugins at user scope in each one,
+  switch them off there, and switch them on per project: a project-scope install binds to one
+  directory, which a worktree-per-agent layout never reuses. Check with the plugin list a session
+  prints at start, not with the settings file.
 - Rule files for layers 1 and 4 sit next to the other path-scoped rules and say when to reach
   for each verb. See [templates/sensor-config-examples.md](../templates/sensor-config-examples.md).
 
