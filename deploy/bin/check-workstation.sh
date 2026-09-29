@@ -50,6 +50,19 @@ d=json.load(open(p)) if os.path.exists(p) else {}
 sys.exit(0 if d.get('enabledPlugins',{}).get(sys.argv[1]) else 1)
 PY
 }
+CHISLE_SHA=a5486fa112c961f9b25349a29ede38cc9f2a1a5c
+chisle_install_state() { CFG="$CFG" SHA="$CHISLE_SHA" python3 - <<'PY' 2>/dev/null || echo broken
+import json, os
+cfg = os.environ['CFG']
+inst = json.load(open(os.path.join(cfg, 'plugins', 'installed_plugins.json')))
+user = [e for e in inst.get('plugins', {}).get('chisle@chisle', []) if e.get('scope') == 'user']
+known = json.load(open(os.path.join(cfg, 'plugins', 'known_marketplaces.json'))).get('chisle', {})
+src = known.get('source', {})
+ok = (any(e.get('gitCommitSha') == os.environ['SHA'] for e in user)
+      and src.get('repo') == 'JayPokale/Chisle' and src.get('ref') == 'v3.0.0')
+print('pinned' if ok else 'unpinned')
+PY
+}
 marketplace_known() { CFG="$CFG" python3 - "$1" <<'PY' 2>/dev/null
 import json,os,sys
 p=os.path.join(os.environ['CFG'],'plugins/known_marketplaces.json')
@@ -84,7 +97,15 @@ else
 fi
 plugin_enabled consort@consort && ok "plugin consort@consort" || { [ $PM -eq 1 ] && skip "plugin consort@consort" "PM profile" || miss "plugin consort@consort" "claude plugin marketplace add siimvene/consort && claude plugin install consort@consort"; }
 marketplace_known software-factory && ok "marketplace software-factory" || miss "marketplace software-factory" "claude plugin marketplace add <path>/software-factory/deploy/marketplace"
-plugin_enabled chisle@chisle && ok "plugin chisle@chisle (user scope)" || { [ $PM -eq 1 ] && skip "plugin chisle@chisle" "PM profile" || miss "plugin chisle@chisle" "pin the chisle marketplace to v3.0.0, then: claude plugin install chisle@chisle --scope user"; }
+if [ $PM -eq 1 ]; then
+  skip "plugin chisle@chisle" "PM profile"
+else
+  case "$(chisle_install_state)" in
+    pinned) ok "plugin chisle@chisle (user scope, pinned commit, marketplace ref v3.0.0)" ;;
+    *) miss "plugin chisle@chisle" "pin the marketplace to ref v3.0.0, claude plugin install chisle@chisle --scope user, installed commit must be $CHISLE_SHA" ;;
+  esac
+  plugin_enabled chisle@chisle && warn "plugin chisle@chisle on for every repository" "set enabledPlugins chisle@chisle to false in $CFG/settings.json; projects switch it on"
+fi
 
 if [ $PM -eq 1 ]; then
   echo "== PM profile: engineer-only sections skipped (sensors, reviewers, scanners, containers)"

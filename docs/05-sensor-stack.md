@@ -72,7 +72,7 @@ What is wired where, as of 2026-09-07:
 | # | Layer | Checks in use | kvart | The legacy core |
 |---|---|---|---|---|
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired; index correct per worktree `[measured 2026-09-29]`; unused by a headless builder | not wired |
-| 2 | chisle | plugin installed at user scope, enabled per project, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
+| 2 | chisle | plugin installed at user scope and off there, switched on per project, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once; backtest 201 merges, 0 regressions `[measured 2026-09-29]` | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
@@ -147,9 +147,14 @@ called, so their 35 % gap is the run-to-run spread, and the saving sits inside i
 run was the one that redefined an acceptance example and said so only under assumptions. n = 1
 per arm; the effect needs several runs per arm `[measured 2026-09-29]`.
 
-Install it at user scope and enable it per project. A project-scope plugin install is keyed to
-one exact directory, so in a worktree-per-agent layout every new worktree runs without it. On
-kvart it had silently stopped loading for a week before anyone looked `[measured 2026-09-29]`.
+Install it at user scope, switch it off there, and switch it on per project. A project-scope
+plugin install is keyed to one exact directory, so in a worktree-per-agent layout every new
+worktree runs without it; on kvart it had silently stopped loading for a week before anyone
+looked `[measured 2026-09-29]`. The user-scope install writes the switch as on for every
+repository, and an output hook that reads every tool result should run only where a project
+opted in, so the user-level switch is set to off and the project's tracked settings turn it on
+(verified by the plugin list at session start: on in kvart, off in another repository, off where
+a local settings file disables it).
 
 ## Layer 3: quality ratchets (post-write)
 
@@ -447,10 +452,10 @@ count a gate's false blocks next to its catches `[measured 2026-09-29]`.
 - The settings file is a supply-chain tripwire, so it is tracked and its diff reviewed. The
   attach step wrote exactly two hooks, both invoking the gate; verified by diff.
 - Two agent config directories exist on one machine (plain terminal vs the canvas runtime);
-  a plugin registered in one is absent in the other. Install plugins at user scope in each one
-  and enable them per project: a project-scope install binds to one directory, which a
-  worktree-per-agent layout never reuses. Check with the plugin list a session prints at start,
-  not with the settings file.
+  a plugin registered in one is absent in the other. Install plugins at user scope in each one,
+  switch them off there, and switch them on per project: a project-scope install binds to one
+  directory, which a worktree-per-agent layout never reuses. Check with the plugin list a session
+  prints at start, not with the settings file.
 - Rule files for layers 1 and 4 sit next to the other path-scoped rules and say when to reach
   for each verb. See [templates/sensor-config-examples.md](../templates/sensor-config-examples.md).
 

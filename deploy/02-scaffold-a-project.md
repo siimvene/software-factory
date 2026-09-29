@@ -214,8 +214,8 @@ mkdir -p scripts/claude-hooks && cp $SF/deploy/templates/claude-hooks/enola-stop
 Read the settings file you just copied: a PreToolUse guard that refuses edits to the gate
 policy, a Stop hook that runs the ratchets on changed files and then the architecture check,
 a SessionStart hook for the architecture snapshot, `chisle` enabled from a marketplace pinned
-to tag v3.0.0 (the install itself is user scope; a project-scope install would bind to this
-directory and miss every worktree). Every entry is PATH-guarded so it is a no-op where a binary is absent. Make sure
+to tag v3.0.0 (the install itself is user scope and switched off there; a project-scope install would
+bind to this directory and miss every worktree). Every entry is PATH-guarded so it is a no-op where a binary is absent. Make sure
 `.gitignore` tracks `.claude/settings.json`, `.claude/rules/` and any skill you want every
 worktree to have, and ignores the rest of `.claude/` (kvart's pattern: `.claude/*` then
 `!.claude/rules/`, `!.claude/settings.json`).

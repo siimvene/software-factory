@@ -25,9 +25,12 @@ inside a session, and does not read nested worktrees `[measured 2026-09-29]`.
 scope, and a project-scope install is keyed to one exact directory. The install was recorded
 for a scratchpad path only, so the main checkout and every worktree ran without it: no elision
 in any kvart transcript after 2026-09-22, and a session's startup plugin list did not contain it
-`[measured 2026-09-29]`. Fixed the same day by a user-scope install at the same pin (installed
-commit `a5486fa112` equals the `v3.0.0` tag), then confirmed by the plugin list in the main
-checkout, in another repository, and absent where a local settings file disables it.
+`[measured 2026-09-29]`. Fixed the same day: a user-scope install at the same pin (installed
+commit `a5486fa112` equals the `v3.0.0` tag), the user-level switch set to off because the install
+writes it as on for every repository, and the project's tracked settings switching it on. Checked
+by the plugin list at session start: on in the main checkout, off in another repository, off where
+a local settings file disables it. The blind security pass on this change caught the user-level
+switch: the first cut had left chisle on in every repository.
 
 **Elision audit.** Every kvart transcript on the reference machine (2,751 files):
 - 67 elisions: 59 shell outputs, 7 memory searches, 1 tracker search.
