@@ -84,7 +84,7 @@ else
 fi
 plugin_enabled consort@consort && ok "plugin consort@consort" || { [ $PM -eq 1 ] && skip "plugin consort@consort" "PM profile" || miss "plugin consort@consort" "claude plugin marketplace add siimvene/consort && claude plugin install consort@consort"; }
 marketplace_known software-factory && ok "marketplace software-factory" || miss "marketplace software-factory" "claude plugin marketplace add <path>/software-factory/deploy/marketplace"
-marketplace_known chisle && ok "marketplace chisle" || { [ $PM -eq 1 ] && skip "marketplace chisle" "PM profile" || warn "marketplace chisle" "registered per project by the scaffold (pinned tag)"; }
+plugin_enabled chisle@chisle && ok "plugin chisle@chisle (user scope)" || { [ $PM -eq 1 ] && skip "plugin chisle@chisle" "PM profile" || miss "plugin chisle@chisle" "pin the chisle marketplace to v3.0.0, then: claude plugin install chisle@chisle --scope user"; }
 
 if [ $PM -eq 1 ]; then
   echo "== PM profile: engineer-only sections skipped (sensors, reviewers, scanners, containers)"
