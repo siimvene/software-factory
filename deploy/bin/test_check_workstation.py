@@ -221,18 +221,27 @@ class Fixture:
         )
 
     def chisle_install(
-        self, sha: str = CHISLE_SHA, ref: str | None = "v3.0.0", scope: str = "user"
+        self,
+        sha: str = CHISLE_SHA,
+        ref: str | None = "v3.0.0",
+        scope: str = "user",
+        kind: str = "github",
+        loadable: bool = True,
     ) -> None:
-        source = {"source": "github", "repo": "JayPokale/Chisle"}
+        source = {"source": kind, "repo": "JayPokale/Chisle"}
         if ref is not None:
             source["ref"] = ref
         (self.cfg / "plugins" / "known_marketplaces.json").write_text(
             json.dumps({"software-factory": {}, "chisle": {"source": source}})
         )
+        install = self.cfg / "plugins" / "cache" / "chisle" / "chisle" / "3.0.0"
+        (install / ".claude-plugin").mkdir(parents=True, exist_ok=True)
+        (install / ".claude-plugin" / "plugin.json").write_text('{"name": "chisle"}')
+        if not loadable:
+            (install / ".claude-plugin" / "plugin.json").unlink()
+        entry = {"scope": scope, "version": "3.0.0", "gitCommitSha": sha, "installPath": str(install)}
         (self.cfg / "plugins" / "installed_plugins.json").write_text(
-            json.dumps(
-                {"version": 2, "plugins": {"chisle@chisle": [{"scope": scope, "version": "3.0.0", "gitCommitSha": sha}]}}
-            )
+            json.dumps({"version": 2, "plugins": {"chisle@chisle": [entry]}})
         )
 
     def write_settings(self, data: dict) -> None:
@@ -413,7 +422,7 @@ class CheckWorkstationTests(unittest.TestCase):
         out, code = self._reference_run()
         self.assertEqual(code, 0, out)
         self.assertIn("OK       plugin chisle@chisle (user scope, pinned commit", out)
-        self.assertNotIn("on for every repository", out)
+        self.assertNotIn("chisle off at user scope", out)
 
     def test_chisle_other_commit_missing(self) -> None:
         self.fx.chisle_install(sha="0" * 40)
@@ -433,7 +442,19 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertEqual(code, 1, out)
         self.assertIn("MISSING  plugin chisle@chisle", out)
 
-    def test_chisle_on_for_every_repository_warns(self) -> None:
+    def test_chisle_missing_install_path_missing(self) -> None:
+        self.fx.chisle_install(loadable=False)
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_non_github_source_missing(self) -> None:
+        self.fx.chisle_install(kind="directory")
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_on_for_every_repository_fails(self) -> None:
         self.fx.write_settings(
             {
                 "enabledPlugins": {
@@ -445,8 +466,8 @@ class CheckWorkstationTests(unittest.TestCase):
             }
         )
         out, code = self._reference_run()
-        self.assertEqual(code, 0, out)
-        self.assertIn("OPTIONAL plugin chisle@chisle on for every repository", out)
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  chisle off at user scope", out)
 
     def test_vertex_reference_success(self) -> None:
         self.fx.reviewer_stubs("codex", "pi", "gcloud", "rg", "fd")

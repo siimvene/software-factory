@@ -58,7 +58,9 @@ inst = json.load(open(os.path.join(cfg, 'plugins', 'installed_plugins.json')))
 user = [e for e in inst.get('plugins', {}).get('chisle@chisle', []) if e.get('scope') == 'user']
 known = json.load(open(os.path.join(cfg, 'plugins', 'known_marketplaces.json'))).get('chisle', {})
 src = known.get('source', {})
-ok = (any(e.get('gitCommitSha') == os.environ['SHA'] for e in user)
+loadable = [e for e in user if e.get('gitCommitSha') == os.environ['SHA']
+            and os.path.isfile(os.path.join(e.get('installPath') or '/nonexistent', '.claude-plugin', 'plugin.json'))]
+ok = (bool(loadable) and src.get('source') == 'github'
       and src.get('repo') == 'JayPokale/Chisle' and src.get('ref') == 'v3.0.0')
 print('pinned' if ok else 'unpinned')
 PY
@@ -102,9 +104,9 @@ if [ $PM -eq 1 ]; then
 else
   case "$(chisle_install_state)" in
     pinned) ok "plugin chisle@chisle (user scope, pinned commit, marketplace ref v3.0.0)" ;;
-    *) miss "plugin chisle@chisle" "pin the marketplace to ref v3.0.0, claude plugin install chisle@chisle --scope user, installed commit must be $CHISLE_SHA" ;;
+    *) miss "plugin chisle@chisle" "pin the marketplace (github JayPokale/Chisle, ref v3.0.0), claude plugin install chisle@chisle --scope user; installed commit must be $CHISLE_SHA and its installPath must exist" ;;
   esac
-  plugin_enabled chisle@chisle && warn "plugin chisle@chisle on for every repository" "set enabledPlugins chisle@chisle to false in $CFG/settings.json; projects switch it on"
+  plugin_enabled chisle@chisle && miss "chisle off at user scope" "enabledPlugins chisle@chisle is on for every repository: set it to false in $CFG/settings.json; projects switch it on"
 fi
 
 if [ $PM -eq 1 ]; then
