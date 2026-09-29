@@ -15,8 +15,10 @@ Sensors 1, 2 and 4 on the ledger: what a trial could measure and what it could n
 - `docs/05-sensor-stack.md`: the measured results in layers 1, 2 and 4 and the wiring table;
   plugins install at user scope and are enabled per project.
 - `deploy/01-workstation-macos.md`, `deploy/02-scaffold-a-project.md`: chisle installs at user
-  scope behind a pinned marketplace. `deploy/bin/check-workstation.sh` checks the plugin instead
-  of the marketplace, and a missing plugin now fails the check.
+  scope behind a pinned marketplace, switched off there and on per project.
+  `deploy/bin/check-workstation.sh` checks the installed commit against the literal pin and the
+  marketplace ref, fails on a missing or unpinned install, and warns when the plugin is on for
+  every repository.
 
 ## 0.2.13 (2026-09-28)
 
