@@ -16,9 +16,10 @@ Sensors 1, 2 and 4 on the ledger: what a trial could measure and what it could n
   plugins install at user scope and are enabled per project.
 - `deploy/01-workstation-macos.md`, `deploy/02-scaffold-a-project.md`: chisle installs at user
   scope behind a pinned marketplace, switched off there and on per project.
-  `deploy/bin/check-workstation.sh` checks the installed commit against the literal pin and the
-  marketplace ref, fails on a missing or unpinned install, and warns when the plugin is on for
-  every repository.
+  `deploy/bin/check-workstation.sh` checks the installed commit against the literal pin, the
+  install path, and the marketplace source and ref, and fails on a missing, unpinned or
+  project-scope install and on a plugin switched on for every repository.
+  `deploy/bin/check-project.sh` fails when the project does not switch it on.
 
 ## 0.2.13 (2026-09-28)
 
