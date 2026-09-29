@@ -51,7 +51,7 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 | cleat | quality ratchets (sensor 3) | fork `siimvene/cleat` @ `c2947a5` | vendored into each project by `attach.py` |
 | enola | architecture diff (sensor 4) | 0.4.19, the same pin in `templates/github/workflows/gates.yml` | `enola-labs/enola` releases, sha256-verified |
 | ripwire | orientation map (sensor 1) | 0.4.0 | `redhat-et/ripwire` installer |
-| chisle | YAGNI ladder (sensor 2) | tag v3.0.0 | marketplace `JayPokale/Chisle`, pinned to the tag, project scope |
+| chisle | YAGNI ladder (sensor 2) | tag v3.0.0, commit `a5486fa112` | marketplace `JayPokale/Chisle` pinned to the tag; installed at user scope and switched off there, switched on per project |
 | claude-hud | status line | 0.6.0 | marketplace `jarrodwatts/claude-hud` |
 | lizard | complexity analyzer for cleat | 1.23.0 | `uv tool install lizard==1.23.0` |
 | Trivy | secrets, misconfig, dependency scan | 0.74.0 | Homebrew `trivy` |

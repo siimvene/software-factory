@@ -37,6 +37,11 @@ f .claude/settings.json "tracked hooks: cleat guard + stop, enola stop + session
 g .claude/settings.json 'gate.py --guard' "PreToolUse cleat guard"
 g .claude/settings.json 'gate.py --hook' "Stop cleat hook"
 g .claude/settings.json 'enola-stop.sh' "Stop enola hook"
+if [ -f .claude/settings.json ] && python3 -c 'import json,sys; sys.exit(0 if json.load(open(".claude/settings.json")).get("enabledPlugins",{}).get("chisle@chisle") is True else 1)' 2>/dev/null; then
+  ok "chisle on for this project" "sensor 2, enabledPlugins in the tracked settings"
+else
+  miss "chisle on for this project" "enabledPlugins chisle@chisle: true in .claude/settings.json (the install is user scope and off there)"
+fi
 f scripts/claude-hooks/enola-stop.sh
 f .mcp.json "ripwire + enola MCP servers"
 fo .claude/rules/ripwire.md "orientation-map rule"

@@ -158,6 +158,8 @@ def _hash_file(path: Path) -> bytes:
     return hashlib.sha256(path.read_bytes()).digest()
 
 
+CHISLE_SHA = "a5486fa112c961f9b25349a29ede38cc9f2a1a5c"
+
 class Fixture:
     def __init__(self) -> None:
         self.tmp = Path(tempfile.mkdtemp(prefix="sf-ws-"))
@@ -207,9 +209,7 @@ class Fixture:
         (self.home / "git" / "cleat" / "quality" / "bin").mkdir(parents=True)
         (self.home / "git" / "cleat" / "quality" / "bin" / "keep").write_text("")
         (self.cfg / "plugins").mkdir()
-        (self.cfg / "plugins" / "known_marketplaces.json").write_text(
-            json.dumps({"software-factory": {}, "chisle": {}})
-        )
+        self.chisle_install()
         self.write_settings(
             {
                 "enabledPlugins": {
@@ -218,6 +218,30 @@ class Fixture:
                     "consort@consort": True,
                 }
             }
+        )
+
+    def chisle_install(
+        self,
+        sha: str = CHISLE_SHA,
+        ref: str | None = "v3.0.0",
+        scope: str = "user",
+        kind: str = "github",
+        loadable: bool = True,
+    ) -> None:
+        source = {"source": kind, "repo": "JayPokale/Chisle"}
+        if ref is not None:
+            source["ref"] = ref
+        (self.cfg / "plugins" / "known_marketplaces.json").write_text(
+            json.dumps({"software-factory": {}, "chisle": {"source": source}})
+        )
+        install = self.cfg / "plugins" / "cache" / "chisle" / "chisle" / "3.0.0"
+        (install / ".claude-plugin").mkdir(parents=True, exist_ok=True)
+        (install / ".claude-plugin" / "plugin.json").write_text('{"name": "chisle"}')
+        if not loadable:
+            (install / ".claude-plugin" / "plugin.json").unlink()
+        entry = {"scope": scope, "version": "3.0.0", "gitCommitSha": sha, "installPath": str(install)}
+        (self.cfg / "plugins" / "installed_plugins.json").write_text(
+            json.dumps({"version": 2, "plugins": {"chisle@chisle": [entry]}})
         )
 
     def write_settings(self, data: dict) -> None:
@@ -381,6 +405,69 @@ class CheckWorkstationTests(unittest.TestCase):
         log = self.fx.log.read_text() if self.fx.log.exists() else ""
         for frag in FORBIDDEN_FRAGMENTS:
             self.assertNotIn(frag, log)
+
+    def _reference_run(self) -> tuple[str, int]:
+        self.fx.reviewer_stubs("codex", "pi", "gcloud", "rg", "fd")
+        self.fx.adc()
+        proc = self.fx.run(
+            {
+                "CONSORT_REVIEWERS": "codex,pi:google-vertex",
+                "CONSORT_GCP_PROJECT": "example-project",
+                "CONSORT_CODEX_BACKEND": "exec",
+            }
+        )
+        return self._out(proc), proc.returncode
+
+    def test_chisle_pinned_user_install_ok(self) -> None:
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       plugin chisle@chisle (user scope, pinned commit", out)
+        self.assertNotIn("chisle off at user scope", out)
+
+    def test_chisle_other_commit_missing(self) -> None:
+        self.fx.chisle_install(sha="0" * 40)
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_unpinned_marketplace_missing(self) -> None:
+        self.fx.chisle_install(ref=None)
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_project_scope_only_missing(self) -> None:
+        self.fx.chisle_install(scope="project")
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_missing_install_path_missing(self) -> None:
+        self.fx.chisle_install(loadable=False)
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_non_github_source_missing(self) -> None:
+        self.fx.chisle_install(kind="directory")
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  plugin chisle@chisle", out)
+
+    def test_chisle_on_for_every_repository_fails(self) -> None:
+        self.fx.write_settings(
+            {
+                "enabledPlugins": {
+                    "claude-hud@claude-hud": True,
+                    "secret-guard@software-factory": True,
+                    "consort@consort": True,
+                    "chisle@chisle": True,
+                }
+            }
+        )
+        out, code = self._reference_run()
+        self.assertEqual(code, 1, out)
+        self.assertIn("MISSING  chisle off at user scope", out)
 
     def test_vertex_reference_success(self) -> None:
         self.fx.reviewer_stubs("codex", "pi", "gcloud", "rg", "fd")
