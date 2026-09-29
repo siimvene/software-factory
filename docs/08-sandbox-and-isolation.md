@@ -17,6 +17,13 @@ Rules, enforced by behaviour and by the worktree tooling:
 
 - Sessions that will commit, branch, merge or rebase enter their own worktree first. Read-only
   sessions may share.
+- A new worktree is based on `origin/main` after a fetch, never on the local `main`. The
+  local ref is only as fresh as the last person who moved it: kvart's was 114 commits behind
+  while the agent instructions said `git worktree add <path> main`, so every station started
+  that stale, read old code as current and took migration numbers from an old directory
+  `[measured 2026-09-29]`. Check: the instruction names `origin/main`; a session-start hook
+  runs `git fetch -q origin main:main` (fast-forward only; it refuses a diverged or
+  checked-out `main` and changes nothing) so the local ref stops lying to readers too.
 - Banned in a shared checkout, no exceptions: branch switching, `commit --amend`, `rebase`,
   `reset --hard`, any history rewriting.
 - If committing in a shared tree at all (docs-only, no other session active): verify
