@@ -2,19 +2,22 @@
 
 A reference design for agentic software delivery behind mechanical gates. A person turns a
 finding into a ticket with numbered observable examples. Agents build to it, run the
-verification net and a cross-vendor review before a pull request exists, and open the PR. A
-person reads the evidence, merges, and presses release.
+verification net and a cross-vendor review before a pull request exists, and open the PR. The
+PR merges when its required checks are green, or when a person merges it, depending on whose
+repository it is. A person presses release.
 
-Three human decisions stay on the line by design: the ticket is Ready, the PR is merged, the
-release goes out. Nothing here removes them: the factory runs lights-on, and the same line
-works as a factory for one, where a single person holds every role, or as a factory for a team
-that splits them ([12-adoption-playbook](docs/12-adoption-playbook.md)). What the design removes
-is the reading of diffs between those decisions, by moving that work onto gates that refuse
-with a file, a line and a reason. Skipping the per-change merge wait for a qualified class of
-change is the last rung of a ladder
-([11-scaling](docs/11-scaling.md), [adr/0006](adr/0006-pr-gated-output-human-release.md)), not
-the measured state of the line: today every code merge is a named human's click, and the ledger
-records who.
+Two human decisions stay on every line by design: the ticket is Ready, and the release goes
+out. The third, the merge, depends on the repository. In an organisation's repositories a
+person merges on evidence ([adr/0006](adr/0006-pr-gated-output-human-release.md)). In the
+operator's own repositories, the reference implementation's, the merge is delegated by standing
+order to the required checks: the agent arms auto-merge when it opens the PR and the forge
+merges on green ([adr/0014](adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)),
+measured on kvart since 2026-09-30. The factory still runs lights-on, and the same line works as
+a factory for one, where a single person holds every role, or as a factory for a team that
+splits them ([12-adoption-playbook](docs/12-adoption-playbook.md)). What the design removes is
+the reading of diffs between those decisions, by moving that work onto gates that refuse with a
+file, a line and a reason. For an organisation, skipping the per-change merge wait for a
+qualified class of change is still the last rung of a ladder ([11-scaling](docs/11-scaling.md)).
 
 The design was derived from running the loop on a real product (kvart, an apartment association
 management SaaS with money paths and a 4-locale UI) and from bootstrapping the same loop onto a
@@ -115,7 +118,7 @@ edit the HTML and re-render, never the PNG.
 | Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |
 | Scanners | dependency, secret, static analysis | pre-push | known-bad | `measured` |
 | CI | the project's workflows | post-PR | a local pass nobody can reproduce | `measured` |
-| Human gate | a named person | pre-merge, pre-release | an outcome nobody accepted | `measured` |
+| Human gate | a named person | pre-release; pre-merge where the repository keeps a human merge | an outcome nobody accepted | `measured` |
 
 The five sensors keep the numbering they carry in [05-sensor-stack](docs/05-sensor-stack.md);
 the other layers are not sensors and are deliberately unnumbered, so there is one numbering
@@ -132,9 +135,10 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 |---|---|---|---|
 | The ticket is Ready | the PM | the readiness score and its gaps, the numbered examples | `measured` |
 | A finding is fixed, dismissed or deferred | the operator | the reviewer's claim re-run against the code; dismissals go to the escalation thread with a default and a deadline | `measured` |
-| The PR is merged | the code owner | the evidence table, the review report, the ticket's examples; never the diff line by line | `measured`; an agent merged once under a handoff's instruction and the ledger could not tell (adr/0006, 2026-09-09), so the loop does not merge |
+| The PR is merged (an organisation's repositories) | the code owner | the evidence table, the review report, the ticket's examples; never the diff line by line | `measured`; an agent merged once under a handoff's instruction and the ledger could not tell (adr/0006, 2026-09-09), so the loop does not merge there |
+| The PR is merged (the operator's own repositories) | the forge, on every required check green, by the operator's standing order | nothing per PR: the consort panel ran before the push and the ruleset refuses red | `measured` (2 merges, both through the watcher fallback when armed auto-merge did not fire; adr/0014) |
 | The release goes out | the release owner | the pre-deploy gate; the deploy write-back closes the tickets | `measured` |
-| A qualified low-risk class skips the per-change merge wait | nobody yet | a manual acceptance trial first, then continuous regression detection and rollback | `proposed` |
+| A qualified low-risk class skips the per-change merge wait in an organisation's repositories | nobody yet | a manual acceptance trial first, then continuous regression detection and rollback | `proposed` |
 
 ## Measured, in brief
 
@@ -182,10 +186,12 @@ design's own [decision records](adr/).
 
 - Not a tool. It composes tools that exist (cleat, consort, memspec, enola, ripwire, a context
   standard, a devcontainer template) and says where each sits and why.
-- Not a dark factory. It runs lights-on: the ticket, the merge and the release are human
-  decisions on the measured line, and the ledger can tell a human's click from an agent's. Removing the merge wait for a
-  narrow, proven class of change is a proposed rung with its preconditions listed in
-  `STATUS.md`, not something the line does.
+- Not a dark factory. It runs lights-on: the ticket and the release are human decisions on
+  every line, and so is the merge in an organisation's repositories, where the ledger can tell a
+  human's click from an agent's. In the operator's own repositories the merge is delegated to
+  the required checks by a recorded standing order (adr/0014), and a merge there no longer
+  claims that a person read the PR. Removing the merge wait for a narrow, proven class of
+  change in an organisation is a proposed rung with its preconditions listed in `STATUS.md`.
 - Not a claim that review can be removed. It is a claim that review can be moved: from reading
   diffs to reading evidence, and from every change to the changes that carry risk.
 - Not finished. `STATUS.md` says which rungs are measured and which are still a drawing.

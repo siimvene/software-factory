@@ -10,7 +10,8 @@
 - Ticket: `<path or id of the approved ticket>`
 - Code PR: `<repo>#<n>` (`<short sha>`, branch `<branch>`)
 - Sister spec PR: `<context repo>#<n>` (branch `<branch>`)
-- Merge authority: <role>. Agents open PRs; they never merge their own.
+- Merge authority: <role, or "merge on green (adr 0014)">. Under a human merge, agents open PRs
+  and never merge their own; under merge on green, the arming session and any watcher merge.
 - Review rounds: <n>. Post-review rework share: <lines changed after the first review / merged diff lines>
 
 ## Wall-clock per stage
@@ -41,7 +42,7 @@
 | Sister spec PR open | | | | |
 | **Dev hat on to code PR open** | | | **<mm:ss>** | review is <n>% of it |
 | (idle: waiting on the owner) | | | | not counted in the totals |
-| SHIP: owner merges, worktree cleanup | | | | |
+| SHIP: merge (owner, or on green), worktree cleanup | | | | |
 | SHIP: pre-deploy gate on merged main | | | | |
 | SHIP: deploy | | | | |
 | SHIP: production probe | | | | |
