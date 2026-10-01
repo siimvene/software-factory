@@ -17,5 +17,6 @@ The design's own decisions, in the format it asks adopters to use
 | [0010](0010-program-design-before-the-plan.md) | Program design before the plan on sized tickets; red-first becomes a gate (fail-on-base) | proposed |
 | [0011](0011-agent-managed-context-repos-auto-merge.md) | Agent-managed context repos auto-merge; agents refresh shared context continuously | accepted |
 | [0012](0012-money-paths-are-mapped-and-agree.md) | Money paths are mapped end to end, and every exit agrees | proposed |
+| [0013](0013-merge-serialization-substrate-for-delegated-merge.md) | Merge serialization is the substrate for delegated merge | proposed |
 | [0014](0014-agents-merge-on-green-in-the-operators-own-repositories.md) | Agents merge on green in the operator's own repositories | withdrawn 2026-10-01: an operator-local practice, not part of the reference design |
 | [0015](0015-every-agent-station-runs-the-top-tier.md) | Every agent station runs the top tier | accepted (reference implementation) |

@@ -186,6 +186,37 @@ spec, the reviewer would be diffing the code against two sentences, a weaker and
 than the ADR 0007 sister-spec mechanism this complements and does not substitute for. The
 decision record is [adr/0009](../adr/0009-the-spec-is-a-gate-input.md).
 
+## A green is bound to its base
+
+Every check result above is a statement about one tree: the PR merged onto the main it saw.
+When main moves between the run and the merge, the result says nothing about the tree that
+lands. Two green PRs turned kvart's main red within 20 minutes on 2026-09-29, by two different
+routes `[measured 2026-09-29]` ([evidence](../evidence/kvart-stale-green-merges-2026-09-29.md)):
+
+- **Stale base.** A tests-only PR went green on a main that lacked a verdict refactor; merged
+  after it, its tests imported a deleted function (1 module) and under-mocked a new query
+  (7 tests). A textual dry-run merge was clean; `mergeStateStatus` said `CLEAN`.
+- **Selection gap.** A PR added 2 error codes. Its CI ran 78 impact-selected targets; the
+  repo-wide translation fence was not one of them, because a fence imports nothing specific
+  from the change. Main's full suite caught it after the merge.
+
+Rules, each with its check:
+
+- **Repo-wide fences run on every PR**, outside impact selection: the fences that scan the
+  whole tree (error-code translations, locale parity, migration single head, guard and
+  inventory tests), plus `pytest --collect-only` over the full suite, which costs seconds and
+  catches an import broken by another merge. Check: the selector's output always contains the
+  fence list; a planted untranslated code fails a PR that touches no test `[proposed]`.
+- **A merge happens on the current base.** Either the ruleset requires the PR to be up to date
+  with main (strict), or the merger re-runs the affected tests on a local merge with current
+  main before merging. The second is a hand step and case A above is what a hand step
+  misses, so the design's answer is strict plus a serializer that keeps strict affordable
+  ([adr/0013](../adr/0013-merge-serialization-substrate-for-delegated-merge.md)) `[proposed]`.
+
+Rejected: relying on the post-merge full suite and an automatic revert. It fires after main
+is already red for every branch cut in the meantime; on 2026-09-29 a third PR's CI failed on
+both breaks, neither of them its own.
+
 ## The three axes
 
 A review counts as a consort pass only if all three hold `[measured 2026-08-19]`:

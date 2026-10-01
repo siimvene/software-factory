@@ -93,6 +93,9 @@ Promotion criteria between phases, each with its instrument
 - revert rate ≤ the human baseline;
 - reviewer F1 ≥ target on the known-bug PR set;
 - merge-conflict rate per stream below threshold (dry-run merges);
+- red-main-after-green-merge count at zero: a dry-run merge sees only textual conflicts, and
+  the semantic ones pass it (`[measured 2026-09-29]`: 2 in 20 minutes at a width of 5 open
+  PRs, [evidence](../evidence/kvart-stale-green-merges-2026-09-29.md));
 - parity replay pass rate per flow;
 - defect escape flat.
 
@@ -143,6 +146,11 @@ population for per-team thresholds. Keep a hygiene rule on how the programme is 
    `[field: Pipedrive]`. Two backends at the review tier exist; extend to the builder tier.
 5. Externals set the calendar floor: certifications, third-party integrations, compliance.
    Agents do not accelerate those.
+6. Stale greens. The pairs of open PRs that can break each other grow faster than the PRs
+   do, and each green is valid only on the base it ran on. At 20 to 60 streams a merge
+   serializer on a strict ruleset is a precondition for the width, not an optimisation; it is
+   also the component delegated merge runs through
+   ([adr/0013](../adr/0013-merge-serialization-substrate-for-delegated-merge.md)).
 
 ## Time and cost compression, as a model
 
