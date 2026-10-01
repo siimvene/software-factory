@@ -8,8 +8,10 @@ unmerged merge-serialization branch.)
 
 - `adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md` (accepted, 2026-09-30):
   the agent arms auto-merge when it opens a PR and the forge merges on green; a capped watcher
-  merges by hand when armed auto-merge does not fire (kvart #333 and #356). Never red, never
-  unrun, never admin. Organisations keep adr 0006. 0006's weekly identity check is retired for
+  merges directly, pinned to the checked head with `--match-head-commit`, when armed auto-merge
+  does not fire (kvart #333 and #356). Arming only where required checks exist: elsewhere
+  `--auto` merges at once, so the watcher is the only path; with no checks at all the merge is
+  the owner's. Never red, never unrun, never a head the checks did not see, never admin. Organisations keep adr 0006. 0006's weekly identity check is retired for
   these repositories; its replacement counts merges on red, target 0. The named-human sign-off
   on money, tenant, identity and migration changes moves to the release.
 - `adr/0015-every-agent-station-runs-the-top-tier.md` (accepted, 2026-09-29): every station on
@@ -20,7 +22,9 @@ unmerged merge-serialization branch.)
   `docs/07-roles-and-authority.md`, `docs/00-glossary.md`, `docs/10-measurement.md`,
   `docs/13-failure-catalogue.md`, `STATUS.md`, `templates/dogfood-cycle-report.md`,
   `deploy/01-workstation-macos.md` (pin `claude-opus-5-5`, both knobs),
-  `deploy/02-scaffold-a-project.md` (choose the merge shape; allow auto-merge): both shapes
+  `deploy/02-scaffold-a-project.md` (choose the merge shape; allow auto-merge),
+  `docs/18-flightlist.md` (S2 per merge shape), `templates/feature-spec.md` (money sign-off
+  before release under merge on green): both shapes
   described where the merge was stated; the routing rule where the tiers were.
 - `docs/img/the-line.png` re-rendered from its source: the human gate is pre-release, and
   pre-merge where the repository keeps a human merge. `docs/img/the-loop.png` still reads "the

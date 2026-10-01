@@ -25,8 +25,9 @@ replays past incidents against the changed contract.
   never approve a PR. Exception: a pull request into an agent-managed context/spec repository
   (`*-team-specs`, `*-team-context`, `*-context-repo`) auto-merges on open - that layer is
   agent-managed and unread, so no human decision is being made or laundered (adr 0011). In
-  the operator's own repositories the agent arms auto-merge on every PR it opens and the forge
-  merges on green; red, unrun or bypassed checks never merge (adr 0014). An organisation's
+  the operator's own repositories the agent arms auto-merge on every PR it opens where required
+  checks exist, and the forge merges on green; otherwise a watcher merges on all green, pinned
+  to the checked head. Red, unrun or bypassed checks never merge (adr 0014). An organisation's
   code repositories are unchanged.
 - Team memory reaches the team store only by promote PR. Specs are derived artifacts; hand
   edits are forbidden.

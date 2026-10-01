@@ -27,14 +27,20 @@ adding a reading, the merge is the same etiquette 0011 removed for the context l
 
 In the operator's own repositories (the reference implementation's code and context repos), an
 agent that opens a PR arms the forge's auto-merge right after opening it
-(`gh pr merge <n> --auto --merge`). The forge merges when every required check is green and
-holds on red. No PR waits for a person to say "merge".
+(`gh pr merge <n> --auto --merge`), where the repository has required checks. The forge merges
+when every required check is green and holds on red. No PR waits for a person to say "merge".
+
+Where the repository has no required checks, the agent does not arm: `--auto` on a PR that is
+already mergeable merges it at once, before CI has started (the forge client's own help: auto-
+merge is enabled only "if required checks have not yet passed"). There the watcher below is the
+only merge path. Where a PR has no checks at all, nothing can be green, and merge on green does
+not apply: the merge is the owner's.
 
 Rules that do not change:
 
 - The consort panel and the security side-pass run before any push of code (0003).
 - Never bypass or override a red check, never use an admin merge, never merge a PR whose
-  checks did not run.
+  checks did not run, never merge a head the checks did not see.
 - A handoff still never instructs a merge: the PR is armed when it is opened, so there is
   nothing left to instruct.
 - Production release stays a human authority (0006). The named-human outcome sign-off on
@@ -52,10 +58,13 @@ otherwise for itself.
 - **Watcher fallback.** Armed auto-merge did not fire on kvart #333 and #356 with every check
   green and the merge state `CLEAN` `[measured 2026-09-30]`. Cause not investigated; the
   candidate is a status posted by the out-of-forge poller that does not re-trigger the forge's
-  evaluation. So arming is paired with a capped watcher: it polls the PR's checks, stops and
-  reports on any red, and merges with `gh pr merge <n> --merge` once nothing is pending and
-  the PR is still open a couple of minutes later. Where a repository has no required checks,
-  the watcher is the only path, and it merges only on all green.
+  evaluation. So arming is paired with a capped watcher: it records the head commit, polls
+  that head's checks, stops and reports on any red, and once nothing is pending and the PR is
+  still open a couple of minutes later merges directly with
+  `gh pr merge <n> --merge --match-head-commit <sha>`. A new push changes the head, the merge
+  is refused, and the watcher starts over on the new head. Where a repository has no required
+  checks, the watcher is the only path, and the head pin is what stops a push that landed after
+  the green from merging unchecked.
 - **The ledger.** The forge records the arming identity, which is the owner's login. In these
   repositories a merge by the owner's identity no longer claims that a person read the PR: the
   standing order is the human decision, and this record is where it is written down. 0006's

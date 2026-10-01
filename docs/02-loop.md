@@ -175,12 +175,15 @@ from feature failures and never "fixed" by editing a baseline.
   not duplicate the consort review.
 - Who merges depends on whose repository it is. In the operator's own repositories the agent
   arms the forge's auto-merge right after opening the PR, and the forge merges when every
-  required check is green; a capped watcher merges by hand when armed auto-merge does not fire
-  (kvart #333 and #356, 2026-09-30) ([adr/0014](../adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)).
+  required check is green. A capped watcher merges directly, pinned to the head its checks
+  saw, when armed auto-merge does not fire (kvart #333 and #356, 2026-09-30) or when the
+  repository has no required checks, where arming would merge at once
+  ([adr/0014](../adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)). A PR
+  with no checks at all is the owner's to merge.
   In an organisation's repositories the owner merges: agents propose, humans merge
   ([adr/0006](../adr/0006-pr-gated-output-human-release.md)).
 - Either way: never push to a default branch, never approve a PR, never bypass a red check,
-  never admin-merge, never merge a PR whose checks did not run. A handoff may instruct a
+  never admin-merge, never merge a PR whose checks did not run or a head they did not see. A handoff may instruct a
   verify, never a merge: on 2026-09-09 an agent merged a green infrastructure PR under the
   owner's login on a handoff's instruction, and the ledger cannot tell that merge from a human
   decision `[measured 2026-09-09]`. Under merge on green there is nothing to instruct: the PR

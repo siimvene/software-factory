@@ -76,11 +76,12 @@ Encoded as team decision records and enforced where a mechanism exists:
 - Never move money, vote, or delete. Read-only tool access to the product excludes money and
   governance operations `[measured: decision records 0008, 0009]`.
 - Never push to a default branch or approve a PR. Never merge their own proposal in an
-  organisation's repositories. Two exceptions, both armed auto-merge rather than a direct merge:
-  an agent-managed context/spec repo (`*-team-specs`, `*-team-context`, `*-context-repo`), whose
-  PRs auto-merge because no human review is claimed for that layer (adr 0011), and the
-  operator's own repositories, where every PR is armed on open and merges on green (adr 0014).
-  Never bypass a red check, never admin-merge.
+  organisation's repositories. Two exceptions: an agent-managed context/spec repo
+  (`*-team-specs`, `*-team-context`, `*-context-repo`), whose PRs auto-merge because no human
+  review is claimed for that layer (adr 0011), and the operator's own repositories, where PRs
+  merge on green through armed auto-merge or, where it does not fire or cannot be armed, a
+  watcher's direct merge pinned to the checked head (adr 0014). Never bypass a red check, never
+  admin-merge.
 - Never edit a ratchet baseline, the quality policy, or the hooks (guarded).
 - Never install a dependency without a named-version proposal (human-only blocker unattended).
 - Never write a secret anywhere, echo one, or paste a personal token into a shared volume.
