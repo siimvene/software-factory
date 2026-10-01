@@ -240,9 +240,10 @@ Reference Vertex route:
     "CONSORT_REVIEWERS": "codex,pi:google-vertex",
     "CONSORT_GCP_PROJECT": "<gcp project the Vertex calls bill to>",
     "CONSORT_GEMINI_LOCATION": "global",
-    "CONSORT_GCP_CREDENTIALS": "<path to a service-account key, only if ADC is not used>"
+    "CONSORT_GCP_CREDENTIALS": "<path to a service-account key, only if ADC is not used>",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5"
   },
-  "modelOverrides": { "claude-opus-5": "claude-opus-4-8" },
+  "modelOverrides": { "claude-opus-5": "claude-opus-5-5" },
   "statusLine": { "type": "command", "command": "<what claude-hud:setup wrote>" }
 }
 ```
@@ -253,17 +254,20 @@ auth stay in the user environment:
 ```json
 {
   "env": {
-    "CONSORT_REVIEWERS": "codex,pi:<provider-id>:<model-id>"
+    "CONSORT_REVIEWERS": "codex,pi:<provider-id>:<model-id>",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5"
   },
-  "modelOverrides": { "claude-opus-5": "claude-opus-4-8" },
+  "modelOverrides": { "claude-opus-5": "claude-opus-5-5" },
   "statusLine": { "type": "command", "command": "<what claude-hud:setup wrote>" }
 }
 ```
 
 `CONSORT_REVIEWERS` makes the gate a two-leg panel instead of whichever backend is reachable.
-The model override is the worker-tier decision in
-[docs/03](../docs/03-operating-contract.md) (build stations on the mid tier, the top tier for
-debugging and verification, and the alias that resolves to the unstable tier remapped). The
+The model pin is the routing decision in
+[adr/0015](../adr/0015-every-agent-station-runs-the-top-tier.md): every station runs the top
+tier, and both knobs map the bare alias to the pinned release so an earlier one is never served.
+Set both in every Claude Code config directory on the machine; a directory without them is the
+leak [docs/13](../docs/13-failure-catalogue.md) records. The
 status line shows the served model, context and cost. Run `/claude-hud:setup` once and let it
 write the status line entry. The reference machine also sets
 `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`. It is not required by anything in this directory.

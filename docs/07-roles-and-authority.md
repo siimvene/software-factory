@@ -9,12 +9,17 @@ roles only (no names, ever, in any committed artifact).
 | Hat | Owns | Touchpoints in a turn | Never |
 |---|---|---|---|
 | **PM** | intent: the ticket, its numbered examples, acceptance of behaviour on evidence | approve Ready; accept or reject on the evidence table | operate git; certify code safety, security, accounting or infrastructure |
-| **Dev (operator)** | operating the agents, reading evidence, technical assurance, exceptions, service ownership | drive BUILD and VERIFY; adjudicate findings; own the exception queue | hand-write features (an incident, see below); merge own proposals |
-| **Owner** (code owner, release owner) | merge and release authority | read the PR for business truth and merge; run the pre-deploy gate and press release | approve without reading; author |
+| **Dev (operator)** | operating the agents, reading evidence, technical assurance, exceptions, service ownership | drive BUILD and VERIFY; adjudicate findings; own the exception queue | hand-write features (an incident, see below); merge own proposals by hand |
+| **Owner** (code owner, release owner) | merge and release authority | read the PR for business truth and merge (an organisation's repositories); run the pre-deploy gate and press release | approve without reading; author |
+
+In the operator's own repositories the merge is delegated to the required checks by standing
+order: the agent arms auto-merge when it opens the PR and the forge merges on green
+([adr/0014](../adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)). The
+owner's touchpoints there are the ticket and the release.
 
 A solo founder wears all three and records every shortcut in a decision record. kvart's named
 shortcuts: self-review as code owner (branch protection refused on the plan, so the merge gate
-is a habit); no ticket tracker (tickets are files with a stage line); PM and dev hat in one
+was a habit until the ruleset of 2026-09-08 and merge on green of 2026-09-30); no ticket tracker (tickets are files with a stage line); PM and dev hat in one
 session (the dev inherits the PM's framing; mitigated by the non-inheriting reviewers)
 `[measured 2026-09-07]`. What a solo dev drops is what a team must keep.
 
@@ -28,7 +33,7 @@ Inside the dev hat, the delegation shape that was trialled and measured:
   writes glue, never bulk code. On a sized ticket it writes the program design note before the
   first brief ([02-loop](02-loop.md)); the hands build to sections cited by number and never
   design.
-- **Hands**: a cheaper model or a second vendor, fresh process per call, implements against the
+- **Hands**: a fresh station or a second vendor, fresh process per call, implements against the
   brief and returns schema-shaped results. The same vendor serves as the blind reviewer.
 
 Measured on a medium backend change: 4 rounds of hands, ≈314k hands tokens, the head caught an
@@ -37,18 +42,26 @@ SERIOUS performance regression via the reviewer in round 3 `[measured 2026-09-05
 holds when the head actually verifies; it fails when the head waits (the 2 h 08 m idle stall in
 the same trial).
 
-Model routing inside the hands tier is measured, not assumed. BUILD stations default to the mid
-tier. The top tier is reserved for debugging with an unknown root cause, for security side-agents,
-and for adversarial verification, which always runs at a tier at or above the builder's. Escalation
-is by re-brief: a fresh station gets the failed attempt's evidence, never a retry of the same brief
-on a bigger model. Six mid-tier build cycles landed by 2026-09-09 with no regression attributed to
-the tier `[measured 2026-09-08..09]`, and cycle 4 ran a top-tier backend station beside a mid-tier
-web station and a mid-tier UI station from one contract. The rejected alternative, the top tier at
-every station, buys nothing measurable: the mid-tier default was recorded at half the bill with no
-quality signal to separate the two.
+Model routing inside the hands tier is one rule since 2026-09-29: every station runs the top
+tier, and reviewers and adversarial verifiers may run the reviewer model instead
+([adr/0015](../adr/0015-every-agent-station-runs-the-top-tier.md)). On the reference machine that
+is Opus 5.5 for every station and Fable 5.1 as the reviewer option. The model is passed
+explicitly on every spawn. Effort floor medium; high for money paths, security, adversarial
+verification, findings-driven fixes and debugging with an unknown root cause; the orchestrating
+session runs high. Escalation is by re-brief: a fresh station gets the failed attempt's evidence,
+never a retry of the same brief.
 
-Remediation of CRITICAL and SERIOUS findings is top-tier work regardless: a fixer below the
-reviewer's depth closes the reported hole and opens an adjacent one.
+The rule it replaced defaulted BUILD stations to the mid tier and reserved the top tier for
+debugging, security side-agents, adversarial verification and fixes. Six mid-tier build cycles
+landed by 2026-09-09 with no regression attributed to the tier, at about half the bill
+`[measured 2026-09-08..09]`, and cycle 4 ran a top-tier backend station beside two mid-tier
+stations from one contract. That record is kept: it shows the mid tier did not visibly fail, at a
+sample size that could not have seen a tier effect either way. The operator's position is that
+correctness and coverage are the constraint, not token cost, and the cost side is re-measured
+against the payoff bar in [10-measurement](10-measurement.md).
+
+Remediation of CRITICAL and SERIOUS findings runs at high effort: a fixer below the reviewer's
+depth closes the reported hole and opens an adjacent one.
 
 The routing rule needs a check, because the tier a station runs on is not always the tier it was
 asked for. A model alias is a per-config-directory setting, and on 2026-09-08 two of three Claude
@@ -62,7 +75,12 @@ Encoded as team decision records and enforced where a mechanism exists:
 
 - Never move money, vote, or delete. Read-only tool access to the product excludes money and
   governance operations `[measured: decision records 0008, 0009]`.
-- Never push to a default branch, merge their own proposal, or approve a PR. The one exception is an agent-managed context/spec repo (`*-team-specs`, `*-team-context`, `*-context-repo`), whose PRs auto-merge because no human review is claimed for that layer (adr 0011); code merges stay human.
+- Never push to a default branch or approve a PR. Never merge their own proposal in an
+  organisation's repositories. Two exceptions, both armed auto-merge rather than a direct merge:
+  an agent-managed context/spec repo (`*-team-specs`, `*-team-context`, `*-context-repo`), whose
+  PRs auto-merge because no human review is claimed for that layer (adr 0011), and the
+  operator's own repositories, where every PR is armed on open and merges on green (adr 0014).
+  Never bypass a red check, never admin-merge.
 - Never edit a ratchet baseline, the quality policy, or the hooks (guarded).
 - Never install a dependency without a named-version proposal (human-only blocker unattended).
 - Never write a secret anywhere, echo one, or paste a personal token into a shared volume.
@@ -76,7 +94,8 @@ factory's own rungs. The instrument, because a constraint without one is a vibe:
 
 1. Every commit carries an agent attribution trailer and a session link.
 2. A pre-receive or branch-protection check rejects commits lacking provenance. Human identities
-   approve and merge; they do not author.
+   approve and merge (or, under adr 0014, set the standing order the forge merges by); they do
+   not author.
 3. Hand-written code is not forbidden; it is an **incident**: a logged override (the 3 a.m.
    hotfix) with a post-mortem asking why the factory could not do it, feeding the backlog.
 4. Metric: hand-written lines per week, target 0, on the same dashboard as cost per merged

@@ -1,6 +1,7 @@
 # 0005. Humans approve and merge; they never author. Hand-written code is an incident
 
-- Status: accepted for the reference implementation; proposed for organisations
+- Status: accepted for the reference implementation; proposed for organisations. The merge half
+  is qualified by 0014: in the operator's own repositories the forge merges on green
 - Date: 2026-09-07
 - Deciders: the operator
 

@@ -24,8 +24,10 @@ replays past incidents against the changed contract.
 - Agents propose; humans merge. Never push to a default branch, never merge your own proposal,
   never approve a PR. Exception: a pull request into an agent-managed context/spec repository
   (`*-team-specs`, `*-team-context`, `*-context-repo`) auto-merges on open - that layer is
-  agent-managed and unread, so no human decision is being made or laundered (adr 0011). Code
-  repositories are unchanged.
+  agent-managed and unread, so no human decision is being made or laundered (adr 0011). In
+  the operator's own repositories the agent arms auto-merge on every PR it opens and the forge
+  merges on green; red, unrun or bypassed checks never merge (adr 0014). An organisation's
+  code repositories are unchanged.
 - Team memory reaches the team store only by promote PR. Specs are derived artifacts; hand
   edits are forbidden.
 - Never `git add .` or `git add -A`. Stage by explicit path. Before committing, list the staged
@@ -63,10 +65,10 @@ replays past incidents against the changed contract.
 ## 4. Plan before change
 
 - Load the repo's agent instructions before the first edit. In multi-repo folders, load each.
-- Post a 2 to 6 step plan with a model class and effort per step. Route by payoff: a mid-tier
-  model is the floor for bounded engineering work; the top tier is reserved for orchestration,
-  deep cross-cutting analysis and adversarial verification of the tier below. Simple work never
-  runs on the top tier.
+- Post a 2 to 6 step plan with an effort level per step. Every station runs the top tier,
+  reviewers may run the reviewer model, and the model is passed explicitly on every spawn
+  (adr 0015). Effort floor medium; high for money paths, security, adversarial verification,
+  findings-driven fixes and debugging with an unknown root cause.
 - On a sized ticket (two or more modules, a new type or migration, a money, tenant or identity
   path) the program design note precedes the plan and the plan follows its slice order; the
   sizing rule is in [02-loop](02-loop.md).
@@ -156,9 +158,10 @@ heavy context: write the handoff (state table, done-and-verified, gotchas, decis
 verify-on-arrival commands, memory hints), commit it, and say it is safe to clear. Never hand
 off over in-flight work. See [templates/handoff.md](../templates/handoff.md).
 
-A handoff may instruct a verify, never a merge. Merge authority is the owner's (see ADR 0006);
-a handoff note that says "merge after green" launders a machine decision through the owner's
-identity.
+A handoff may instruct a verify, never a merge. Where merge authority is the owner's (ADR
+0006), a handoff note that says "merge after green" launders a machine decision through the
+owner's identity. Where agents merge on green (ADR 0014), the PR was armed when it was opened,
+so a handoff has nothing to instruct. Release is never instructed either way.
 
 ## 11. Escalation
 
