@@ -23,9 +23,8 @@ modules:
 
 money_critical: <true|false>
   # True when the change can move money, change what a person is charged, or alter an
-  # accounting record. True raises the bar: human sign-off before merge (before release
-  # where the repository merges on green, adr 0014), and mutation testing on the changed
-  # money path rather than line coverage alone.
+  # accounting record. True raises the bar: human sign-off before merge, and mutation
+  # testing on the changed money path rather than line coverage alone.
 
 constraints:
   # The surface allowlist (paths, services, APIs that may be touched; everything unlisted

@@ -76,7 +76,7 @@ The commands that execute the D0, G and M legs, with the files they copy, are in
 | # | Leg | Do | Check | Evidence | Who | Where |
 |---|---|---|---|---|---|---|
 | S1 | Sandbox booted | From the template; egress allowlist | allowlisted host 200, non-allowlisted refused, direct route absent; the build still resolves private packages | the three probes | Agent | [08](08-sandbox-and-isolation.md) |
-| S2 | Scoped identity | A bot identity authors PRs; humans merge, or the forge merges on green where the owner chose adr 0014 | a PR opened by the bot; under a human merge, a merge attempted by the bot is refused; under merge on green, a merge attempted on a red or unrun required check is refused | the PR, the refusal | Human grants, agent proves | [08](08-sandbox-and-isolation.md), [07](07-roles-and-authority.md) |
+| S2 | Scoped identity | A bot identity authors PRs; humans merge | a PR opened by the bot; a merge attempted by the bot is refused | the PR, the refusal | Human grants, agent proves | [08](08-sandbox-and-isolation.md), [07](07-roles-and-authority.md) |
 | S3 | Worktree per turn | Nested worktrees excluded from every sensor walk; deletion owned by the orchestrator | `git worktree list` is clean after a cycle | the listing | Agent | [08](08-sandbox-and-isolation.md), [05](05-sensor-stack.md) |
 | S4 | Test data isolation | One database or schema per tree | two trees, two databases, verified | the listing | Agent | [08](08-sandbox-and-isolation.md) |
 

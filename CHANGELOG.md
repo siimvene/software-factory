@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.17 (2026-10-01)
+
+Merge on green leaves the reference design: it is the operator's local practice, and at the
+reference level the owner merges (adr 0006).
+
+- `adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md`: rejected, withdrawn the
+  day after 0.2.16 merged it. The file stays, as every record does.
+- `README.md`, `docs/02-loop.md`, `docs/03-operating-contract.md`,
+  `docs/07-roles-and-authority.md`, `docs/13-failure-catalogue.md`, `docs/18-flightlist.md`,
+  `STATUS.md`, `templates/dogfood-cycle-report.md`, `templates/feature-spec.md`,
+  `deploy/02-scaffold-a-project.md`, `docs/img/the-line.png` and its source, the adr index and
+  the 0005/0006 status lines: back to the owner merge, as in 0.2.14.
+- Unchanged from 0.2.16: adr 0015 (every station on the top tier) and the routing edits in
+  `docs/00-glossary.md`, `docs/03`, `docs/07`, `docs/10`, `docs/13`, `STATUS.md` and
+  `deploy/01-workstation-macos.md`.
+
 ## 0.2.16 (2026-10-01)
 
 The spec catches up with two operator decisions: merge on green in the operator's own
