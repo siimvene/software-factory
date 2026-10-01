@@ -17,13 +17,18 @@ Rules, enforced by behaviour and by the worktree tooling:
 
 - Sessions that will commit, branch, merge or rebase enter their own worktree first. Read-only
   sessions may share.
-- A new worktree is based on `origin/main` after a fetch, never on the local `main`. The
-  local ref is only as fresh as the last person who moved it: kvart's was 114 commits behind
-  while the agent instructions said `git worktree add <path> main`, so every station started
-  that stale, read old code as current and took migration numbers from an old directory
-  `[measured 2026-09-29]`. Check: the instruction names `origin/main`; a session-start hook
-  runs `git fetch -q origin main:main` (fast-forward only; it refuses a diverged or
-  checked-out `main` and changes nothing) so the local ref stops lying to readers too.
+- A new worktree is based on the remote default branch (`origin/main` in kvart; `develop` in
+  the legacy core of `09-legacy-adoption.md`) after a fetch, never on the local ref. The local
+  ref is only as fresh as the last person who moved it: kvart's was 114 commits behind while
+  the agent instructions said `git worktree add <path> main`, so every station started that
+  stale, read old code as current and took migration numbers from an old directory
+  `[measured 2026-09-29]`. Check: the instruction names the remote ref. A session-start hook
+  runs `git fetch -q origin`, which keeps the remote ref current for new worktrees, and then
+  fast-forwards the local default branch only where that is safe: `git merge --ff-only` in a
+  clean checkout that has it checked out, `git fetch origin <b>:<b>` where no worktree has it
+  checked out. Git refuses the second form for a checked-out branch (exit 128), which is the
+  shared clone's usual state, so the fetch-into-ref form alone never updates the tree it was
+  meant for `[measured 2026-10-01]`. The hook reports a refusal instead of hiding it.
 - Banned in a shared checkout, no exceptions: branch switching, `commit --amend`, `rebase`,
   `reset --hard`, any history rewriting.
 - If committing in a shared tree at all (docs-only, no other session active): verify

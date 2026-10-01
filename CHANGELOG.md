@@ -56,9 +56,13 @@ A green is valid only on its base: two green PRs turned kvart's main red in 20 m
 - `docs/06-verify-gate.md`: "A green is bound to its base": repo-wide fences on every PR,
   merges only on the current base.
 - `adr/0013`: one merge serializer in two layers; layer 1 never merges, layer 2 is ADR 0006's
-  delegated merge under the bot identity. Proposed.
-- `docs/08-sandbox-and-isolation.md`: worktrees start from `origin/main`; a session-start hook
-  fast-forwards the local ref.
+  delegated merge under the bot identity. An arm binds to one head; it is a human decision only
+  where agents cannot arm under the human's identity; the serializer's own config and the gate's
+  tests are never in a delegated class. Proposed. Panel-reviewed (two vendors plus a blind
+  security pass) before merge.
+- `docs/08-sandbox-and-isolation.md`: worktrees start from the remote default branch; a
+  session-start hook fetches, then fast-forwards the local ref only where git allows it (not
+  `fetch <b>:<b>` into a checked-out branch).
 - `docs/11-scaling.md`: red-main-after-green-merge as a promotion criterion; stale greens as a
   scale failure. `docs/13-failure-catalogue.md`: one new row, one fix mechanised.
 - `STATUS.md`: one row.

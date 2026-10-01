@@ -28,16 +28,42 @@ We will build one merge serializer, in two layers, and turn the strict ruleset b
 layer 1 runs.
 
 - **Layer 1, serializer only.** A poller next to the existing tracker-sync poller picks the
-  oldest open PR that has the forge's auto-merge enabled and is behind main, updates its
-  branch, and waits for its checks. One PR at a time. It never merges: the forge's auto-merge
-  does, credited to whoever enabled it. Enabling auto-merge is the human merge decision
-  ADR 0006 requires, and the forge records it as such. The serializer only makes that
-  decision cheap to act on under strict.
+  oldest open PR that has the forge's auto-merge enabled and is behind the default branch,
+  updates its branch, and waits until that PR merges, goes red, is disarmed or passes a
+  deadline (about twice the p95 PR CI time). Only then does it pick the next PR: the forge's
+  merge lands after the checks turn green, and a poller that moves on at green updates the
+  next PR onto a base that is about to move. A PR past the deadline leaves the queue with a
+  comment. One PR at a time. It never merges: the forge's auto-merge does, credited to whoever
+  enabled it.
+- **An arm is a decision about one head.** The forge keeps auto-merge enabled across pushes by
+  anyone with write access, so the poller records the head that was armed and the heads its
+  own updates produce. A push it did not make disarms the PR, and the owner re-arms after
+  reading the new head. A PR that goes red leaves the queue disarmed.
+- **Enabling auto-merge is the human merge decision ADR 0006 requires only where an agent
+  cannot do it under the human's identity**, the same identity separation 0006 sets for the
+  merge itself. Where agent sessions hold the owner's forge login, an arm by that login proves
+  nothing, and the serializer must not run in that repository. Check: arm events
+  (`auto_merge_enabled` on the PR timeline) counted by actor, alongside 0006's merges by
+  identity; an arm by the owner's identity from an agent session is an incident, as a merge
+  is.
 - **Layer 2, delegated merge.** The same poller, running as the bot identity, enables
   auto-merge itself for PRs in a qualified class (candidates: tests-only, locale-only, a
   loop-infrastructure PR after green, per ADR 0006). The class list, its expiry and its
   revocation live in the poller's configuration, reviewed like code. Each class carries its
   record: merges under it, reverts, escaped defects. Any escaped defect suspends the class.
+  Bounds on every class:
+  - Eligibility is evaluated again on the head that merges: the pin above applies to the
+    bot's arms too.
+  - The author must be an allowlisted station identity. A PR from anyone else never qualifies.
+  - Never in a class, always the owner's merge: the serializer's own code and configuration,
+    the class list and its record, CI workflow files, rulesets and required checks, and the
+    gate's tests (repo-wide fences, guard and inventory tests, test configuration, fixtures
+    and plugins that can deselect them). "Tests-only" and "loop-infrastructure" are read with
+    these carved out; otherwise a delegated PR can widen its own mandate or switch off a fence.
+  - The forge cannot narrow a token that may update branches so that it cannot also arm or
+    merge, so "layer 1 never merges" holds by behaviour and no permission enforces it. Check: arms and merges by
+    the poller's identities outside the class list, target 0; layer 2 runs under its own
+    identity, separate from layer 1's.
 
 Scope: one serializer per repository. Layer 2 does not start before layer 1 has run for the
 promotion window in `docs/11-scaling.md`.
