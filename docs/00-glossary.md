@@ -73,9 +73,10 @@ See [06-verify-gate](06-verify-gate.md).
 vendor's model), non-inheriting (the reviewer never saw the author's session), verification
 before action (findings are hypotheses to check against code, not a work queue).
 
-**Head and hands.** A delegation shape: the head (an expensive model) selects, designs,
-reviews, directs remediation and runs the gate; the hands (a cheaper model or a second vendor,
-fresh process per call) implement. The head verifies everything itself.
+**Head and hands.** A delegation shape: the head (the orchestrating session) selects, designs,
+reviews, directs remediation and runs the gate; the hands (fresh stations on the same top tier
+or a second vendor, fresh process per call; adr 0015) implement. The head verifies everything
+itself.
 
 **PM hat / dev hat / owner.** The three human roles a turn touches. PM: intake and
 acceptance of behaviour. Dev: operates the agents, reads evidence, owns exceptions. Owner (code
