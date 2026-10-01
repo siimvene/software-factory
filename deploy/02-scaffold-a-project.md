@@ -301,9 +301,10 @@ Which merge shape the project runs is the owner's call, recorded in an ADR: a pe
 merges on green (adr 0014, the operator's own repositories). Merge on green needs the ruleset
 below plus the repository setting that allows auto-merge
 (`gh api -X PATCH repos/<org>/<repo> -F allow_auto_merge=true`). Check:
-`gh api repos/<org>/<repo> --jq .allow_auto_merge` prints `true`. Without required checks,
-`--auto` has nothing to wait for, so the arming session's watcher is the only merge path and it
-merges only on all green.
+`gh api repos/<org>/<repo> --jq .allow_auto_merge` prints `true`. Without required checks, do
+not arm: `--auto` on an already mergeable PR merges it at once, before CI starts. The watcher is
+then the only merge path, merging on all green with `--match-head-commit` pinned to the checked
+head; with no checks at all, the merge is the owner's.
 
 CI first, so the required checks exist before the ruleset names them:
 
