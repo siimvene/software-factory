@@ -9,17 +9,12 @@ roles only (no names, ever, in any committed artifact).
 | Hat | Owns | Touchpoints in a turn | Never |
 |---|---|---|---|
 | **PM** | intent: the ticket, its numbered examples, acceptance of behaviour on evidence | approve Ready; accept or reject on the evidence table | operate git; certify code safety, security, accounting or infrastructure |
-| **Dev (operator)** | operating the agents, reading evidence, technical assurance, exceptions, service ownership | drive BUILD and VERIFY; adjudicate findings; own the exception queue | hand-write features (an incident, see below); merge own proposals by hand |
-| **Owner** (code owner, release owner) | merge and release authority | read the PR for business truth and merge (an organisation's repositories); run the pre-deploy gate and press release | approve without reading; author |
-
-In the operator's own repositories the merge is delegated to the required checks by standing
-order: the agent arms auto-merge when it opens the PR and the forge merges on green
-([adr/0014](../adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)). The
-owner's touchpoints there are the ticket and the release.
+| **Dev (operator)** | operating the agents, reading evidence, technical assurance, exceptions, service ownership | drive BUILD and VERIFY; adjudicate findings; own the exception queue | hand-write features (an incident, see below); merge own proposals |
+| **Owner** (code owner, release owner) | merge and release authority | read the PR for business truth and merge; run the pre-deploy gate and press release | approve without reading; author |
 
 A solo founder wears all three and records every shortcut in a decision record. kvart's named
 shortcuts: self-review as code owner (branch protection refused on the plan, so the merge gate
-was a habit until the ruleset of 2026-09-08 and merge on green of 2026-09-30); no ticket tracker (tickets are files with a stage line); PM and dev hat in one
+is a habit); no ticket tracker (tickets are files with a stage line); PM and dev hat in one
 session (the dev inherits the PM's framing; mitigated by the non-inheriting reviewers)
 `[measured 2026-09-07]`. What a solo dev drops is what a team must keep.
 
@@ -75,13 +70,7 @@ Encoded as team decision records and enforced where a mechanism exists:
 
 - Never move money, vote, or delete. Read-only tool access to the product excludes money and
   governance operations `[measured: decision records 0008, 0009]`.
-- Never push to a default branch or approve a PR. Never merge their own proposal in an
-  organisation's repositories. Two exceptions: an agent-managed context/spec repo
-  (`*-team-specs`, `*-team-context`, `*-context-repo`), whose PRs auto-merge because no human
-  review is claimed for that layer (adr 0011), and the operator's own repositories, where PRs
-  merge on green through armed auto-merge or, where it does not fire or cannot be armed, a
-  watcher's direct merge pinned to the checked head (adr 0014). Never bypass a red check, never
-  admin-merge.
+- Never push to a default branch, merge their own proposal, or approve a PR. The one exception is an agent-managed context/spec repo (`*-team-specs`, `*-team-context`, `*-context-repo`), whose PRs auto-merge because no human review is claimed for that layer (adr 0011); code merges stay human.
 - Never edit a ratchet baseline, the quality policy, or the hooks (guarded).
 - Never install a dependency without a named-version proposal (human-only blocker unattended).
 - Never write a secret anywhere, echo one, or paste a personal token into a shared volume.
@@ -95,8 +84,7 @@ factory's own rungs. The instrument, because a constraint without one is a vibe:
 
 1. Every commit carries an agent attribution trailer and a session link.
 2. A pre-receive or branch-protection check rejects commits lacking provenance. Human identities
-   approve and merge (or, under adr 0014, set the standing order the forge merges by); they do
-   not author.
+   approve and merge; they do not author.
 3. Hand-written code is not forbidden; it is an **incident**: a logged override (the 3 a.m.
    hotfix) with a post-mortem asking why the factory could not do it, feeding the backlog.
 4. Metric: hand-written lines per week, target 0, on the same dashboard as cost per merged

@@ -296,16 +296,6 @@ and ignore its contents.
 
 ### G6 and S2 Merge authority and the bot identity (Agent prepares, **Human** grants)
 
-Which merge shape the project runs is the owner's call, recorded in an ADR: a person merges
-(adr 0006, the default for an organisation), or agents arm auto-merge on every PR and the forge
-merges on green (adr 0014, the operator's own repositories). Merge on green needs the ruleset
-below plus the repository setting that allows auto-merge
-(`gh api -X PATCH repos/<org>/<repo> -F allow_auto_merge=true`). Check:
-`gh api repos/<org>/<repo> --jq .allow_auto_merge` prints `true`. Without required checks, do
-not arm: `--auto` on an already mergeable PR merges it at once, before CI starts. The watcher is
-then the only merge path, merging on all green with `--match-head-commit` pinned to the checked
-head; with no checks at all, the merge is the owner's.
-
 CI first, so the required checks exist before the ruleset names them:
 
 ```
