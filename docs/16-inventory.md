@@ -118,6 +118,29 @@ or upstream. They are the honest edge of the inventory.
    the hooks are prompt-shaped code with no test suite. A change to any of them ships on
    judgement. This is the design's largest single gap: everything else in the tables is gated,
    and the thing that configures the gates is not `[proposed]`.
+   Analysis suggestions added 2026-09-12, reference-design backlog only:
+   - Replay known factory failures: a failed command reported as success, a missing gate in a
+     fresh worktree, stale evidence accepted, a reviewer outage reported clean, an unapproved
+     scope reduction, a merge attempted under a human identity, and a wrong served-model alias.
+   - Pair each refusal with a valid permitted case. A configuration that blocks everything
+     must fail the evaluation. Assert observable results and side effects, not exact prose.
+   - Reuse existing tool tests and evidence storage. Run affected cases for changes to contracts,
+     rules, skills, hooks and routing; changes to shared selection logic run the initial full
+     set. An unmapped configuration change reports an evaluation-coverage gap.
+   - Separate deterministic enforcement tests from model-judgment evaluations. Required
+     deterministic cases must pass. Start semantic cases as diagnostic repeated runs, reporting
+     missed defects, false alarms, duration and usage before proposing promotion thresholds.
+   - Record configuration and fixture revisions, runtime versions, requested and served model,
+     command, evidence and result. ERROR, NOT RUN and UNVERIFIED never become PASS. Keep the
+     expected outcome independent of the candidate's own explanation.
+   - Use disposable repositories, fake services and synthetic credentials. No production fault
+     injection or change to release authority is needed to evaluate the control.
+   - Link confirmed incidents to a preventive artifact and measure recurrence in eligible later
+     cycles. A memory entry alone is not evidence that the failure was prevented.
+   First proof: a deliberately broken configuration fails for the expected reason and its
+   corrected counterpart permits valid work. Initial case selection, semantic repeat counts,
+   budgets and promotion thresholds remain design decisions. This item does not commission
+   work in the reference product's backlog or require a new platform or reviewer panel.
 2. **Acceptance identity for the PM role.** Accepting behaviour on evidence requires knowing
    who accepted it, and no identity currently distinguishes the PM's acceptance from the code
    owner's merge. A manual trial precedes any tooling here `[proposed, critic-reviewed]`.
