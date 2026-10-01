@@ -9,7 +9,7 @@ flowchart LR
     SPEC["SPEC<br/>ticket as the delta<br/>numbered examples<br/>a person approves"]
     BUILD["BUILD<br/>worktree per turn<br/>program design for sized tickets<br/>plan, tests red on the merge base<br/>disjoint parallel lanes"]
     VERIFY["VERIFY<br/>sensors, then consort<br/>scanners, browser QA<br/>findings dispositioned"]
-    SHIP["SHIP<br/>PR arrives reviewed<br/>merges on green<br/>release is separate"]
+    SHIP["SHIP<br/>PR arrives reviewed<br/>the owner merges<br/>release is separate"]
     LEARN["LEARN<br/>two write-backs<br/>cycle report: wall-clock,<br/>tokens, every shortcut"]
     HUB[("team-context<br/>specs/<br/>decision records<br/>.memspec/")]
 
@@ -173,25 +173,14 @@ from feature failures and never "fixed" by editing a baseline.
 
 - The PR arrives already reviewed. CI is mechanical (lint, tests, version, docs-lint) and does
   not duplicate the consort review.
-- Who merges depends on whose repository it is. In the operator's own repositories the agent
-  arms the forge's auto-merge right after opening the PR, and the forge merges when every
-  required check is green. A capped watcher merges directly, pinned to the head its checks
-  saw, when armed auto-merge does not fire (kvart #333 and #356, 2026-09-30) or when the
-  repository has no required checks, where arming would merge at once
-  ([adr/0014](../adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md)). A PR
-  with no checks at all is the owner's to merge.
-  In an organisation's repositories the owner merges: agents propose, humans merge
-  ([adr/0006](../adr/0006-pr-gated-output-human-release.md)).
-- Either way: never push to a default branch, never approve a PR, never bypass a red check,
-  never admin-merge, never merge a PR whose checks did not run or a head they did not see. A handoff may instruct a
-  verify, never a merge: on 2026-09-09 an agent merged a green infrastructure PR under the
-  owner's login on a handoff's instruction, and the ledger cannot tell that merge from a human
-  decision `[measured 2026-09-09]`. Under merge on green there is nothing to instruct: the PR
-  is armed when it is opened.
+- The owner merges. Agents propose; humans merge. Never push to a default branch, never
+  merge your own proposal, never approve a PR. A handoff may instruct a verify, never a
+  merge: on 2026-09-09 an agent merged a green infrastructure PR under the owner's login on a
+  handoff's instruction, and the ledger cannot tell that merge from a human decision
+  `[measured 2026-09-09]`. See ADR 0006 for what that decided.
 - Provenance: every commit carries an agent attribution trailer and a session link. See
   [07-roles-and-authority](07-roles-and-authority.md).
 - Money, tenant, identity and migration changes require named-human outcome sign-off, always.
-  Under merge on green that sign-off sits at the release, which stays human.
   Low-risk surfaces may auto-accept on green once the promotion criteria in
   [11-scaling](11-scaling.md) hold.
 - Release is a separate authority from merge. Pre-deploy gate (smoke plus the changed-surface

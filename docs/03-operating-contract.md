@@ -24,11 +24,8 @@ replays past incidents against the changed contract.
 - Agents propose; humans merge. Never push to a default branch, never merge your own proposal,
   never approve a PR. Exception: a pull request into an agent-managed context/spec repository
   (`*-team-specs`, `*-team-context`, `*-context-repo`) auto-merges on open - that layer is
-  agent-managed and unread, so no human decision is being made or laundered (adr 0011). In
-  the operator's own repositories the agent arms auto-merge on every PR it opens where required
-  checks exist, and the forge merges on green; otherwise a watcher merges on all green, pinned
-  to the checked head. Red, unrun or bypassed checks never merge (adr 0014). An organisation's
-  code repositories are unchanged.
+  agent-managed and unread, so no human decision is being made or laundered (adr 0011). Code
+  repositories are unchanged.
 - Team memory reaches the team store only by promote PR. Specs are derived artifacts; hand
   edits are forbidden.
 - Never `git add .` or `git add -A`. Stage by explicit path. Before committing, list the staged
@@ -159,10 +156,9 @@ heavy context: write the handoff (state table, done-and-verified, gotchas, decis
 verify-on-arrival commands, memory hints), commit it, and say it is safe to clear. Never hand
 off over in-flight work. See [templates/handoff.md](../templates/handoff.md).
 
-A handoff may instruct a verify, never a merge. Where merge authority is the owner's (ADR
-0006), a handoff note that says "merge after green" launders a machine decision through the
-owner's identity. Where agents merge on green (ADR 0014), the PR was armed when it was opened,
-so a handoff has nothing to instruct. Release is never instructed either way.
+A handoff may instruct a verify, never a merge. Merge authority is the owner's (see ADR 0006);
+a handoff note that says "merge after green" launders a machine decision through the owner's
+identity.
 
 ## 11. Escalation
 
