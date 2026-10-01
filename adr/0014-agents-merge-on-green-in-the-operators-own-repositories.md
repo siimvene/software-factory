@@ -1,7 +1,12 @@
 # 0014. Agents merge on green in the operator's own repositories
 
-- **Status:** accepted for the reference implementation; organisations keep 0006 by default
+- **Status:** rejected (withdrawn 2026-10-01, the day after it was merged)
 - **Date:** 2026-09-30
+- **Withdrawn because:** merge on green is the operator's local working practice for the operator's own
+  repositories, not a decision of the reference design. At the reference level the owner merges
+  ([0006](0006-pr-gated-output-human-release.md) stands in full, and 0005's merge half with it).
+  This record is kept, as every record is, so the reasoning stays readable; nothing below is in
+  force in the design.
 - **Deciders:** the operator
 - **Qualifies:** 0005 (humans approve and merge), 0006 (merge is a human decision; the loop
   does not merge), 0011 (auto-merge for context repos)
