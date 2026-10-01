@@ -1,6 +1,6 @@
 # 0006. PR-gated output; production release stays human; delegation is earned and revocable
 
-- Status: accepted (PR gate, human release); proposed (delegated merge); one incident recorded (2026-09-09)
+- Status: accepted (PR gate, human release); proposed (delegated merge); one incident recorded (2026-09-09); merge qualified by 0014 in the operator's own repositories (2026-09-30), release unchanged
 - Date: 2026-09-05
 - Deciders: the operator, after an independent critic review of the proposal
 

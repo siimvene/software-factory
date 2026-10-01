@@ -165,9 +165,12 @@ implementation `[measured 2026-09-07, re-measure at check-by]`:
 - a week with non-review fix:feat < 1 (after the hardening phase is declared over), and
 - cost per commit < $8 list price.
 
-Secondary check: audit top-tier model usage per project for a week; if half is mechanical, the
-routing rule is not being obeyed (≈ $4k/month waste at list price). The audit reads the served
-model, not the requested alias: an alias that resolves to the wrong tier in one config
+Secondary check: the weekly routing audit. Under the single-tier rule (adr 0015) every station
+is served the top tier or, for reviewers, the reviewer model; any other served model is a leak,
+target 0. The cost side of that rule is the payoff bar above: it is re-measured over the first
+full week under the rule, not assumed to hold. Before 2026-09-29 the audit's question was the
+reverse (half of top-tier usage mechanical meant ≈ $4k/month waste at list price). The audit
+reads the served model, not the requested alias: an alias that resolves to the wrong tier in one config
 directory routes silently, so a per-alias count would report clean while the served count shows
 the leak (2026-09-08, about 11,000 calls on the wrong tier since 2026-08-13).
 
