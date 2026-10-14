@@ -20,3 +20,5 @@ The design's own decisions, in the format it asks adopters to use
 | [0013](0013-merge-serialization-substrate-for-delegated-merge.md) | Merge serialization is the substrate for delegated merge | proposed |
 | [0014](0014-agents-merge-on-green-in-the-operators-own-repositories.md) | Agents merge on green in the operator's own repositories | withdrawn 2026-10-01: an operator-local practice, not part of the reference design |
 | [0015](0015-every-agent-station-runs-the-top-tier.md) | Every agent station runs the top tier | accepted (reference implementation) |
+| [0016](0016-the-reviewer-gets-a-computed-impact-set.md) | The reviewer gets a computed impact set, and every module in it gets a verdict | proposed |
+| [0017](0017-mechanical-changes-ship-as-a-recipe.md) | Mechanical changes ship as a recipe: the recipe is reviewed, the diff is checked to be its output | proposed |
