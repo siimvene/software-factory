@@ -72,6 +72,30 @@ d=json.load(open(p)) if os.path.exists(p) else {}
 sys.exit(0 if sys.argv[1] in d else 1)
 PY
 }
+# A hook counts when its file is in $CFG/hooks and a command in $CFG/settings.json runs that file.
+# memspec init always writes ~/.claude, so under another CLAUDE_CONFIG_DIR the file can be present
+# and registered in the other directory only, which this session never reads.
+hook_registered() { CFG="$CFG" python3 - "$1" <<'PY' 2>/dev/null
+import json,os,sys
+cfg=os.path.realpath(os.environ['CFG'])
+target=os.path.join(cfg,'hooks',sys.argv[1])
+p=os.path.join(cfg,'settings.json')
+d=json.load(open(p)) if os.path.exists(p) else {}
+for entries in (d.get('hooks') or {}).values():
+    for e in entries or []:
+        for h in e.get('hooks') or []:
+            cmd=os.path.expanduser(os.path.expandvars(h.get('command') or ''))
+            for word in cmd.replace('"',' ').replace("'",' ').split():
+                if word.endswith('/'+sys.argv[1]) and os.path.realpath(word)==target:
+                    sys.exit(0)
+sys.exit(1)
+PY
+}
+if [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
+  HOOK_HINT="memspec init writes ~/.claude only: copy the hooks into $CFG/hooks and register them in $CFG/settings.json (guide section 2)"
+else
+  HOOK_HINT="memspec init installs it"
+fi
 
 echo "== agent runtime (config dir: $CFG)"
 req claude claude --version
@@ -86,9 +110,21 @@ if [ $PM -eq 1 ]; then skip uv "PM profile"; skip pnpm "PM profile"; else req uv
 req memspec memspec --version
 req memspec-mcp true "npm install -g memspec (ships memspec-mcp)"
 if grep -qs '^min-release-age=' "$HOME/.npmrc"; then warn "npm min-release-age set" "a memspec pin younger than that needs --min-release-age=0 on the install line (see guide section 2)"; fi
-[ -d "$HOME/.memspec" ] && ok "~/.memspec store" "$(ls "$HOME/.memspec/memory" 2>/dev/null | wc -l | tr -d ' ') files" || miss "~/.memspec store" "run: memspec init ~/.memspec"
-if have claude && claude mcp list 2>/dev/null | grep -q '^memspec'; then ok "memspec MCP (user scope)"; else miss "memspec MCP (user scope)" "claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp"; fi
-for h in memspec-session-start.js memspec-consolidate.js; do [ -f "$CFG/hooks/$h" ] && ok "hook $h" || warn "hook $h" "memspec init installs it"; done
+[ -d "$HOME/.memspec" ] && ok "~/.memspec store" "$(ls "$HOME/.memspec/memory" 2>/dev/null | wc -l | tr -d ' ') files" || miss "~/.memspec store" "run: (cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)"
+# `claude mcp list` also lists a project-scope .mcp.json entry that is still pending approval, which
+# is what memspec init leaves in the directory it ran in. Only the user-scope registration counts.
+MEMSPEC_SCOPE="$(have claude && claude mcp get memspec 2>/dev/null | sed -n 's/^ *Scope: *//p' | head -1)"
+case "$MEMSPEC_SCOPE" in
+  "User config"*) ok "memspec MCP (user scope)" ;;
+  "") miss "memspec MCP (user scope)" "claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp" ;;
+  *) miss "memspec MCP (user scope)" "registered as \"$MEMSPEC_SCOPE\" only; remove the .mcp.json memspec init wrote, then: claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp" ;;
+esac
+for h in memspec-session-start.js memspec-consolidate.js; do
+  if [ ! -f "$CFG/hooks/$h" ]; then warn "hook $h" "$HOOK_HINT"
+  elif hook_registered "$h"; then ok "hook $h"
+  else warn "hook $h" "file present, not registered in $CFG/settings.json; $HOOK_HINT"
+  fi
+done
 
 echo "== plugins (user scope)"
 if [ $PM -eq 1 ]; then
