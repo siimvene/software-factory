@@ -1,15 +1,29 @@
 # TRACKER.md
 
 The team's tracker, as the skills need it. Written once at setup, corrected in place when a ticket
-preview shows a field that needed a different answer. Nothing here is asked for again once it is here.
+preview shows a field that needed a different answer, or when the first apply for a project fills
+the required-fields and workflow tables below. Nothing here is asked for again once it is here.
 
-## Project
+## Site
 
-| Key | Site | Board | Note |
+| Site | Connector | Note |
+|---|---|---|
+| `{{SITE_URL}}` | Atlassian MCP connector (read and write, the owner's own identity) | REST only where the connector has no call (attachments) |
+
+## Projects
+
+The FIRST project block below is the default project when a staged file carries no `project:`
+line. A workspace with more than one project repeats the whole `### {{PROJECT_KEY}}` block.
+
+### {{PROJECT_KEY}}
+
+#### Project
+
+| Key | Board | Managed | Note |
 |---|---|---|---|
-| `{{PROJECT_KEY}}` | `{{SITE_URL}}` | {{BOARD}} | company-managed / team-managed; which statuses the team uses |
+| `{{PROJECT_KEY}}` | {{BOARD}} | company-managed / team-managed | |
 
-## Issue types in use
+#### Issue types in use
 
 The group standard defines Initiative, Epic, Story, Technical Development, Bug, Sub-task, and a Task
 type outside the engineering workflow. List the ones this project actually has and what each is for.
@@ -22,7 +36,30 @@ type outside the engineering workflow. List the ones this project actually has a
 | Bug | a defect with steps to reproduce | relates to the story that shipped the behaviour |
 | Task | work outside the engineering workflow | |
 
-## Epic parent convention
+#### Required fields at create
+
+Fields the project's create screen requires that a staged file never carries, per issue type.
+Discovered from the create metadata the first time a type is applied in this project, confirmed by
+the owner once, reused for every later apply of that type. Never guessed. The first apply of each
+type fills its rows.
+
+| Issue type | Field | Id | Shape | Value | Note |
+|---|---|---|---|---|---|
+
+#### Workflow
+
+Recorded from a real issue's transitions after the first apply, as its own confirmed edit, ordered
+as the board walks them. `Review status` names the status a code review maps to; `Done status` the
+terminal one. `Issue types` names the types the walk was observed on. The first apply fills this
+table and the two status lines below.
+
+| Order | Status | Reached by transition | Id | Issue types | Note |
+|---|---|---|---|---|---|
+
+Review status:
+Done status:
+
+#### Epic parent convention
 
 A story staged under `Jira/<Epic Name>/` gets the epic key in this table. `none` means the folder is a
 grouping only and its stories are parentless. A story with no folder is asked once. A new epic in the
@@ -32,7 +69,7 @@ tracker is a new row here, in the same approval as the ticket that created it.
 |---|---|---|
 | | | |
 
-## Labels
+#### Labels
 
 Only labels in this table are applied. A label added by hand in a preview is proposed as a new row.
 

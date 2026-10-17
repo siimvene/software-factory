@@ -1,7 +1,7 @@
 ---
 name: task-splitter
 description: Split a polished, high-scoring ticket (readiness score 85 or above) into 2-N independently deliverable sub-tasks, each estimated at 2 man-days or less. The original ticket's content is promoted into an epic to preserve all context. Invoked from `readiness-evaluator` option [3], or directly when the user says "split this ticket", "break it up", "too big", "create sub-tasks". Do not use it on a ticket that hasn't been scored 85 or above (run `readiness-evaluator` or `task-improver` first), and do not use it to write anything to Jira - it only stages files under `Jira/`.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Task splitter
@@ -160,6 +160,7 @@ section 9:
 ---
 action: create
 type: Epic
+project: [the project key of the ticket being split; from its front matter, else TRACKER.md's first block]
 epic:
 labels:
 links:
@@ -182,7 +183,8 @@ acceptance criteria carry over.
 
 If the input was itself a staged `action: create` file under `Jira/`, that file becomes the epic:
 it is moved into `Jira/[Epic Name]/` as `Epic - [Title].md`, so no duplicate story file is left
-behind and nothing is deleted. Its front matter is rewritten for an epic: `type: Epic`, `epic:`
+behind and nothing is deleted. Its front matter is rewritten for an epic: `type: Epic`, `project`
+kept as it was (or written from `TRACKER.md`'s first block when the story had none), `epic:`
 emptied (an epic has no parent), `links:` emptied (the story's links move to the sub-task that
 inherits that scope), `readiness` kept, `status: draft`. Before the move, re-read the source at its
 path: if it is gone or its text differs from what the proposal was built from, do not move or
@@ -203,6 +205,7 @@ sub-task, write `Jira/[Epic Name]/<Type> - [Title].md`:
 ---
 action: create
 type: Story
+project: [the epic's project key, the same for every sub-task]
 epic: [Epic Name]
 labels:
 links: [depends on Story - Sub-task N, if any]

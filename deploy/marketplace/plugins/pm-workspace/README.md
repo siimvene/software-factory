@@ -23,9 +23,13 @@ The conventions define the workspace folders and root files:
 - `Todo.md`, `Waiting-On.md`, `Action-Points.md`, `Decisions.md`, `Ingest-Log.md` - the tracking layer
 - `CLAUDE.md` - the canonical rule file: what this workspace is, plus the owner's preferences
 - `CONVENTIONS.md` - the copy of the conventions this workspace follows, with its version number
-- `POINTERS.md` - read-only pointers to code and team-context repositories
-- `TRACKER.md` - the tracker's project, issue types, epic-folder mapping and label table, written once
-  and corrected from ticket previews so no session asks for them twice
+- `POINTERS.md` - read-only pointers to code and team-context repositories; an entry may name the
+  development remote behind a hosted mirror, and a code owner may record an owner-authorised write remote
+  (branch push and merge request only, never a merge; `CONVENTIONS.md` section 13)
+- `TRACKER.md` - the tracker, one block per project: issue types, the fields the create screen
+  requires with their value shapes, the workflow statuses and transitions, the epic-folder mapping and
+  the label table. Written once at setup, completed by the first apply, corrected from ticket previews,
+  so no session asks for any of it twice
 - `SENSITIVITY.md` - what may leave the workspace, and the capture rules
 
 An `AGENTS.md` is not created; if a workspace carries one it is preserved as the owner's content, and
@@ -47,6 +51,14 @@ Skills:
   assignee, priority, sprint or points. On a bigger ticket (money, identity, new stored data,
   another consumer, a removal) it asks one extra question, in a fixed order, that the build's own
   design will otherwise have to come back for.
+- **apply** - sends staged `Jira/` files to the tracker, and only those: `status: ready` with a
+  readiness score of 85 or above recorded by `readiness-evaluator`, or it runs the evaluator first (an
+  owner's word that a ticket is ready is not a score). On the first apply in a project it reads the
+  create screen's required fields (the group's accounting fields among them) and the workflow's statuses
+  and transitions, asks once, and writes them into `TRACKER.md`; later applies ask nothing. Preview,
+  confirm, execute; `status: applied` and the key are written back into the staged file. Its second mode,
+  `review-opened`, walks an applied ticket forward to the project's review status when a merge request
+  or pull request is reported, and comments the link.
 - **graduate** - packages a matured `Features/` document as a pull request into a team-context
   repository. Runs the readiness and sensitivity gates, resolves the target via `POINTERS.md`, shows
   the full package for confirmation, and - only after an explicit go-ahead - opens the PR through the
@@ -78,6 +90,9 @@ Update this workspace to the latest PM conventions
 /ingest Meetings/Raw/2026-07-24 - Fees workshop.md
 Ingest this into my workspace: <pasted notes>
 /graduate Features/Localized Emails.md
+/apply Jira/Localized Emails/Story - Localized Emails.md
+Apply everything that is ready under Jira/Localized Emails
+The MR is open: https://gitlab.example.com/group/repo/-/merge_requests/12, move ABC-123 to code review
 /ticket Features/Localized Emails.md
 /ticket a task: the nightly export job must skip archived events
 Score Jira/Localized Emails/Story - Localized Emails.md
@@ -86,8 +101,22 @@ Split Jira/Localized Emails/Story - Localized Emails.md into sub-tasks
 ```
 
 Upgrading a workspace after this plugin is updated: run `/pm-workspace-setup` in the workspace again.
-It compares the version in the workspace's `CONVENTIONS.md` against the plugin's, applies the
+It compares the version in the workspace's `CONVENTIONS.md` against the plugin's, shows you the
+changelog rows between the two versions and asks before it writes the new conventions, applies the
 migrations from the changelog, and leaves your own content and your `CLAUDE.md` edits alone.
+
+## Workstation notes for a PM
+
+Three things the first external run of this workflow met that no skill can fix on its own:
+
+- The PM workstation is CI-first. It carries no compiler or build toolchain for the product's stack,
+  so nothing a PM stages or pushes is verified locally; the pipeline is the verification. Say so on
+  the merge request when one is opened from a PM machine.
+- Key material stays out of the agent's reach. `secret-guard` refuses reads of the SSH key directory
+  by design; creating a key is a two-minute hand step in the terminal. The group's workstation runbook
+  (software-factory `deploy/01-workstation-macos.md`, PM profile) carries the steps.
+- Company admin interfaces are blocked for the agent's browser. UI verification comes from the
+  owner's own screenshots, and those stay out of the workspace under `SENSITIVITY.md`.
 
 ## Maintainers
 

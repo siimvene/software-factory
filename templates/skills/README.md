@@ -25,9 +25,11 @@ vague one is a skill that never fires or fires always.
 
 Concept and conventions for the spec skills: [README-specs.md](README-specs.md).
 
-What is deliberately not here: the tracker skill (every read and write against Jira or its
-equivalent is preview, confirm, execute, and the wiring is tracker-specific), the daily-ops
-skills (morning, wrap-up, checkpoint), and the two skills that improve the skills (degrader,
-optimizer). All are catalogued with their inputs and outputs in
+What is deliberately not here: the tracker skill, because its wiring is tracker-specific. Its
+write path (a staged ticket into the tracker, and the walk to review when a merge request
+opens) ships instead as `apply` in the vendored pm-workspace plugin from 1.8.0,
+[deploy/marketplace](../../deploy/marketplace/plugins/pm-workspace/skills/apply/SKILL.md). Also
+not here: the daily-ops skills (morning, wrap-up, checkpoint), and the two skills that improve
+the skills (degrader, optimizer). All are catalogued with their inputs and outputs in
 [docs/14-pm-surface.md](../../docs/14-pm-surface.md) and follow the skeleton in
 [pm-skill.md](../pm-skill.md).
