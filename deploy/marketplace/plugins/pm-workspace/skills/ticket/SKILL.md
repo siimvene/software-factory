@@ -1,7 +1,7 @@
 ---
 name: ticket
 description: Use this skill when the user wants to draft a Jira ticket - a story, epic, task or bug - from a Features/ document, from a chat description (single stories only), or from an existing staged ticket as context - e.g. "draft a ticket for this", "write the story for Features/Localized Emails.md", "turn this into an epic with stories", "napisz ticket", "create a task". It works out issue type, project, epic parent, labels and links from the source, the code and TRACKER.md, shows them with a reason each, and stages the approved file under Jira/. It never applies anything to Jira and never asks for a tracker value TRACKER.md already holds. Do not use it to apply staged files to Jira, to mature a feature (that is Discovery/ and Features/), or to set up the workspace (pm-workspace-setup).
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Draft a ticket
@@ -149,7 +149,8 @@ Asking the same question in the next session is the failure this step exists to 
 ## Step 5 - Draft
 
 Apply the style rules. Use the staged file format from `CONVENTIONS.md` section 9: front matter with
-`action: create`, `type`, `epic`, `labels`, `links`, `status: draft`, `source`; then the summary line,
+`action: create`, `type`, `project` (the key resolved in step 4b, always written, even when it is
+the first block in `TRACKER.md`), `epic`, `labels`, `links`, `status: draft`, `source`; then the summary line,
 Description, Acceptance criteria, Links. Tickets say what, not how; acceptance criteria are observable
 outcomes with exact values where a value is involved, except that a value shaped like a credential,
 token, key or internal hostname is never copied from code into a ticket: cite the path instead. A UI ticket names its design artifacts (the

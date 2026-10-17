@@ -1,7 +1,7 @@
 ---
 name: graduate
 description: Use this skill when the user wants to promote a matured feature out of their PM workspace into a team repository - e.g. "graduate this feature", "prepare the PR for the payments team", "this spec is ready, package it for team-context", "promote Features/Localized Emails.md". Runs the readiness gate, checks the sensitivity gate in both directions, resolves the target repository via POINTERS.md, and prepares the pull request package. It never pushes or opens a PR without an explicit go-ahead, and after that go-ahead it opens the PR through the GitHub MCP server as the owner's own identity and merges it (context/spec repos auto-merge; adr 0011), with no local git or copy-paste. Do not use it to write or mature a feature - that is done in Discovery/ and Features/ by hand or with the `ingest` skill.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Graduate a feature into a team repository
@@ -21,6 +21,11 @@ merge it, because the target is an agent-managed context/spec repo whose PRs aut
 The owner reviews the package and gives the go-ahead to graduate; the merge follows automatically,
 so the human decision is at graduation, not at the merge click. Human-owned merge stays the rule for
 code repositories, which graduation never targets.
+
+Graduation targets context repositories only. A code repository is never a graduation target, even
+when its `POINTERS.md` entry carries an owner-authorised write remote: that exception covers a
+branch push and an MR/PR open by the owner's explicit request outside this skill, never a merge. See
+CONVENTIONS section 13 for the exception and the hosted-mirror note.
 
 ## Workspace layout and rules
 
@@ -78,8 +83,8 @@ the ticket skill ask at drafting time.
 
 ## Step 2 - Resolve the target and rewrite into its format
 
-- Resolve the target team-context repository from `POINTERS.md` (the `*-team-specs` / `*-team-context`
-  entry). If more than one could fit, ask which team once; do not guess.
+- Resolve the target team-context repository from `POINTERS.md` (a `*-team-specs`, `*-team-context`
+  or `*-context-repo` entry). If more than one could fit, ask which team once; do not guess.
 - Read the target repository's spec directory and conventions (typically `specs/`; confirm from the
   repo itself or the notes in `POINTERS.md`) through its `POINTERS.md` entry and rewrite the feature
   into the target repo's spec format. Read it live; do not copy stale content in.
@@ -91,8 +96,10 @@ the ticket skill ask at drafting time.
 
 ## Step 3 - Show the full package and destination, then wait
 
-The go-ahead you ask for authorizes opening the PR **and merging it** - the target is a context repo,
-which auto-merges (adr 0011), so approval lands the change in the team layer. Say this in the ask.
+The go-ahead you ask for authorizes opening the PR **and merging it** - the target is a context
+repo, which auto-merges (adr 0011), so approval lands the change in the team layer, it does not just
+open a PR for later review. Say this in the ask, and show the target path and whether it creates or
+updates a spec, so the owner is approving the merged result, not just a draft.
 
 Present, and stop for an explicit go-ahead:
 
@@ -150,12 +157,20 @@ order; if any check or write fails, stop and follow "If a write fails" below.
 7. **Verify, then open the PR.** Immediately before opening, confirm the branch is still exactly one
    commit ahead of the default branch and touches only the target path. Then open the PR from the
    branch into the default branch with the package's title and description, and report the PR URL.
+8. **Merge it.** The graduation target is an agent-managed context/spec repo, whose PRs auto-merge
+   (adr 0011), so merge the PR you just opened and report the merge. Two guards before you do:
+   confirm the target is the context/spec repo from `POINTERS.md` and matches the `*-team-specs` /
+   `*-team-context` / `*-context-repo` shape - never auto-merge into a code repository, whatever
+   `POINTERS.md` says; and pin the merge to the exact head SHA you verified in step 7 (re-read the
+   PR head, commit count and changed paths first - if the head moved since you opened it, a
+   concurrent push rode in, so stop and report rather than merge it). If the merge is refused
+   (branch protection, a required check, no write access), stop and report the gap exactly as for a
+   failed write below - do not retry blindly and do not leave a half-open state unreported.
 
 You open the PR and, into a context repo, merge it - the go-ahead to graduate was the human
-decision, and the merge is a mechanical consequence for a layer no human reviews (adr 0011). Guard
-before merging: confirm the target matches the `*-team-specs` / `*-team-context` / `*-context-repo`
-shape (never auto-merge a code repo) and pin the merge to the head SHA you just verified. Human-owned
-merge stays the rule for code repositories.
+decision, and the merge is a mechanical consequence for a layer no human reviews. This is not the
+adr 0006 laundering case, which is about code merges under a human identity standing in for a review
+that was expected; here none is. Human-owned merge stays the rule for code repositories.
 
 **If a write fails** - a denied push (no write access, or a read-only MCP grant), or a failure partway
 through - stop and say plainly what happened: which operation failed, and exactly what already landed

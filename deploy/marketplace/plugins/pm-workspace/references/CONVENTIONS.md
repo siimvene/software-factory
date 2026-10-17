@@ -1,6 +1,6 @@
 # PM Workspace Conventions
 
-Convention version: 2.6.0
+Convention version: 2.7.0
 
 This file defines how a **Product Manager Workspace** is organised: which folders exist, what goes
 into each of them, how documents are named and structured, and how they link to each other.
@@ -199,10 +199,10 @@ about current system behaviour is grounded (section 13, R1).
 ## 9. Jira
 
 At apply time, expect the target project to enforce **required custom fields the staged
-file does not carry** — org accounting fields (Tempo Account, Work for, Capitalisation
+file does not carry** - org accounting fields (Tempo Account, Work for, Capitalisation
 Type) are standard across group projects. The applying agent reads the create-screen
 requirements, asks the owner once for the missing values, and reuses them for the whole
-batch; it never guesses cost-attribution values. (Field-proven 2026-08-18: the APT apply
+batch; it never guesses cost-attribution values. (Field-proven 2026-08-18: a group project's apply
 failed on exactly these three until supplied.)
 
 `Jira/` is a staging area. Nothing here has been applied to Jira until its `status` says so, and
@@ -218,6 +218,7 @@ nothing is applied without the workspace owner asking for it.
 ---
 action: create | update
 type: Epic | Story | Technical Development | Task | Bug
+project: ABC          # optional; the TRACKER.md project block this file applies to. Default: the first block
 key: ABC-123          # only for action: update
 epic: ABC-100         # or the epic folder name when the epic itself is not created yet
 labels: [flywheel]    # optional; only labels TRACKER.md defines
@@ -250,8 +251,23 @@ a staged file: those belong to the team lead and grooming.
 Tickets describe **what**, not **how**: no proposed technical approach sections, and acceptance
 criteria state observable outcomes. The developers own the implementation.
 
-`status: ready` is set only when the `readiness-evaluator` skill has scored the file at 85 or
-above and the owner has approved marking it ready; no other skill sets that status value.
+`status: ready` is set only by the `readiness-evaluator` skill, at a score of 85 or above and with
+the owner's approval; no other skill sets that status value. The apply step refuses a create file
+that lacks a `readiness` score or that scores below 85: it runs the evaluator first. An owner's
+assertion of readiness without a recorded score is not a substitute and is refused with the line
+the evaluator needs.
+
+**Applying.** The `apply` skill is the only path from `Jira/` into the tracker: preview, confirm,
+execute. Required fields per project are read from `TRACKER.md` (section 13.1), discovered on the
+first apply for that project; the workflow is recorded on the first apply too. The code-review-
+opened rule below moves an applied ticket forward once a review opens. On a successful create,
+`status: applied` plus `key:` are written back into the staged file.
+
+**Code-review-opened rule.** When the owner reports a merge request or pull request for an applied
+ticket, the `apply` skill (`review-opened` mode) walks the ticket forward through the recorded
+workflow to the project's `Review status` in one confirmed action and comments the link on the
+ticket. It never moves an epic, never walks backward, and does nothing when the ticket is already
+at or past the review status.
 
 ## 10. Reference
 
@@ -316,11 +332,11 @@ team-context repositories, design-standards repositories, and the systems the wo
 Confluence, Figma). Each repository entry names the repository as an `org/repo` slug plus access
 notes, never content. A local checkout path may be added where one already exists; it is optional.
 
-- **Everything in `POINTERS.md` is read-only.** The agent reads the repositories through it and never
-  writes, commits or pushes to them. The only path from this workspace into a team-context repository
-  is graduation (section 15).
+- **Everything in `POINTERS.md` is read-only by default.** The agent reads the repositories through
+  it and never writes, commits or pushes to them, outside the two exceptions named in R2 below
+  (graduation, and an owner-authorised write remote).
 - **Read path: connector first.** The default way to read a pointer repository is the workspace's
-  GitHub connector, by `org/repo` slug — it works on every surface and needs no git on this machine.
+  GitHub connector, by `org/repo` slug - it works on every surface and needs no git on this machine.
   Where an entry carries a local checkout path and that checkout exists, the agent may grep it
   instead for faster searching; treat a local checkout as possibly stale and prefer the connector
   when freshness matters.
@@ -330,6 +346,19 @@ notes, never content. A local checkout path may be added where one already exist
   searching the GitHub connector for the team's `*-team-context`, `*-team-specs` or `*-context-repo` repository and
   reading the code repositories its `CLAUDE.md` names; the owner only confirms their team. A blank
   placeholder is the fallback for when the connector sees nothing, not the default.
+- **Optional per-entry lines.** A repository entry MAY carry a `development remote:` line and a
+  `write remote (owner-authorised):` line, indented under the entry:
+
+  ```
+  - org/repo                          (hosted mirror, read-only, the connector reads it)
+    development remote: <url>         (where development actually happens, when the hosted repo is a mirror
+                                       that lags; skills prefer it when freshness matters; read-only)
+    write remote (owner-authorised): <url>, granted <YYYY-MM-DD> by <role>
+                                      (the R2 exception below; branch push and MR/PR open only)
+  ```
+
+  See "Hosted mirrors and a second remote" below for `development remote:`, and R2 for
+  `write remote:`.
 
 Two hard rules govern how pointer repositories are used:
 
@@ -337,19 +366,110 @@ Two hard rules govern how pointer repositories are used:
   it in the actual code via a `POINTERS.md` repository and cite where it was checked (repo + path). If
   the code is unreachable or unclear, mark the claim **unverified** rather than presenting a guess as
   current behaviour. Unverified claims become specific questions for the delivery team.
-- **R2 - Read/write contract.** Repositories in `POINTERS.md` are read-only. Never write, commit,
-  push, or open a pull request against them autonomously. Graduation is the one exception: the agent
-  opens the PR only after an explicit go-ahead, and then merges it, because the target context repo
-  auto-merges (software-factory adr 0011). The human decision is the go-ahead, not the merge.
+- **R2 - Read/write contract.** Repositories in `POINTERS.md` are read-only. Two exceptions, both
+  explicit in the file: (1) graduation into a context repo (unchanged, section 15); (2) an
+  owner-authorised write remote: a code owner or the architect grants a named repository a write
+  remote, the grant is recorded on the entry with the date and the granting role, and it permits
+  exactly two writes, pushing a branch and opening a merge request or pull request, after the
+  owner's go-ahead per push. It never permits a merge, never applies to the mirror entry, and does
+  not change who merges (the code owner). A write against a repository without that line is
+  refused, whatever the owner says in chat. The agent performs such a push only through a skill
+  that runs the section 14 outbound check on the exact bytes leaving the workspace and previews
+  the push for confirmation; this plugin ships no such skill, so until one exists the push and
+  the MR/PR open are the owner's own hand steps, and the agent limits itself to preparing the
+  branch content and the MR/PR text inside the workspace.
+
+### Hosted mirrors and a second remote
+
+When the hosted repository is a mirror of a GitLab (or other) development remote, the mirror can
+lag. Skills reading for freshness use the `development remote:` line when a local checkout of it
+exists, and otherwise say the read may be stale. No skill in this plugin pushes to a development
+remote or opens a merge request (R2 above); where the owner holds a write remote and does it by
+hand, the known shape is to rebase onto the development remote's default branch and open the MR
+in the web interface, because push-option MR creation rejects multi-line descriptions.
 
 ### 13.1 TRACKER.md
 
 `TRACKER.md` records how the team's tracker is set up, so that no skill has to ask for it and no
-session has to be told twice: the project key and board, the issue types the team uses and what each
-is for, how a `Jira/` epic folder maps to an epic key, the labels in use with a meaning and an owner
-per label, and the working language of tickets. It is written once by `pm-workspace-setup` (from a
-template, filled from the tracker's own metadata where the connector can read it) and corrected in
-place from ticket previews.
+session has to be told twice. Per-project blocks replace a single root project table: everything a
+skill needs about ONE project lives under that project's block, under a `## Projects` heading. A
+workspace with two projects has two blocks. The FIRST block is the default project when a staged
+file carries no `project:` line (section 9). The file is written once by `pm-workspace-setup` (from
+the template, filled from the tracker's own metadata where the connector can read it) and corrected
+in place from ticket previews and from the `apply` skill.
+
+```markdown
+# TRACKER.md
+
+## Site
+
+| Site | Connector | Note |
+|---|---|---|
+| `{{SITE_URL}}` | Atlassian MCP connector (read and write, the owner's own identity) | REST only where the connector has no call (attachments) |
+
+## Projects
+
+### {{PROJECT_KEY}}
+
+#### Project
+
+| Key | Board | Managed | Note |
+|---|---|---|---|
+| `{{PROJECT_KEY}}` | {{BOARD}} | company-managed / team-managed | |
+
+#### Issue types in use
+(the type table, as before: Type | Used for | Note)
+
+#### Required fields at create
+
+Fields the project's create screen requires that a staged file never carries, per issue type: a
+project can require different fields for a Story and a Bug. Discovered from the create metadata the
+first time a type is applied in the project, confirmed by the owner once, reused for every later
+apply of that type. A type with no rows yet is discovered on its first apply; other types' rows are
+never reused for it. Create only: an `action: update` file sends the fields in its delta and nothing
+else. Never guessed.
+
+| Issue type | Field | Id | Shape | Value | Note |
+|---|---|---|---|---|---|
+| Story | Account (Tempo) | `customfield_<n>` | number | `<id>` (the account name) | example row: the one allowed value in that project |
+| Story | Work for | `customfield_<n>` | option id | `<id>` (Group) | example row |
+| Story | Capitalisation Type | `customfield_<n>` | option id | `<id>` (CAPEX or OPEX) | example row; asked once per batch when the answer could differ per ticket |
+
+Shape vocabulary (exact strings): `number` (a bare JSON number), `option id` (`{"id": "<id>"}`),
+`option value` (`{"value": "<text>"}`), `text` (a string), `strings` (a JSON array of strings).
+The Tempo Account field is `number`: it refuses the `{"id": n}` shape (field-proven 2026-09-21).
+
+#### Workflow
+
+Recorded from a real issue's transitions after the first apply, as its own confirmed edit. Ordered
+as the board walks them. `Review status` names the status a code review maps to; `Done status` the
+terminal one. The `Issue types` column names the types the walk was observed on; a project whose
+types run different workflows gets one row set per type, and a transition walk on a type not yet
+listed first checks that its available transitions match the recorded first hop, else records that
+type separately.
+
+| Order | Status | Reached by transition | Id | Issue types | Note |
+|---|---|---|---|---|---|
+| 1 | Backlog | (initial) | | Story, Bug | |
+| 2 | Grooming | Groom | `2` | Story, Bug | |
+| ... | | | | | |
+
+Review status: `Code Review`
+Done status: `Done`
+
+#### Epic parent convention
+(the folder-to-epic table, as before)
+
+#### Labels
+(the label table, as before)
+
+## Working language
+(as before)
+```
+
+The plugin's `TRACKER.template.md` ships one project block with `{{...}}` placeholders, an empty
+"Required fields at create" table and an empty "Workflow" table (headers only); the first apply for
+the project fills both.
 
 - **Fields are deduced, shown, approved, never asked twice.** The `ticket` skill reads this file,
   deduces issue type, project, epic parent, labels and links from the source and the code, shows each
@@ -430,9 +550,9 @@ carries the full procedure.
 ## 16. Links between documents
 
 - Always relative markdown links, for example `[Localized Emails](../Discovery/Localized%20Emails.md)`.
-  Never wikilinks (`[[...]]`) — they are not CommonMark and render broken on GitHub, which matters
+  Never wikilinks (`[[...]]`) - they are not CommonMark and render broken on GitHub, which matters
   the moment a document graduates into a team repository PR. A PM may view the workspace in any
-  markdown editor (Obsidian included — it renders relative links natively); editors are viewers,
+  markdown editor (Obsidian included - it renders relative links natively); editors are viewers,
   never a reason to change the link format. (Decided 2026-08-19: wikilink accommodation removed.)
 - A new document inside a Discovery folder is linked from that folder's lead document, otherwise it
   is unreachable.
@@ -454,6 +574,9 @@ These are the defaults:
   not by engineers. Leave out class names, file paths, framework names, backend field names, enum
   values, route patterns and regular expressions. Keep behaviour in plain business terms, plus the
   counts that size the work, the markets and the user roles affected.
+- **Code paths stay in References.** A code path (repo + path) belongs in a document's References
+  or Links section only, as evidence for a claim; never in a summary, description or acceptance
+  criterion.
 - Factual and direct. Short sentences, no marketing voice, no aphorisms.
 - Privacy: first name plus the first letter of the surname, for example "Mari T.".
 - State what is unresolved as an open question instead of guessing.
@@ -470,4 +593,5 @@ These are the defaults:
 | 2.4.0 | Section 9: `type` gains `Technical Development` (the group standard's type for work with nothing visible; Task where a project lacks it). Section 13.1: `TRACKER.md` holds the tracker's project, issue types, epic-folder mapping, label table and working language, written once and corrected from ticket previews. Section 9: staged issue files may carry `labels` and `links`; type, epic, labels and links are deduced by the new `ticket` skill and approved with the draft, never asked for as bare values. | Create `TRACKER.md` from the plugin template when missing (`pm-workspace-setup` fills the project and issue-type rows from the tracker connector where it can and leaves the rest for the owner); never overwrite an existing one. Existing `Jira/` files need no change; `labels` and `links` are optional. |
 | 2.3.0 | Section 13: `POINTERS.md` repository entries are populated by discovery. `pm-workspace-setup` searches the GitHub connector for the team's `*-team-context` / `*-team-specs` repository and reads the code repositories its `CLAUDE.md` names; the owner confirms their team rather than pasting slugs. The blank placeholder is the fallback for when the connector sees nothing. | None for existing workspaces. A workspace with an empty `POINTERS.md` gets its repository section offered by discovery on the next setup run. |
 | 2.5.0 | Section 9: staged `Jira/` files may carry an optional `readiness` field (0 to 100), written by the new `readiness-evaluator` skill; `status: ready` is set only at a readiness score of 85 or above with the owner's approval. New skills `readiness-evaluator`, `task-improver`, and `task-splitter` score, refine, and split staged tickets without ever writing to Jira. | None; the field is optional. |
-| 2.6.0 | Sections 13 and 15: graduation into an agent-managed context repo (`*-team-specs`, `*-team-context`, `*-context-repo`) opens the PR and then **merges it automatically** - the human decision is the go-ahead to graduate, not a merge click (software-factory adr 0011). Human-owned merge unchanged for code repositories. | None for existing workspaces. |
+| 2.6.0 | Sections 13 and 15: graduation into an agent-managed context repo (`*-team-specs`, `*-team-context`, `*-context-repo`) opens the PR and then **merges it automatically** - the human decision is the go-ahead to graduate, not a merge click, because the context layer is agent-managed and unread (software-factory adr 0011). Human-owned merge is unchanged for code repositories, which graduation never targets. | None for existing workspaces. |
+| 2.7.0 | Section 13.1: `TRACKER.md` moves to per-project blocks under `## Projects`, each carrying a "Required fields at create" table (per issue type, create only) and a "Workflow" table (per issue type, with `Review status` and `Done status`), filled by the first apply of each type in that project as its own confirmed edit; an applied epic replaces its `pending` folder mapping with its key. Section 9: optional `project:` front matter field, written by `ticket` and `task-splitter` on every staged file; the apply contract and the new `apply` skill; `status: ready` is evaluator-backed only, never asserted; the code-review-opened rule. Section 13: `POINTERS.md` gains an optional `development remote:` line and, as R2's second exception, an owner-authorised `write remote:` line (branch push and MR/PR open only, never a merge); a new "Hosted mirrors and a second remote" subsection. Section 17: code paths belong in References or Links only. | `pm-workspace-setup` rewrites an existing `TRACKER.md` into one project block under `## Projects`, keeping every filled row, with an empty required-fields table and an empty workflow table that the first apply fills; existing `Jira/` files need no change. |
