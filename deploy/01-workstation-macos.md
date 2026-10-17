@@ -62,15 +62,18 @@ gcloud auth login                          # Vertex route only (section 3)
 claude                                     # first run logs you in; then exit
 npm install -g memspec@0.11.0 --min-release-age=0
 (cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)   # the store is ~/.memspec
-rm ~/.mcp.json                             # init writes a project-scope entry here; the user-scope one below replaces it
+# init writes a project-scope memspec entry into ~/.mcp.json; the user-scope one below replaces it.
+# Drop only that entry, and the file only when nothing else is left in it:
+if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 ```
 
 `memspec init` takes the project root as `--cwd` and creates the store in `<root>/.memspec`, so
 the root is the home directory. memspec 0.11.0 refuses a positional path (`too many arguments for
-'init'`). Check `~/.mcp.json` before removing it: if it existed before init and holds other
-servers, delete only its `memspec` entry. Left in place, it is a project-scope server that every
-session started under the home directory finds, pending approval, beside the user-scope one.
+'init'`). The `jq` line removes the `memspec` entry init wrote to `~/.mcp.json` and keeps any
+other servers already there; it deletes the file only when nothing else is left, and does nothing
+when the file is absent. Left in place, the entry is a project-scope server that every session
+started under the home directory finds, pending approval, beside the user-scope one.
 
 `--min-release-age=0` is there for one reason: a workstation that already carries the
 supply-chain setting `min-release-age=30` in `~/.npmrc` (the operator's machines have it; a
@@ -346,7 +349,8 @@ PM rows of 6, and the Jira rows of 8. Concretely:
 brew install git gh jq node && brew install --cask claude-code
 claude; gh auth login
 npm install -g memspec@0.11.0 --min-release-age=0
-(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch) && rm ~/.mcp.json   # section 2 says when not to rm
+(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)
+if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi   # section 2
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"
 claude plugin install pm-workspace@software-factory && claude plugin install secret-guard@software-factory
