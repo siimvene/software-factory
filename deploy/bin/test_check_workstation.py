@@ -245,7 +245,18 @@ class Fixture:
         )
 
     def write_settings(self, data: dict) -> None:
+        data.setdefault("hooks", self.memspec_hooks(str(self.cfg / "hooks")))
         (self.cfg / "settings.json").write_text(json.dumps(data))
+
+    @staticmethod
+    def memspec_hooks(hooks_dir: str) -> dict:
+        def entry(name: str) -> dict:
+            return {"hooks": [{"type": "command", "command": f'node "{hooks_dir}/{name}"', "timeout": 5}]}
+
+        return {
+            "SessionStart": [entry("memspec-session-start.js")],
+            "PostToolUse": [{**entry("memspec-consolidate.js"), "matcher": "Bash"}],
+        }
 
     def write_stub(self, name: str, body: str) -> None:
         path = self.stub / name
@@ -273,7 +284,7 @@ exit 0
             if name == "claude":
                 extra = """
 if [ "${1:-}" = "auth" ]; then exit 0; fi
-if [ "${1:-}" = "mcp" ]; then printf 'memspec\\n'; exit 0; fi
+if [ "${1:-}" = "mcp" ]; then printf 'memspec:\\n  Scope: %s\\n' "${STUB_MCP_SCOPE:-User config (available in all your projects)}"; exit 0; fi
 """
             elif name == "gh":
                 extra = """
@@ -417,6 +428,39 @@ class CheckWorkstationTests(unittest.TestCase):
             }
         )
         return self._out(proc), proc.returncode
+
+    def test_memspec_user_scope_and_hooks_ok(self) -> None:
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       memspec MCP (user scope)", out)
+        self.assertIn("OK       hook memspec-session-start.js", out)
+        self.assertIn("OK       hook memspec-consolidate.js", out)
+
+    def test_memspec_project_scope_only_missing(self) -> None:
+        self.fx.reviewer_stubs("codex", "pi", "gcloud", "rg", "fd")
+        self.fx.adc()
+        proc = self.fx.run(
+            {
+                "CONSORT_REVIEWERS": "codex,pi:google-vertex",
+                "CONSORT_GCP_PROJECT": "example-project",
+                "CONSORT_CODEX_BACKEND": "exec",
+                "STUB_MCP_SCOPE": "Project config (shared via .mcp.json)",
+            }
+        )
+        out = self._out(proc)
+        self.assertEqual(proc.returncode, 1, out)
+        self.assertIn("MISSING  memspec MCP (user scope)", out)
+        self.assertIn("Project config", out)
+
+    def test_memspec_hooks_registered_in_other_config_dir(self) -> None:
+        settings = json.loads((self.fx.cfg / "settings.json").read_text())
+        settings["hooks"] = self.fx.memspec_hooks("$HOME/.claude/hooks")
+        self.fx.write_settings(settings)
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OPTIONAL hook memspec-session-start.js", out)
+        self.assertIn("not registered in", out)
+        self.assertIn("memspec init writes ~/.claude only", out)
 
     def test_chisle_pinned_user_install_ok(self) -> None:
         out, code = self._reference_run()

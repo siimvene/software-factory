@@ -17,6 +17,16 @@ alternative. It does not need gcloud. Order matters in two other places only. In
 engine before the agent hooks that call it, and install Codex before the consort plugin that
 wraps it. Everything else can be installed in any order.
 
+`$CFG` below is the Claude Code config directory: `$CLAUDE_CONFIG_DIR` when it is set, `~/.claude`
+otherwise. `claude` commands follow it on their own. Two tools write `~/.claude` regardless of
+it: `memspec init` (section 2) and Consort's Codex companion lookup (section 3). On a machine
+that runs Claude Code from another directory, follow the per-section notes, then run the checker
+with the same `CLAUDE_CONFIG_DIR` the sessions use; it reports which directory it read.
+
+```
+CFG="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+```
+
 ## 1. Base toolchain
 
 ```
@@ -51,9 +61,19 @@ gcloud auth login                          # Vertex route only (section 3)
 ```
 claude                                     # first run logs you in; then exit
 npm install -g memspec@0.11.0 --min-release-age=0
-memspec init ~/.memspec                    # the personal scratch store; installs the two session hooks
+(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)   # the store is ~/.memspec
+# init writes a project-scope memspec entry into ~/.mcp.json; the user-scope one below replaces it.
+# Drop only that entry, and the file only when nothing else is left in it:
+if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 ```
+
+`memspec init` takes the project root as `--cwd` and creates the store in `<root>/.memspec`, so
+the root is the home directory. memspec 0.11.0 refuses a positional path (`too many arguments for
+'init'`). The `jq` line removes the `memspec` entry init wrote to `~/.mcp.json` and keeps any
+other servers already there; it deletes the file only when nothing else is left, and does nothing
+when the file is absent. Left in place, the entry is a project-scope server that every session
+started under the home directory finds, pending approval, beside the user-scope one.
 
 `--min-release-age=0` is there for one reason: a workstation that already carries the
 supply-chain setting `min-release-age=30` in `~/.npmrc` (the operator's machines have it; a
@@ -65,8 +85,26 @@ no-op there.
 
 `memspec init` writes `memspec-session-start.js` and `memspec-consolidate.js` under
 `~/.claude/hooks/` and wires them into `~/.claude/settings.json`; the MCP registration gives
-every session the `memspec_*` tools. Verify with `claude mcp list` (memspec listed, connected)
-and `memspec stores` from any directory (the global store, read-write).
+every session the `memspec_*` tools. Verify with `claude mcp get memspec` (`Scope: User config`,
+connected) and `memspec stores` from any directory (the global store, read-write).
+
+With `CLAUDE_CONFIG_DIR` set, `memspec init` still writes `~/.claude` (the path is fixed in
+memspec 0.11.0), where those sessions never read it. Add `--no-install-hooks` to the init line
+and install the hooks into `$CFG` instead:
+
+```
+CFG="$CLAUDE_CONFIG_DIR"; SRC="$(npm root -g)/memspec/hooks"
+mkdir -p "$CFG/hooks" && install -m 0755 "$SRC"/memspec-{session-start,consolidate,claims-check}.js "$CFG/hooks/"
+cp "$CFG/settings.json" "$CFG/settings.json.bak"
+jq --arg d "$CFG/hooks" '
+  .hooks.SessionStart = ((.hooks.SessionStart // []) + [{hooks: [{type: "command", command: "node \"\($d)/memspec-session-start.js\"", timeout: 5}]}]) |
+  .hooks.PostToolUse  = ((.hooks.PostToolUse  // []) + [{matcher: "Bash", hooks: [{type: "command", command: "node \"\($d)/memspec-consolidate.js\"", timeout: 5}]}])
+' "$CFG/settings.json.bak" > "$CFG/settings.json"
+```
+
+The session-start hook's own claims check also looks under `~/.claude` only, so it may print a
+warning that the hook is not installed. The checker's hook lines are the check that counts: both
+`OK` means the file is in `$CFG/hooks` and `$CFG/settings.json` runs it.
 
 The store is personal scratch. Durable team knowledge lives in the team-context repo and
 reaches it through promote PRs; the scaffold runbook binds each code repo to that store
@@ -115,8 +153,14 @@ checkout (`~/git/consort/scripts/consort-panel.sh`, `merge-findings.mjs`), which
 reference machine runs the gate. `codex exec` always reads stdin. Redirect it from `/dev/null`
 or it waits forever, which is the 2h08m stall in the trial report.
 
+With `CLAUDE_CONFIG_DIR` set, the Codex plugin installs under `$CFG/plugins/cache`, but Consort
+5f68ef6 looks for `codex-companion.mjs` under `~/.claude/plugins/cache` only
+(`scripts/codex-backend.sh`). Its plugin transport then finds nothing and the auto mode falls
+back to the CLI. Set `CONSORT_CODEX_BACKEND=exec` in the section 7 block so the transport is a
+stated choice rather than a silent fallback.
+
 The panel reads process environment, not Claude settings files. For a Claude session, merge the
-keys in section 7 into user-scope `~/.claude/settings.json` so the session inherits them. For a
+keys in section 7 into user-scope `$CFG/settings.json` so the session inherits them. For a
 shell panel, export the same keys in that shell. A review of a multi-hundred-line diff that
 returns in seconds did not run. The panel's `[label]` stderr lines and its `seconds` are the
 evidence that it did.
@@ -200,20 +244,20 @@ reference implementation it stopped loading for a week that way
 ([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)). The switch stays per project because
 its output hook sees every tool result, and a repository that did not opt in should not run it.
 
-1. Pin the marketplace: an `extraKnownMarketplaces` entry `chisle` in `~/.claude/settings.json`
+1. Pin the marketplace: an `extraKnownMarketplaces` entry `chisle` in `$CFG/settings.json`
    with source `{"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}`.
 2. `claude plugin install chisle@chisle --scope user`.
-3. Set `"chisle@chisle": false` under `enabledPlugins` in `~/.claude/settings.json`. The install
+3. Set `"chisle@chisle": false` under `enabledPlugins` in `$CFG/settings.json`. The install
    writes `true`, which would switch it on in every repository.
 4. Check the installed commit against the literal pin, not against the tag (a tag can move and
-   the install would follow it): `gitCommitSha` in `~/.claude/plugins/installed_plugins.json`
+   the install would follow it): `gitCommitSha` in `$CFG/plugins/installed_plugins.json`
    must be `a5486fa112c961f9b25349a29ede38cc9f2a1a5c`. `check-workstation.sh` does this.
 
 Repeat in every `CLAUDE_CONFIG_DIR` the machine uses.
 
 The `claude plugin marketplace add` commands above track each source's default branch, and a
 plugin runs code. Where the source has tags, pin it the way the scaffold pins chisle: an
-`extraKnownMarketplaces` entry in `~/.claude/settings.json` with a `ref` (consort tags its
+`extraKnownMarketplaces` entry in `$CFG/settings.json` with a `ref` (consort tags its
 releases; check the other two before pinning). An unpinned marketplace is a named shortcut.
 
 Known trap: two config directories. A canvas or terminal-multiplexer runtime may start Claude
@@ -222,7 +266,7 @@ directory is absent in the other, silently. Register in both, or run the checker
 
 ## 7. Settings that every session inherits
 
-Merge the block for your chosen route into user-scope `~/.claude/settings.json` (the memspec
+Merge the block for your chosen route into user-scope `$CFG/settings.json` (the memspec
 hooks are already there after section 2). Values in angle brackets are yours. Nothing here is a
 secret. Do not put executable paths, `PI_CODING_AGENT_DIR`, credentials, or reviewer keys into
 tracked project `.claude/settings.json`.
@@ -261,6 +305,9 @@ auth stay in the user environment:
   "statusLine": { "type": "command", "command": "<what claude-hud:setup wrote>" }
 }
 ```
+
+With `CLAUDE_CONFIG_DIR` set, add `"CONSORT_CODEX_BACKEND": "exec"` to either block (section 3
+says why).
 
 `CONSORT_REVIEWERS` makes the gate a two-leg panel instead of whichever backend is reachable.
 The model pin is the routing decision in
@@ -301,7 +348,9 @@ PM rows of 6, and the Jira rows of 8. Concretely:
 ```
 brew install git gh jq node && brew install --cask claude-code
 claude; gh auth login
-npm install -g memspec@0.11.0 --min-release-age=0 && memspec init ~/.memspec
+npm install -g memspec@0.11.0 --min-release-age=0
+(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)
+if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi   # section 2
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"
 claude plugin install pm-workspace@software-factory && claude plugin install secret-guard@software-factory
@@ -383,6 +432,13 @@ lines that say `UNVERIFIED` as limits, not success. Prove these separately, once
   is on npm: `~/.npmrc` has `min-release-age=30` and the pin is younger than that. Add
   `--min-release-age=0` to that one install (already in sections 2 and 9); the checker prints
   an OPTIONAL line when the setting is present.
+- `memspec init ~/.memspec` fails with `too many arguments for 'init'` on memspec 0.11.0. The
+  root goes in `--cwd`, and init leaves a project-scope `.mcp.json` in that root (section 2)
+  `[measured 2026-10-15]`.
+- A machine that runs Claude Code from a `CLAUDE_CONFIG_DIR` other than `~/.claude` gets the
+  memspec hooks in the wrong directory and Consort's Codex plugin transport finds no companion.
+  Both are fixed paths in the tools, not settings. Sections 2 and 3 carry the workarounds; the
+  checker's hook lines say `not registered in $CFG/settings.json` when the first one bites.
 - No `timeout` on macOS without coreutils. A delegation's wall-clock cap is
   `perl -e 'alarm N; exec @ARGV' <cmd...>`; a bare `timeout` exits 127 before the child starts
   and reads as an instant success.
