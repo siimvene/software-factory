@@ -64,6 +64,7 @@ evidence class from `STATUS.md`:
 | Readiness | a score out of 100 against seven criteria, per-criterion gaps, one highest-impact question; 85 is Ready | `readiness-evaluator` | `measured` (kvart cycles self-scored 94 and 93 of 100 `[measured 2026-09-07]`) |
 | Refinement | one question at a time until the score clears 85, then a drift check against the original and a session log | `task-improver` | `designed` |
 | Splitting | a ticket over about two person-days becomes an epic with independently deliverable stories, coverage checked | `task-splitter` | `designed` |
+| Applying to the tracker | a staged ticket created in the tracker only at an evaluator-recorded readiness of 85 or above; the project's required fields and workflow learned once per issue type, every write previewed; a reported merge request walks the ticket to review and comments the link | `apply` | `designed` |
 | Graduation | a rewritten features file plus a handoff package; six checks, no partial packages; the human submits | `graduate` | `designed` |
 | Specs from code | feature maps, a candidate table and spec pairs retro-generated on Day 1 and again when a ticket touches unbuilt surface; a sister spec delta after every behaviour-changing merge | `retrogenerate-specs`, `update-specs-for-commits`, `check-specs` | `measured` (run by hand on kvart) |
 | Program design note | for a sized ticket, the shape of the change before the plan: which module gains what, where the transaction boundary sits, which slice lands first; the module list is the spillover scope for the architecture diff | [templates/program-design.md](templates/program-design.md), [adr/0010](adr/0010-program-design-before-the-plan.md) | `proposed` (the cycle-4 API contract is the measured precursor) |
@@ -76,7 +77,7 @@ Where these live in this repository:
   a workspace's or a repository's `.claude/skills/`.
 - [deploy/marketplace/](deploy/README.md): the same skills as installable plugins, copied at
   pinned commits from the group's catalog with its identifiers scrubbed. `pm-workspace` carries
-  the seven PM skills including workspace setup; `spec-repos` carries the three spec skills; six more plugins cover rule packs,
+  the eight PM skills including workspace setup and `apply`; `spec-repos` carries the three spec skills; six more plugins cover rule packs,
   secret guarding, team memory, browser QA, a hygiene pass and a one-model fallback review.
 - [templates/ticket.md](templates/ticket.md), [templates/pm-skill.md](templates/pm-skill.md):
   the ticket shape the skills produce and the skeleton every PM skill follows.
