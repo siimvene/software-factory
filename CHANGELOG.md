@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.18 (2026-10-17)
+
+The vendored PM plugin catches up with its source, and the tracker skill stops being "not here".
+
+- `deploy/marketplace/plugins/pm-workspace/`: re-vendored at the group catalog's `main` @
+  `9c32239` (1.8.0, conventions 2.7.0): the new `apply` skill, per-project `TRACKER.md` blocks,
+  `project:` front matter, the development and owner-authorised write remotes, the setup upgrade
+  notice. The previous copy had been edited in place after vendoring (`a74fdbd`, `cead07b`) and
+  matched neither 1.7.0 commit of its source; this one is the source verbatim plus the two-step
+  scrub, twelve lines and nothing else. The marketplace index entry and the pin table follow; the
+  pin table also stops counting `rule-packs`, which is written here, as vendored.
+- `README.md`, `docs/14-pm-surface.md`, `templates/skills/README.md`, `STATUS.md`: `apply` as the
+  shipped write path of `tracker-mcp` `[designed]`; the catalogue count corrected to nineteen.
+
 ## 0.2.17 (2026-10-01)
 
 Merge on green leaves the reference design: it is the operator's local practice, and at the

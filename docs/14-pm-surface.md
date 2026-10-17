@@ -104,12 +104,15 @@ the human only when the answer is genuinely not determinable from either, and sa
 "Gated" below means the skill refuses to proceed or requires an explicit confirmation before a
 write or a promotion. "Advisory" means it produces something a person then decides on.
 
-Five of the seventeen ship in this repository, anonymised from the reference implementation:
-`ticket`, `readiness-evaluator`, `task-improver`, `task-splitter` and `graduate`, under
-[templates/skills](../templates/skills/). They are the chain that turns intent into the
+Five of the nineteen ship in this repository as copies, anonymised from the reference
+implementation: `ticket`, `readiness-evaluator`, `task-improver`, `task-splitter` and `graduate`,
+under [templates/skills](../templates/skills/). They are the chain that turns intent into the
 structured input every later stage reads: a ticket with numbered examples, scored to the
-threshold, split when too large, and graduated into the team layer. The other twelve follow the
-same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopter's to port.
+threshold, split when too large, and graduated into the team layer. The write path of
+`tracker-mcp` ships too, as `apply` in the vendored pm-workspace plugin from 1.8.0
+([deploy/marketplace](../deploy/marketplace/plugins/pm-workspace/skills/apply/SKILL.md))
+`[designed]`. The rest follow the same shape ([templates/pm-skill.md](../templates/pm-skill.md))
+and are the adopter's to port.
 
 | Skill | Job | Inputs, in read order | Output artifact | Loop position | Kind |
 |---|---|---|---|---|---|
@@ -127,7 +130,7 @@ same shape ([templates/pm-skill.md](../templates/pm-skill.md)) and are the adopt
 | `session-checkpoint` | Save, list, resume and branch a refinement session | the conversation's score tables and question log | a checkpoint file outside the workspace | daily ops | advisory, non-destructive by rule |
 | `graduate` | Promote a `features/` file into the team layer | the file, then `POINTERS.md`, then the target repository's spec conventions | a rewritten file plus a handoff package: target path, branch name, title, description, and both submission routes | SPEC to team layer | gated: six checks, all must pass, no partial packages, the human submits |
 | `demo` | Build a throwaway clickable, navigable prototype as a stakeholder reaction artifact | a discovery or features file, then the design standards, then the code for the behaviour it mirrors | one self-contained HTML file in the discovery folder; on request, a published private page for stakeholders | SPEC intake | gated by three hard rules: a visible throwaway banner, fake data only, never lands in the team layer. Once the flow is agreed it is attached to the ticket or epic as a design artifact, a load-bearing input for the frontend builder (decided 2026-09-09, not yet measured). Publishing is an explicit sensitivity decision by the PM, never the skill's default |
-| `tracker-mcp` | Every read and write against a ticket tracker such as Jira, attachments included | tracker identifiers and the current user, then `TRACKER.md`, then the issues themselves | tracker mutations; design artifacts and screenshots attached to the issue or epic under a "Design artifacts" heading | daily ops and SHIP | gated: preview, confirm, execute on every write. The hosted MCP surface has no attachment call, so attachments go through the tracker's REST endpoint with the PM's own token, under the same preview |
+| `tracker-mcp` | Every read and write against a ticket tracker such as Jira, attachments included | tracker identifiers and the current user, then `TRACKER.md`, then the issues themselves | tracker mutations; design artifacts and screenshots attached to the issue or epic under a "Design artifacts" heading | daily ops and SHIP | gated: preview, confirm, execute on every write. The hosted MCP surface has no attachment call, so attachments go through the tracker's REST endpoint with the PM's own token, under the same preview. The write path ships as `apply` (pm-workspace 1.8.0, `[designed]`): only an evaluator-recorded readiness of 85 or above goes out, required fields are learned per project and issue type, the workflow is recorded once, and a reported merge request walks the ticket to the review status with the link as a comment |
 | `release-note` | Turn shipped tickets into a release page entry | the tickets, grouped by user-visible change | a title plus a two or three sentence factual description | SHIP | advisory |
 | `morning` | Start-of-day brief with chase and overdue flags | `Todo.md`, `Waiting-On.md`, `Action-Points.md`, then the tracker if connected | a brief under 25 lines: top three, chase list, overdue, blocked, heads-up | daily ops | advisory |
 | `wrap-up` | Persist the session's outcomes so nothing agreed dies in the transcript | the conversation | updates to the four tracking files plus a five-line summary of what landed where | daily ops and LEARN | advisory, but capture is mechanical by rule |
@@ -206,8 +209,10 @@ label rows, and the vocabulary line.
 attachments like any other issue. The hosted tracker MCP exposes create, edit, comment, transition
 and link, and no attachment call `[measured 2026-09-15]`, so the tracker skill attaches through the
 tracker's REST endpoint with the PM's own token, under the same preview-confirm rule as every
-write. Until that is wired, the `demo` skill's "attach it to the ticket" step is a hand step in the
-tracker's web interface, and the design says so rather than pretending.
+write. The `apply` skill specifies exactly that, with a named hand step as its fallback when REST
+is unreachable `[designed]`; until it has run against a real tracker, the `demo` skill's "attach
+it to the ticket" step stays a hand step in the tracker's web interface, and the design says so
+rather than pretending.
 
 **Sharing a prototype.** The prototype is one self-contained file: clickable and navigable across
 its screens, fake data, a visible throwaway banner. For stakeholders who will not open a file, the
