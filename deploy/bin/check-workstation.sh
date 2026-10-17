@@ -117,7 +117,7 @@ MEMSPEC_SCOPE="$(have claude && claude mcp get memspec 2>/dev/null | sed -n 's/^
 case "$MEMSPEC_SCOPE" in
   "User config"*) ok "memspec MCP (user scope)" ;;
   "") miss "memspec MCP (user scope)" "claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp" ;;
-  *) miss "memspec MCP (user scope)" "registered as \"$MEMSPEC_SCOPE\" only; remove the .mcp.json memspec init wrote, then: claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp" ;;
+  *) miss "memspec MCP (user scope)" "registered as \"$MEMSPEC_SCOPE\" only; drop the memspec entry init wrote to .mcp.json (guide section 2), then: claude mcp add --scope user memspec -e MEMSPEC_ROOT=\$HOME/.memspec -- memspec-mcp" ;;
 esac
 for h in memspec-session-start.js memspec-consolidate.js; do
   if [ ! -f "$CFG/hooks/$h" ]; then warn "hook $h" "$HOOK_HINT"
