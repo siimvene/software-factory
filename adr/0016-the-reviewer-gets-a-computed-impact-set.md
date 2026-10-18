@@ -63,26 +63,42 @@ as an input pack, and refuse the gate when a module in the set has no evidenced 
    handlers; scheduled jobs and their registrations (shared with the money path map's `wired_by`,
    adr/0012, never duplicated); tables written by one module and read by another; whole-tree
    fences (translations, error codes, permissions catalogues); contracts another repository reads.
-   It is seeded by the people who hold the "if X changes, look at Y" knowledge, and a resolver
-   checks that every trigger still matches something in the tree, in the shape of adr/0012's.
+   It is seeded by the people who hold the "if X changes, look at Y" knowledge. A resolver, in
+   the shape of adr/0012's, checks both ends: every trigger still matches something in the tree,
+   and every target still resolves (a module's path exists, a fence's test node id is collected
+   by the test runner). A target in another repository is reported as unchecked, never as
+   resolved; its seam names the local contract file it reaches, and that file is what a reviewer
+   cites.
 2. **The impact set.** A script reads the diff, takes the changed symbols, and writes
    `impact-set.json`: the modules reached by static dependents (the orientation map's
    `--impact`, or the architecture tool's impact analysis), the modules and fences reached by any
    seam whose trigger the diff matches, and the touched money path entries. Each module carries
-   its reason (an edge or a seam id). Changed symbols, not changed files, so a one-line edit in a
-   hub module does not pull in every importer of that module. The set is capped at 12 modules (a
-   starting value for the measurement below), ranked seams first, then by edge distance. A set
-   over the cap is reported as truncated, and a truncated set on a one-shot ticket
-   reclassifies it as one-note under adr/0010's sizing rule.
+   its reason (an edge or a seam id) and the paths that belong to it. Changed symbols, not
+   changed files, so a one-line edit in a hub module does not pull in every importer of that
+   module. Both sides of the diff count: a symbol deleted or renamed, or a registration line
+   removed, has its dependents and seam triggers looked up on the merge base, because on the
+   branch it no longer exists to be found (cycle 2's poller removal is that case). The file
+   records the base and head commits it was computed for and is written into the panel run's own
+   directory, so two panels in one checkout cannot read each other's set. The set is capped at 12
+   modules (a starting value for the measurement below), ranked seams first, then by edge
+   distance. A set over the cap is reported as truncated, and the truncated tail needs the
+   owner's disposition (review it, or accept it with a reason) before the gate passes. Sizing
+   happens before the build, so the same script runs at sizing time on the symbols the ticket
+   and the plan name; a set over the cap there makes a one-shot ticket one-note under adr/0010,
+   before any brief is written, never after the diff exists.
 3. **The pack.** The set travels to every leg as one more injected pack, the mechanism adr/0009
    uses for the spec. The instruction: for each listed module, state `checked-clean`,
-   `finding`, or `not-inspected`, and cite at least one `file:line` read in that module. A
-   verdict without a citation counts as `not-inspected`. The diff-only transport receives the
-   set too and answers `not-inspected`, which is honest; it is not asked to pretend.
+   `finding`, or `not-inspected`, and cite at least one `file:line` read in that module, outside
+   the diff's hunks. A verdict without such a citation counts as `not-inspected`. The diff-only
+   transport receives the set too and answers `not-inspected`, which is honest; it is not asked
+   to pretend.
 4. **The coverage check.** The review schema gains a `coverage` array (module, verdict,
    citations). A script over the merged panel output refuses the gate when a module in the set
    has no `checked-clean` or `finding` verdict from at least one repo-reading leg, and names the
-   module. A citation that does not resolve to an existing line in the tree counts as no verdict.
+   module. A citation counts only when it resolves to an existing line at the recorded head, in
+   a path that belongs to the module it is credited to, and not inside a hunk of the diff (a line
+   the payload already showed proves nothing was read). The check refuses a set whose recorded
+   base and head differ from the panel's.
    The adjudicator spot-checks one `checked-clean` verdict per panel against the cited lines, as
    it already disbelieves one rejected finding.
 5. **Escapes grow the file.** A finding the adjudicator confirms in a module outside the set, and
