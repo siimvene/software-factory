@@ -84,18 +84,19 @@ target=os.path.join(cfg,'hooks',sys.argv[1])
 p=os.path.join(cfg,'settings.json')
 d=json.load(open(p)) if os.path.exists(p) else {}
 def words(h):
+    # Exec form runs without a shell: its arguments are literal, nothing is expanded.
     cmd=h.get('command') or ''
     if isinstance(h.get('args'),list):
         return [cmd]+[str(a) for a in h['args']]
     try:
-        return shlex.split(cmd)
+        parts=shlex.split(cmd)
     except ValueError:
-        return cmd.split()
+        parts=cmd.split()
+    return [os.path.expanduser(os.path.expandvars(w)) for w in parts]
 for entries in (d.get('hooks') or {}).values():
     for e in entries or []:
         for h in e.get('hooks') or []:
             for word in words(h):
-                word=os.path.expanduser(os.path.expandvars(word))
                 if word.endswith('/'+sys.argv[1]) and os.path.realpath(word)==target:
                     sys.exit(0)
 sys.exit(1)

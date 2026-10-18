@@ -489,6 +489,19 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertIn("OK       hook memspec-session-start.js", out)
         self.assertIn("OK       hook memspec-consolidate.js", out)
 
+    def test_memspec_hooks_exec_form_args_are_not_expanded(self) -> None:
+        # Exec form spawns without a shell, so "$HOME/..." reaches node literally and fails.
+        settings = json.loads((self.fx.cfg / "settings.json").read_text())
+        rel = os.path.relpath(self.fx.cfg / "hooks", self.fx.home)
+        settings["hooks"] = {
+            "SessionStart": [{"hooks": [{"type": "command", "command": "node", "args": [f"$HOME/{rel}/memspec-session-start.js"]}]}],
+        }
+        self.fx.write_settings(settings)
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OPTIONAL hook memspec-session-start.js", out)
+        self.assertIn("not registered in", out)
+
     def test_memspec_older_than_0_12_3_warns_under_a_config_dir(self) -> None:
         self.fx.version_stub("memspec", version="0.11.0")
         out, code = self._reference_run()
