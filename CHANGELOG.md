@@ -8,11 +8,13 @@ affects, and a repository-wide mechanical change has no lane of its own. Both pr
 - `adr/0016`: a script computes the affected modules from the changed symbols plus a declared
   `seams.yaml` (dispatch, registrations, shared tables, whole-tree fences); every leg gets the set
   as a pack and owes one evidenced verdict per module; the gate refuses a module no repo-reading
-  leg checked; escapes add seams; CI test selection reads the same file.
+  leg checked, with a citation inside that module and outside the diff; the set is bound to the
+  panel's base and head; escapes add seams; CI test selection reads the same file.
 - `adr/0017`: a `mechanical` ticket class; the builder writes a codemod recipe with its tests;
-  the PR is recipe, recipe output, hand edits; a script re-runs the recipe on the base and
-  requires a byte-identical result, a residual query at 0 and the full suite; the panel reviews
-  the recipe and a sampled output; a moved base is a re-run, never a hand-resolved conflict.
+  the PR is recipe, recipe output, hand edits; a script re-runs the recipe on commit 2's parent
+  and requires a byte-identical result, a residual query at 0 and the full suite; the panel reviews
+  the recipe and a sampled output; a moved base is a re-run of the recipe and of every check,
+  never a hand-resolved conflict. Both revised after a two-leg panel (Codex 3, Gemini 4 findings).
 - `evidence/field-evidence.md`: §9 deterministic refactoring for agents, §10 Ponytail 5's
   caller-reading review, each with its caveats.
 - `adr/README.md`, `STATUS.md`: the rows.
