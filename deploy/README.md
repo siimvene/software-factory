@@ -47,7 +47,7 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 | Gemini CLI | third vendor, cli transport | 0.58.0 | npm `@google/gemini-cli` |
 | Pi | multi-provider headless agent; Vertex Gemini or another explicit provider/model for the second panel leg | 0.84.1 | npm `@earendil-works/pi-coding-agent` |
 | consort | the cross-vendor verify gate, panel, scan, security side-pass | 0.9.1 (`5f68ef6`) | `siimvene/consort`, plugin plus a checkout |
-| memspec | memory engine and MCP server | 0.11.0 | npm `memspec` |
+| memspec | memory engine and MCP server | 0.12.3 | npm `memspec` |
 | cleat | quality ratchets (sensor 3) | fork `siimvene/cleat` @ `c2947a5` | vendored into each project by `attach.py` |
 | enola | architecture diff (sensor 4) | 0.4.19, the same pin in `templates/github/workflows/gates.yml` | `enola-labs/enola` releases, sha256-verified |
 | ripwire | orientation map (sensor 1) | 0.4.0 | `redhat-et/ripwire` installer |

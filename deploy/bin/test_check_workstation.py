@@ -164,7 +164,7 @@ class Fixture:
     def __init__(self) -> None:
         self.tmp = Path(tempfile.mkdtemp(prefix="sf-ws-"))
         self.home = self.tmp / "home"
-        self.cfg = self.tmp / "claude"
+        self.cfg = self.tmp / "App Support" / "claude"
         self.stub = self.tmp / "stub"
         self.unix = self.tmp / "unix"
         self.cwd = self.tmp / "work"
@@ -460,7 +460,66 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertEqual(code, 0, out)
         self.assertIn("OPTIONAL hook memspec-session-start.js", out)
         self.assertIn("not registered in", out)
-        self.assertIn("memspec init writes ~/.claude only", out)
+        self.assertIn("with this CLAUDE_CONFIG_DIR: memspec init ~/.memspec", out)
+
+    def test_memspec_hooks_single_quoted_as_memspec_writes_them(self) -> None:
+        # memspec 0.12.3 registers `node '<abs path>'`; the config dir path has a space.
+        settings = json.loads((self.fx.cfg / "settings.json").read_text())
+        hooks = self.fx.cfg / "hooks"
+        settings["hooks"] = {
+            "SessionStart": [{"hooks": [{"type": "command", "command": f"node '{hooks}/memspec-session-start.js'"}]}],
+            "PostToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": f"node '{hooks}/memspec-consolidate.js'"}]}],
+        }
+        self.fx.write_settings(settings)
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       hook memspec-session-start.js", out)
+        self.assertIn("OK       hook memspec-consolidate.js", out)
+
+    def test_memspec_hooks_exec_form_ok(self) -> None:
+        settings = json.loads((self.fx.cfg / "settings.json").read_text())
+        hooks = self.fx.cfg / "hooks"
+        settings["hooks"] = {
+            "SessionStart": [{"hooks": [{"type": "command", "command": "node", "args": [f"{hooks}/memspec-session-start.js"]}]}],
+            "PostToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "node", "args": [f"{hooks}/memspec-consolidate.js"]}]}],
+        }
+        self.fx.write_settings(settings)
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       hook memspec-session-start.js", out)
+        self.assertIn("OK       hook memspec-consolidate.js", out)
+
+    def test_memspec_hooks_exec_form_args_are_not_expanded(self) -> None:
+        # Exec form spawns without a shell, so "$HOME/..." reaches node literally and fails.
+        settings = json.loads((self.fx.cfg / "settings.json").read_text())
+        rel = os.path.relpath(self.fx.cfg / "hooks", self.fx.home)
+        settings["hooks"] = {
+            "SessionStart": [{"hooks": [{"type": "command", "command": "node", "args": [f"$HOME/{rel}/memspec-session-start.js"]}]}],
+        }
+        self.fx.write_settings(settings)
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OPTIONAL hook memspec-session-start.js", out)
+        self.assertIn("not registered in", out)
+
+    def test_memspec_older_than_0_12_3_warns_under_a_config_dir(self) -> None:
+        self.fx.version_stub("memspec", version="0.11.0")
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OPTIONAL memspec 0.11.0", out)
+        self.assertIn("ignores CLAUDE_CONFIG_DIR", out)
+        self.fx.version_stub("memspec", version="0.12.3")
+        out = self._out(
+            self.fx.run(
+                {
+                    "CONSORT_REVIEWERS": "codex,pi:google-vertex",
+                    "CONSORT_GCP_PROJECT": "example-project",
+                    "CONSORT_CODEX_BACKEND": "exec",
+                }
+            )
+        )
+        self.assertIn("OK       memspec", out)
+        self.assertNotIn("ignores CLAUDE_CONFIG_DIR", out)
 
     def test_chisle_pinned_user_install_ok(self) -> None:
         out, code = self._reference_run()
