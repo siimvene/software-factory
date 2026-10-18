@@ -75,13 +75,14 @@ init writes to `~/.memspec/.mcp.json`, keeps any other servers in that file, del
 nothing else is left, and does nothing when it is absent. Left in place, it is a project-scope
 server, pending approval, in every session started inside the store directory.
 
-`--min-release-age=0` is there for one reason: a workstation that already carries the
-supply-chain setting `min-release-age=30` in `~/.npmrc` (the operator's machines have it; a
-fresh Mac does not) refuses to install a version published less than 30 days ago, and a
-pinned memspec release is exactly that for its first month (0.12.3 shipped 2026-10-18). The flag lifts the
-gate for this single install and nothing else; the pin, not the age, is the trust decision
-here (the package is ours). Leave it in place even on a machine without the setting, it is a
-no-op there.
+`--min-release-age=0` drops the npm release-age gate for this install. A workstation that
+carries `min-release-age=30` in `~/.npmrc` (the operator's machines do; a fresh Mac does not)
+refuses a version published less than 30 days ago, and a pinned memspec release is exactly that
+for its first month (0.12.3 shipped 2026-10-18). The flag applies to the whole install, not only
+to memspec: memspec's dependencies are declared as ranges and resolve to their newest versions,
+so packages younger than 30 days come in with it. On the reference machine 0.12.3 brought four
+`[measured 2026-10-18]`. That is accepted here; the trust decision is the memspec pin. On a
+machine without the setting the flag is a no-op.
 
 `memspec init` writes `memspec-session-start.js` and `memspec-consolidate.js` (and the
 `memspec-claims-check.js` helper they load) into `$CFG/hooks/` and registers them in

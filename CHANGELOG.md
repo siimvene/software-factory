@@ -11,7 +11,8 @@ store path positionally, so the 0.11.0 workarounds from 0.2.18's contributed fix
   second config directory is gone: the init line runs once per `CLAUDE_CONFIG_DIR` and repoints
   an old `~/.claude` registration. `CLAUDE_CONFIG_DIR` must be absolute. Section 3 notes that
   Consort 0.13.1 finds the Codex plugin under `CLAUDE_CONFIG_DIR`; the pin stays at 5f68ef6. Known
-  traps rewritten.
+  traps rewritten. The `--min-release-age=0` paragraph no longer claims the flag lifts the gate
+  for memspec alone: it drops it for the whole dependency tree, which is stated and accepted.
 - `deploy/02-scaffold-a-project.md`: the team-context repo's `memspec init .` gains `--force`.
   On a workstation that followed section 2 the repo sits under the home store, and init refuses
   to nest a store without it (rehearsed on 0.12.3); 0.11.0 refused the positional path as well.
