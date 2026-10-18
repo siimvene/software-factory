@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.19 (2026-10-18)
+
+The workstation guide moves to memspec 0.12.3, which honours `CLAUDE_CONFIG_DIR` and takes the
+store path positionally, so the 0.11.0 workarounds from 0.2.18's contributed fix come out.
+
+- `deploy/01-workstation-macos.md`: sections 2 and 9 pin memspec 0.12.3 and run
+  `memspec init ~/.memspec` (hooks land in `$CFG`; `.mcp.json` lands inside the store, not the
+  home directory, and the `jq` line drops its memspec entry). The hand-copied hook install for a
+  second config directory is gone: the init line runs once per `CLAUDE_CONFIG_DIR` and repoints
+  an old `~/.claude` registration. `CLAUDE_CONFIG_DIR` must be absolute. Section 3 notes that
+  Consort 0.13.1 finds the Codex plugin under `CLAUDE_CONFIG_DIR`; the pin stays at 5f68ef6. Known
+  traps rewritten.
+- `deploy/02-scaffold-a-project.md`: the team-context repo's `memspec init .` gains `--force`.
+  On a workstation that followed section 2 the repo sits under the home store, and init refuses
+  to nest a store without it (rehearsed on 0.12.3); 0.11.0 refused the positional path as well.
+- `deploy/bin/check-workstation.sh`: hook commands are split like a shell would, so a quoted
+  path with a space (`Application Support`) or memspec's single-quoted form is recognised, and
+  so is an exec-form entry (`command` plus `args`); the old split broke such paths and reported
+  `not registered`. Hints name the new init line. With `CLAUDE_CONFIG_DIR` set, a memspec older
+  than 0.12.3 is an OPTIONAL warning.
+- `deploy/bin/test_check_workstation.py`: the fixture's config directory has a space in it;
+  three new cases (single-quoted form, exec form, old memspec version). 54 tests.
+
 ## 0.2.18 (2026-10-17)
 
 The vendored PM plugin catches up with its source, and the tracker skill stops being "not here".
