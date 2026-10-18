@@ -335,3 +335,45 @@ a person's decision cannot be read from it. Its one described incident (a site o
 image build) ends with the root cause unestablished and a regression test for a failed build,
 where the outage came from a build in progress; that is noted here as a caveat on the source, and
 nothing in this design depends on it.
+
+## 9. Deterministic refactoring for agents `[field: codemods]`
+
+**What it is.** Three public sources on one idea: a repository-wide mechanical change is written
+once as a deterministic transformation and run everywhere, instead of edited site by site.
+
+- *Software Engineering at Google*, chapter 22, "Large-Scale Changes": the long-standing practice
+  of tooling-driven changes across a monorepo, split into independently reviewable shards.
+- Anthropic's code-modernization plugin (claude-plugins-official, v1.0.0, read 2026-10-14): its
+  uplift command marks each version delta Mechanical (a codemod can do it) or Judgment, and sends
+  the Mechanical ones to a codemod, naming OpenRewrite's headless dry run for Java and Spring.
+- A one-page summary from BrontoSource, "Cutting the cost of agentic refactoring" (2026-10): a
+  compiler-based refactoring tool plus an agent plugin that routes to it, claiming 14 to 26 times
+  lower cost per task than unaided agents across four models, on one C++ codebase of about 50k
+  lines.
+
+**What this design takes.** The ticket class of [adr/0017](../adr/0017-mechanical-changes-ship-as-a-recipe.md):
+the recipe is reviewed, the diff is proven to be its output.
+
+**Caveats.** The cost figure is a marketing sheet: no task list, no N, no variance, the unaided
+arms on older models, and no full paper behind it (the linked paper directory returned 404 on
+2026-10-14). Its "guaranteed correctness" means repeatable, not semantically right. The plugin is
+a routing instruction, not a measurement. No mechanical change has been measured on kvart.
+
+## 10. Ponytail 5: a caller-reading review `[field: Ponytail 5]`
+
+**What it is.** Version 5 of ponytail (section 5), released 2026-10-07 to 10-13. Its review
+command now reads the connected code of a diff: the callers of every changed function, its callees
+and its tests, and every caller when a signature or behaviour changes. The repository publishes an
+agentic benchmark for the builder skill (one model, 39 tasks, 5 runs per arm, 585 sessions, a
+bootstrap interval and a sign test): 53 % fewer lines and 26 % lower cost against no skill, hidden
+checks 97 % against 96 %.
+
+**What this design takes.** Nothing yet. The review command derives the affected set by model
+search, on the authoring vendor, with no record of what it covered; [adr/0016](../adr/0016-the-reviewer-gets-a-computed-impact-set.md)
+lists it as an alternative. The builder benchmark is a reason to re-run ponytail against chisle
+on the reference implementation with this design's own A/B harness.
+
+**Caveats.** The review figures in the release (100 % of planted problems against 87 %, 100 %
+outside the diff against 78 %) appear only as an image; no review task set, N or method was found
+in the repository's benchmark directory. The builder benchmark disabled the shell for every arm,
+so agents could not run their own tests, and it is the author's own.
