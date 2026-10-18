@@ -18,9 +18,10 @@ engine before the agent hooks that call it, and install Codex before the consort
 wraps it. Everything else can be installed in any order.
 
 `$CFG` below is the Claude Code config directory: `$CLAUDE_CONFIG_DIR` when it is set, `~/.claude`
-otherwise. `claude` commands follow it on their own. Two tools write `~/.claude` regardless of
-it: `memspec init` (section 2) and Consort's Codex companion lookup (section 3). On a machine
-that runs Claude Code from another directory, follow the per-section notes, then run the checker
+otherwise. `claude` commands follow it on their own, and so does `memspec init` from 0.12.3. Set
+it as an absolute path: Claude Code does not expand `~` in it, and memspec refuses a relative or
+`~` value. Consort's Codex companion lookup follows it from 0.13.1; the pin in section 3 is older
+(see the note there). On a machine that runs Claude Code from another directory, run the checker
 with the same `CLAUDE_CONFIG_DIR` the sessions use; it reports which directory it read.
 
 ```
@@ -60,51 +61,43 @@ gcloud auth login                          # Vertex route only (section 3)
 
 ```
 claude                                     # first run logs you in; then exit
-npm install -g memspec@0.11.0 --min-release-age=0
-(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)   # the store is ~/.memspec
-# init writes a project-scope memspec entry into ~/.mcp.json; the user-scope one below replaces it.
-# Drop only that entry, and the file only when nothing else is left in it:
-if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi
+npm install -g memspec@0.12.3 --min-release-age=0
+memspec init ~/.memspec --no-interactive --skip-import --skip-patch   # the store; hooks into $CFG
+# init also writes a project-scope memspec entry into ~/.memspec/.mcp.json; the user-scope one
+# below replaces it. Drop only that entry, and the file only when nothing else is left in it:
+M=~/.memspec/.mcp.json; if jq -e '.mcpServers.memspec' "$M" >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' "$M" > "$M.new" && mv "$M.new" "$M"; jq -e '.mcpServers | length > 0' "$M" >/dev/null || rm "$M"; fi
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 ```
 
-`memspec init` takes the project root as `--cwd` and creates the store in `<root>/.memspec`, so
-the root is the home directory. memspec 0.11.0 refuses a positional path (`too many arguments for
-'init'`). The `jq` line removes the `memspec` entry init wrote to `~/.mcp.json` and keeps any
-other servers already there; it deletes the file only when nothing else is left, and does nothing
-when the file is absent. Left in place, the entry is a project-scope server that every session
-started under the home directory finds, pending approval, beside the user-scope one.
+`memspec init ~/.memspec` makes `~/.memspec` the store: a path that ends in `.memspec` is the
+store itself, so nothing lands in the home directory. The `jq` line removes the `memspec` entry
+init writes to `~/.memspec/.mcp.json`, keeps any other servers in that file, deletes it only when
+nothing else is left, and does nothing when it is absent. Left in place, it is a project-scope
+server, pending approval, in every session started inside the store directory.
 
-`--min-release-age=0` is there for one reason: a workstation that already carries the
-supply-chain setting `min-release-age=30` in `~/.npmrc` (the operator's machines have it; a
-fresh Mac does not) refuses to install a version published less than 30 days ago, and a
-pinned memspec release is exactly that for its first month (0.11.0 shipped 2026-09-16). The flag lifts the
-gate for this single install and nothing else; the pin, not the age, is the trust decision
-here (the package is ours). Leave it in place even on a machine without the setting, it is a
-no-op there.
+`--min-release-age=0` drops the npm release-age gate for this install. A workstation that
+carries `min-release-age=30` in `~/.npmrc` (the operator's machines do; a fresh Mac does not)
+refuses a version published less than 30 days ago, and a pinned memspec release is exactly that
+for its first month (0.12.3 shipped 2026-10-18). The flag applies to the whole install, not only
+to memspec: memspec's dependencies are declared as ranges and resolve to their newest versions,
+so packages younger than 30 days come in with it. On the reference machine 0.12.3 brought four
+`[measured 2026-10-18]`. That is accepted here; the trust decision is the memspec pin. On a
+machine without the setting the flag is a no-op.
 
-`memspec init` writes `memspec-session-start.js` and `memspec-consolidate.js` under
-`~/.claude/hooks/` and wires them into `~/.claude/settings.json`; the MCP registration gives
-every session the `memspec_*` tools. Verify with `claude mcp get memspec` (`Scope: User config`,
-connected) and `memspec stores` from any directory (the global store, read-write).
+`memspec init` writes `memspec-session-start.js` and `memspec-consolidate.js` (and the
+`memspec-claims-check.js` helper they load) into `$CFG/hooks/` and registers them in
+`$CFG/settings.json`; the MCP registration gives every session the `memspec_*` tools. Verify with
+`claude mcp get memspec` (`Scope: User config`, connected) and `memspec stores` from any directory
+(the global store, read-write).
 
-With `CLAUDE_CONFIG_DIR` set, `memspec init` still writes `~/.claude` (the path is fixed in
-memspec 0.11.0), where those sessions never read it. Add `--no-install-hooks` to the init line
-and install the hooks into `$CFG` instead:
-
-```
-CFG="$CLAUDE_CONFIG_DIR"; SRC="$(npm root -g)/memspec/hooks"
-mkdir -p "$CFG/hooks" && install -m 0755 "$SRC"/memspec-{session-start,consolidate,claims-check}.js "$CFG/hooks/"
-cp "$CFG/settings.json" "$CFG/settings.json.bak"
-jq --arg d "$CFG/hooks" '
-  .hooks.SessionStart = ((.hooks.SessionStart // []) + [{hooks: [{type: "command", command: "node \"\($d)/memspec-session-start.js\"", timeout: 5}]}]) |
-  .hooks.PostToolUse  = ((.hooks.PostToolUse  // []) + [{matcher: "Bash", hooks: [{type: "command", command: "node \"\($d)/memspec-consolidate.js\"", timeout: 5}]}])
-' "$CFG/settings.json.bak" > "$CFG/settings.json"
-```
-
-The session-start hook's own claims check also looks under `~/.claude` only, so it may print a
-warning that the hook is not installed. The checker's hook lines are the check that counts: both
-`OK` means the file is in `$CFG/hooks` and `$CFG/settings.json` runs it.
+Run the init line once per `CLAUDE_CONFIG_DIR` the machine uses, with that directory set, and the
+`jq` line after each run. A second run leaves the store and an existing registration as they are.
+On a machine set up with memspec before 0.12.3, which always wrote `~/.claude`, the same line
+repairs a second directory: an entry there that is exactly `node <the ~/.claude copy>` is
+repointed to the directory's own copy rather than duplicated, and any other entry (a wrapper, a
+chained command) is left alone. The checker's hook lines say `OK` when the file is in
+`$CFG/hooks` and `$CFG/settings.json` runs it; with `CLAUDE_CONFIG_DIR` set it also warns about a
+memspec older than 0.12.3 `[measured 2026-10-18]`.
 
 The store is personal scratch. Durable team knowledge lives in the team-context repo and
 reaches it through promote PRs; the scaffold runbook binds each code repo to that store
@@ -157,7 +150,8 @@ With `CLAUDE_CONFIG_DIR` set, the Codex plugin installs under `$CFG/plugins/cach
 5f68ef6 looks for `codex-companion.mjs` under `~/.claude/plugins/cache` only
 (`scripts/codex-backend.sh`). Its plugin transport then finds nothing and the auto mode falls
 back to the CLI. Set `CONSORT_CODEX_BACKEND=exec` in the section 7 block so the transport is a
-stated choice rather than a silent fallback.
+stated choice rather than a silent fallback. Consort 0.13.1 (`c26ffca`) searches
+`$CLAUDE_CONFIG_DIR/plugins/cache` first; on a checkout at or after it the setting is not needed.
 
 The panel reads process environment, not Claude settings files. For a Claude session, merge the
 keys in section 7 into user-scope `$CFG/settings.json` so the session inherits them. For a
@@ -348,9 +342,9 @@ PM rows of 6, and the Jira rows of 8. Concretely:
 ```
 brew install git gh jq node && brew install --cask claude-code
 claude; gh auth login
-npm install -g memspec@0.11.0 --min-release-age=0
-(cd ~ && memspec init --cwd ~ --no-interactive --skip-import --skip-patch)
-if jq -e '.mcpServers.memspec' ~/.mcp.json >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' ~/.mcp.json > ~/.mcp.json.new && mv ~/.mcp.json.new ~/.mcp.json; jq -e '.mcpServers | length > 0' ~/.mcp.json >/dev/null || rm ~/.mcp.json; fi   # section 2
+npm install -g memspec@0.12.3 --min-release-age=0
+memspec init ~/.memspec --no-interactive --skip-import --skip-patch
+M=~/.memspec/.mcp.json; if jq -e '.mcpServers.memspec' "$M" >/dev/null 2>&1; then jq 'del(.mcpServers.memspec)' "$M" > "$M.new" && mv "$M.new" "$M"; jq -e '.mcpServers | length > 0' "$M" >/dev/null || rm "$M"; fi   # section 2
 claude mcp add --scope user memspec -e MEMSPEC_ROOT="$HOME/.memspec" -- memspec-mcp
 claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"
 claude plugin install pm-workspace@software-factory && claude plugin install secret-guard@software-factory
@@ -432,13 +426,14 @@ lines that say `UNVERIFIED` as limits, not success. Prove these separately, once
   is on npm: `~/.npmrc` has `min-release-age=30` and the pin is younger than that. Add
   `--min-release-age=0` to that one install (already in sections 2 and 9); the checker prints
   an OPTIONAL line when the setting is present.
-- `memspec init ~/.memspec` fails with `too many arguments for 'init'` on memspec 0.11.0. The
-  root goes in `--cwd`, and init leaves a project-scope `.mcp.json` in that root (section 2)
-  `[measured 2026-10-15]`.
-- A machine that runs Claude Code from a `CLAUDE_CONFIG_DIR` other than `~/.claude` gets the
-  memspec hooks in the wrong directory and Consort's Codex plugin transport finds no companion.
-  Both are fixed paths in the tools, not settings. Sections 2 and 3 carry the workarounds; the
-  checker's hook lines say `not registered in $CFG/settings.json` when the first one bites.
+- memspec 0.11.0 refuses `memspec init ~/.memspec` (`too many arguments for 'init'`) and
+  installs its hooks into `~/.claude` whatever `CLAUDE_CONFIG_DIR` says, so sessions run from
+  another directory never load them `[measured 2026-10-15]`. Both are fixed in 0.12.3, which
+  section 2 pins. The reference machine's two canvas config directories had no memspec hooks at
+  all until 0.12.3 wired them `[measured 2026-10-18]`.
+- Consort before 0.13.1 finds the Codex plugin only under `~/.claude`; section 3 says what to
+  set while the pin is older. The checker's hook lines say `not registered in $CFG/settings.json`
+  when hooks sit in the wrong directory.
 - No `timeout` on macOS without coreutils. A delegation's wall-clock cap is
   `perl -e 'alarm N; exec @ARGV' <cmd...>`; a bare `timeout` exits 127 before the child starts
   and reads as an instant success.

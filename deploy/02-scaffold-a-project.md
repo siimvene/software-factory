@@ -57,8 +57,11 @@ whose input is blank.
 gh repo create <org>/<team>-team-context --private --clone && cd <team>-team-context
 cp $SF/deploy/standard/templates/team-context/{CLAUDE.md,CODEOWNERS} .
 mkdir -p specs docs/adr && cp $SF/templates/adr.md docs/adr/0000-template.md
-memspec init .                              # lays out .memspec/; the store the code repos read
+memspec init . --force                      # lays out .memspec/; the store the code repos read
 ```
+
+`--force` because the repo sits under the home directory, whose `~/.memspec` (workstation guide
+section 2) memspec would otherwise treat as this repo's store and refuse to nest under.
 
 Fill `CLAUDE.md` from the interview (the template's example file shows what good looks like:
 `EXAMPLE-CLAUDE.md` beside it; copy the template, not the example). Put the real owner into
