@@ -90,6 +90,12 @@ required review** (`required_pull_request_reviews: null` above) - a required cod
 physically block the auto-merge. `enforce_admins` and status checks stay. A code repository is the
 opposite case and keeps `require_code_owner_reviews: true`.
 
+Graduation PRs into the context repo are PR-only by default (adr 0018): the repo carries a
+`.graduation.yml` (`merge: pr-only`) and a CODEOWNERS file naming who reviews them, and its default
+branch requires the repo's check status (`required_status_checks: {"strict":false,"contexts":["<check>"]}`
+in the call above), so a client that still merges on open is refused and the PR
+waits for a code owner. Review stays requested, not required, for the reasons above.
+
 Check: the same endpoint with GET returns `required_pull_request_reviews: null` on the context repo. Where the plan
 refuses (HTTP 403 on a free private repo, as kvart hit on 2026-09-07), write the refusal into
 ADR 0001 with the date and move on: the gate is a habit until the plan changes.

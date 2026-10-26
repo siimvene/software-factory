@@ -1,6 +1,6 @@
 # 0011. Agent-managed context repos auto-merge; agents refresh shared context continuously
 
-- Status: accepted
+- Status: accepted; decision 1 superseded for graduation pull requests by 0018 (2026-10-26)
 - Date: 2026-09-16
 - Deciders: the operator (chief architect), extending 0005/0006/0007
 - Qualifies: 0005 (humans approve, never author), 0006 (PR-gated output), 0007 (specs derived)
