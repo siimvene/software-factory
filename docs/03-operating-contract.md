@@ -24,8 +24,9 @@ replays past incidents against the changed contract.
 - Agents propose; humans merge. Never push to a default branch, never merge your own proposal,
   never approve a PR. Exception: a pull request into an agent-managed context/spec repository
   (`*-team-specs`, `*-team-context`, `*-context-repo`) auto-merges on open - that layer is
-  agent-managed and unread, so no human decision is being made or laundered (adr 0011). Code
-  repositories are unchanged.
+  agent-managed and unread, so no human decision is being made or laundered (adr 0011). A
+  graduation PR is not covered: it waits for the repo's code owners unless the repo's
+  `.graduation.yml` opts its paths into auto-merge (adr 0018). Code repositories are unchanged.
 - Team memory reaches the team store only by promote PR. Specs are derived artifacts; hand
   edits are forbidden.
 - Never `git add .` or `git add -A`. Stage by explicit path. Before committing, list the staged
