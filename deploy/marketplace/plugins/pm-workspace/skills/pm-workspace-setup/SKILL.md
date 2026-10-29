@@ -1,7 +1,7 @@
 ---
 name: pm-workspace-setup
 description: Use this skill when the user wants to create, bootstrap, or upgrade a Product Manager workspace - e.g. "set up a PM workspace here", "bootstrap a product manager workspace in ./my-vault", "update this workspace to the latest PM conventions", "check whether my workspace follows the current conventions". Creates the _Inbox / Meetings / Discovery / Features / Jira / Reference structure plus CLAUDE.md, CONVENTIONS.md, POINTERS.md, SENSITIVITY.md and the tracking registers, or upgrades an existing workspace to the current convention version. Do not use it to write feature documents or to ingest sources - that is the `ingest` skill.
-version: 1.3.0
+version: 1.4.1
 ---
 
 # Set up or upgrade a PM Workspace
@@ -34,7 +34,7 @@ to connect one, and proceed in the cloud workspace only on their explicit say-so
 | --- | --- | --- | --- |
 | `CONVENTIONS.md` | verbatim copy of `$CLAUDE_PLUGIN_ROOT/references/CONVENTIONS.md` | create | overwrite after the upgrade notice is shown and confirmed - this file is plugin-owned |
 | `CLAUDE.md` | `$CLAUDE_PLUGIN_ROOT/references/CLAUDE.template.md` | create | leave user content alone, only add missing pointers |
-| `POINTERS.md` | see `CONVENTIONS.md` section 13 | fill the repository section by discovery (step 4a); placeholder only if discovery finds nothing | create only if missing; never overwrite repository entries. Exception: on upgrade to conventions ≥ 2.1.0, if a `POINTERS.md` repository entry lacks an `org/repo` slug, propose the slug lines and add them only with the owner's confirmation (append to entries, change nothing else) |
+| `POINTERS.md` | see `CONVENTIONS.md` section 13 | fill the repository section by discovery (step 4a); placeholder only if discovery finds nothing | create only if missing; never overwrite repository entries. Exception: on upgrade to conventions ≥ 2.1.0, if a `POINTERS.md` repository entry lacks an `org/repo` slug, propose the slug lines and add them only with the owner's confirmation (append to entries, change nothing else). Exception: on any setup run where `POINTERS.md` lists no `<product>-context` repository (only legacy names `*-team-context`, `*-team-specs`, `*-context-repo`, or no context repository) and carries no `<!-- product-context: declined YYYY-MM-DD -->` marker, offer the discovered `<product>-context` ones (step 4a); append only the ones the owner confirms, or the decline marker when the owner declines them all |
 | `SENSITIVITY.md` | see `CONVENTIONS.md` section 14 | create a placeholder for the owner to fill | create only if missing; never overwrite a filled-in file |
 | `TRACKER.md` | `$CLAUDE_PLUGIN_ROOT/references/TRACKER.template.md`, see `CONVENTIONS.md` section 13.1 | create from the template; fill the project and issue-type rows from the tracker connector when it can read the project (step 4b), leave the epic mapping and labels for the owner | create if missing (the 2.4.0 migration); on a re-run, fill only rows that still hold a `{{...}}` template placeholder (step 4b) and leave every filled row as it is. Corrections to filled rows come from ticket previews, not from setup. A pre-2.7.0 file (root `## Project` table, no `## Projects`) is migrated to the per-project shape instead (step 4c), shown then written on confirmation |
 | `_Inbox/`, `Meetings/`, `Discovery/`, `Features/`, `Jira/`, `Reference/` | see `CONVENTIONS.md` § Layout | create (defer to first write when the surface cannot create empty folders - step 4) | create only the ones missing (same deferral applies) |
@@ -151,8 +151,10 @@ separately only when:
 - `POINTERS.md`: when the file is **missing**, do not just drop a blank placeholder - try to fill
   the repository section by discovery first (step 4a). When the file **already exists**, never
   overwrite it: leave every existing line (repository entries and any other pointers the owner added,
-  such as Jira or Confluence) untouched. The only edit allowed to an existing file is discovery
-  *appending* repository entries when its repository section is empty, and the 2.1.0 migration below.
+  such as Jira or Confluence) untouched. The only edits allowed to an existing file are discovery
+  *appending* repository entries when its repository section is empty, the product-context offer
+  (step 4a: appending the confirmed `<product>-context` repositories, or the decline marker), and
+  the 2.1.0 migration below.
   One exception for the 2.1.0 migration: when a filled-in `POINTERS.md` has repository entries without
   an `org/repo` slug, work out the slugs (from the entry's URL, local path, or by asking), show them
   to the owner, and append them to the entries only after confirmation.
@@ -176,38 +178,55 @@ separately only when:
 ### 4a. Populate POINTERS.md by discovery
 
 The point of this step is that the owner never has to know a repository slug. Fill the repository
-section of `POINTERS.md` from what the GitHub connector can already see. Run this only when
-`POINTERS.md` is missing, or exists with an empty repository section; if the file already has
-repository entries, skip discovery entirely and leave the file untouched.
+section of `POINTERS.md` from what the GitHub connector can already see. The decline marker (below)
+wins over everything in this step: while `POINTERS.md` carries it, nothing in 4a runs, whatever the
+repository section holds, until the owner deletes that line. Otherwise run this when
+`POINTERS.md` is missing, or exists with an empty repository section. When the file already has
+repository entries, run only the product-context offer. It runs on any setup run - bootstrap
+re-run, upgrade or same-version check alike - when both of these hold: `POINTERS.md` lists no
+`<product>-context` repository (every context repository it lists has a legacy name
+`*-team-context`, `*-team-specs`, `*-context-repo`, or it lists none; a `*-team-context` name ends
+in `-context` but does not count as a `<product>-context` entry), and it carries no decline marker,
+the line `<!-- product-context: declined YYYY-MM-DD -->`. The trigger does not depend on the version
+the workspace came from, so a run that could not reach the connector simply offers again next time.
+Do step 1 below, show the `<product>-context` repositories found that are not listed yet, and append
+only the ones the owner confirms, under the context repositories, with any code repositories from
+step 2 that are not listed yet; change no existing line. When the owner declines them all, append
+the decline marker with today's date as the last line of `POINTERS.md`, so later runs do not ask
+again; the owner deletes that line to be asked again. An unavailable connector, or a search with no
+`<product>-context` match, writes no marker. If the file already lists a `<product>-context`
+repository, or carries the decline marker, skip discovery entirely and leave the file untouched.
 
 Everything here is read-only discovery. You are reading repositories the owner already has access to
 through their own connector; no workspace content leaves the workspace, so this is not an outbound
 external query and the `SENSITIVITY.md` outbound gate does not apply. Never write, commit, or push to
 any repository you discover (R2).
 
-1. **Check the connector, then find the team-context repository.** First establish whether the GitHub
+1. **Check the connector, then find the context repositories.** First establish whether the GitHub
    connector tools are actually available and authenticated in this session. If they are not, stop
    here: state plainly that discovery needs the GitHub connector connected (step 3 of onboarding),
    leave `POINTERS.md` as a blank placeholder when the file is missing, and offer to re-run discovery
    once it is connected. Do not guess why - only report "connector not available" when that is what
    you observed.
    If the connector is available, search the group's GitHub organization for repositories whose names
-   end in `-team-context`, `-team-specs` or `-context-repo` (a dedicated per-code-repo context repo,
-   e.g. `group-app-context-repo`, uses the last form and the `*-team-*` search misses it). List
+   end in `-context` - the primary shape, one `<product>-context` repository per product - and
+   for the legacy shapes `-team-context`, `-team-specs` and
+   `-context-repo`, which are still accepted (the `*-context` search alone misses the last two). List
    only what the connector actually returns - never invent or guess a repository name.
-   - Search succeeded but returned no match: the owner's team is not onboarded yet. Leave a blank
-     placeholder when the file is missing, say plainly that a developer sets up the team-context
-     repository first, and offer to re-run discovery later.
-   - One or more returned: show the owner the list and ask which repository is their team's. Confirm
-     even when there is only one match; do not assume.
-2. **Resolve the code repositories.** Read the chosen team-context repository's `CLAUDE.md` through
+   - Search succeeded but returned no match: the owner's product is not onboarded yet. Leave a blank
+     placeholder when the file is missing, say plainly that a developer sets up the product's
+     context repository first, and offer to re-run discovery later.
+   - One or more returned: show the owner the list and ask once which product or products they work
+     on; a PM may work across several, so more than one may be chosen. Confirm even when there is
+     only one match; do not assume.
+2. **Resolve the code repositories.** Read each chosen context repository's `CLAUDE.md` through
    the connector and take the implementing code repositories it names (as `org/repo` slugs or GitHub
    URLs). Add only repositories the file actually names. If it names none, or cannot be read, record
-   the team-context repository alone and note that code repositories are unresolved - specs are the
-   main value and the owner can add code repositories later.
+   the context repository alone and note that code repositories are unresolved - specs are the main
+   value and the owner can add code repositories later.
 3. **Write the entries.** Write the confirmed repositories into `POINTERS.md` as `org/repo` slugs
-   under their sections (team-context, then product code), following section 13 - read-only, no local
-   paths. Show the owner exactly what was written. The org design-system repository, if the team uses
+   under their sections (context repositories, then product code), following section 13 - read-only,
+   no local paths. Show the owner exactly what was written. The org design-system repository, if the team uses
    one, is an optional manual add; do not guess its name.
 4. **Development remote (mirror detection).** For each code repository just written, check whether its
    README or `CLAUDE.md` (read through the connector) says it mirrors another remote, or the owner
@@ -269,9 +288,9 @@ State the resolved target directory, the convention version the workspace is now
 lists: created, updated, left unchanged. State the conventions delta shown in step 2a - either
 `Conventions <from> -> <to>` with the changelog rows, or `conventions up to date`. If the user's
 `CLAUDE.md` was extended, quote the section that was appended. State what discovery wrote into
-`POINTERS.md` (the team-context repository, any code repositories resolved, and any `development
-remote:` line offered or `write remote` line reported), or that it fell back to a placeholder and
-why. State whether `TRACKER.md` was created, migrated to the 2.7.0 shape (step 4c), and which rows
+`POINTERS.md` (the context repositories, any code repositories resolved, the product-context decline
+marker when the owner declined, and any `development remote:` line offered or `write remote` line
+reported), or that it fell back to a placeholder and why. State whether `TRACKER.md` was created, migrated to the 2.7.0 shape (step 4c), and which rows
 were filled from the tracker. Close with the one thing worth doing next: fill in `SENSITIVITY.md`,
 confirm the discovered repositories, or the personal preferences section of `CLAUDE.md`.
 

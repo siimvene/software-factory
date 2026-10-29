@@ -1,7 +1,7 @@
 ---
 name: readiness-evaluator
 description: Evaluate a ticket against a 7-criterion readiness rubric and output a score (0-100) with per-criterion feedback. Use whenever the user asks to score, evaluate, assess, or review a ticket's quality or readiness - e.g. "evaluate this ticket", "score this ticket", "is this ticket ready", "how good is this ticket", "check ticket quality". Do not use it to write or refine a ticket's content (that is `task-improver`), to break a ticket into sub-tasks (that is `task-splitter`), or to apply anything to Jira - this skill never writes to Jira, only to a staged file already under `Jira/`.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Readiness evaluator
@@ -240,10 +240,12 @@ actionable by pointing at the exact file where the missing context already exist
 
 **Two lookup sources, in this order:**
 
-### 1. Team-context repository (via POINTERS.md)
+### 1. Context repository (via POINTERS.md)
 
-Read the team-context repository entry in `POINTERS.md` (section 13; connector first, read-only)
-and search its spec files for the ticket's topic. This is a read, not a write: R1 and R2 in
+Read the context repository entry in `POINTERS.md` (section 13: a `<product>-context` repository,
+or a legacy `*-team-context` / `*-team-specs` / `*-context-repo` one; connector first, read-only)
+and search its spec files for the ticket's topic. When `POINTERS.md` lists more than one context
+repository, search the one for the ticket's product, or all of them when the product is unclear. This is a read, not a write: R1 and R2 in
 `CONVENTIONS.md` section 13 apply here as they do everywhere else.
 
 ### 2. The workspace itself
@@ -254,7 +256,7 @@ topic. These cover the PM's own drafted specs, open research, and captured backg
 **Lookup steps:**
 
 1. Extract a feature name or topic keyword from the ticket title and description.
-2. Check the team-context repository first through `POINTERS.md`.
+2. Check the context repository first through `POINTERS.md`.
 3. Then search `Features/`, `Discovery/`, and `Reference/` for any additional matches.
 4. If a match is found in either source, read it before applying the rubric.
 5. For each gap found during scoring, check whether the matched file contains an answer. If yes,
