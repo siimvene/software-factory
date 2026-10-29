@@ -1,7 +1,7 @@
 ---
 name: ingest
 description: Use this skill when the user wants to bring an external source into their PM workspace - e.g. "ingest this Confluence page", "add these meeting notes to the workspace", "file this article under Reference", "process this in my inbox", "co z tym zrobić w vaulcie". Extracts facts, decisions and open questions from the source, cross-references them against what the workspace already documents, rolls meeting decisions and action points into the registers, and writes only after the user confirms the plan. Do not use it to file analysis Claude itself just produced, and do not use it to set up the workspace structure - that is the `pm-workspace-setup` skill.
-version: 1.1.1
+version: 1.1.2
 ---
 
 # Ingest a source into the PM workspace
@@ -77,7 +77,7 @@ Verify claims rather than trusting them:
 - A claim about a Jira issue: read the issue and check it actually says that.
 - A claim about behaviour in code: check the repositories named in `POINTERS.md` (or the workspace
   `CLAUDE.md`, legacy `AGENTS.md`) via the GitHub connector. A local checkout may help locate the
-  right files, but a possibly stale clone does not count as verification — confirm via the connector.
+  right files, but a possibly stale clone does not count as verification; confirm via the connector.
   If the repository is unreachable, say the claim is unverified.
 
 Do not trust the source uncritically. If the source contradicts the code, the code wins. If two

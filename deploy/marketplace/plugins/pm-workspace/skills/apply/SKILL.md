@@ -1,7 +1,7 @@
 ---
 name: apply
-description: Use this skill when the owner wants a staged Jira/ file sent to the tracker, or an applied ticket moved forward because its review is open - e.g. "apply this ticket", "send the staged tickets to Jira", "create these in Jira", "apply everything ready", "the MR is open, move the ticket", "move ABC-12 to code review", "PR's up for ABC-12". It is the only path from Jira/ into the tracker - it enforces the readiness gate, discovers or reuses a project's required fields and workflow from TRACKER.md, previews every write, and writes an applied status plus the new key back into the staged file. Do not use it to draft or refine a ticket's content (that is `ticket`), to score or mark a ticket ready (that is `readiness-evaluator`), or to promote a Features/ document into a team repository (that is `graduate`).
-version: 1.0.0
+description: Use this skill when the owner wants a staged Jira/ file sent to the tracker, or an applied ticket moved forward because its review is open - e.g. "apply this ticket", "send the staged tickets to Jira", "create these in Jira", "apply everything ready", "the MR is open, move the ticket", "move ABC-12 to code review", "PR's up for ABC-12". It is the only path from Jira/ into the tracker - it enforces the readiness gate, discovers or reuses a project's required fields and workflow from TRACKER.md, previews every write, and writes an applied status plus the new key back into the staged file. Do not use it to draft or refine a ticket's content (that is `ticket`), to score or mark a ticket ready (that is `readiness-evaluator`), or to promote a Features/ document into a context repository (that is `graduate`).
+version: 1.0.1
 ---
 
 # Apply a staged ticket
@@ -9,7 +9,7 @@ version: 1.0.0
 Send a staged `Jira/` file to the tracker, or walk an applied ticket forward once its code review
 is open. This is the only skill that writes a create or a status transition into the tracker from
 this workspace. Drafting content is `ticket`. Scoring or marking a file `status: ready` is
-`readiness-evaluator`. Promoting a `Features/` document into a team repository is `graduate`. None
+`readiness-evaluator`. Promoting a `Features/` document into a context repository is `graduate`. None
 of those three write to the tracker; this one does, and only after a preview and a confirm.
 
 Locate the workspace root by walking up from the current working directory until a
@@ -202,7 +202,7 @@ one link, nothing else.
 - **Draft or refine ticket content.** That is `ticket` (and `task-improver` for refinement).
 - **Score a ticket or set `status: ready`.** That is `readiness-evaluator`; this skill only reads
   that field, it never writes it.
-- **Promote a `Features/` document into a team repository.** That is `graduate` - a different gate,
+- **Promote a `Features/` document into a context repository.** That is `graduate` - a different gate,
   a different target, a different write path.
 - **Guess a required field's value or a workflow status's meaning.** Both are discovered from the
   tracker's own metadata or asked once, then persisted to `TRACKER.md` for reuse - never invented.

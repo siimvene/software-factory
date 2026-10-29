@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.21 (2026-10-29)
+
+The vendored PM plugin catches up with its source again, so a PM following the workstation guide
+gets the product-context-repository offer.
+
+- `deploy/marketplace/plugins/pm-workspace/`: re-vendored at the group catalog's `main` @
+  `ff7c175` (1.9.1, conventions 2.8.1): setup discovers the organisation's `<product>-context`
+  repositories and offers them for `POINTERS.md`; graduation opens the PR and stops unless the
+  target repo's `.graduation.yml` opts in to auto-merge (adr 0018). The source verbatim plus the
+  two-step scrub, eleven lines and nothing else (1.9.1 already dropped the example repository
+  name that 1.8.0 needed scrubbed). The marketplace index entry and the pin table follow.
+- `deploy/01-workstation-macos.md`, `STATUS.md`: name 1.9.1.
+
 ## 0.2.20 (2026-10-18)
 
 Two gaps found by reading against the design: the reviewer is never handed the code a change

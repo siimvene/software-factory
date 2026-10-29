@@ -26,7 +26,8 @@ Short version:
 - `Reference/` - markdown dump of external information: wiki pages, articles, content from
   spreadsheets and documents received from colleagues
 - `Todo.md`, `Waiting-On.md`, `Action-Points.md`, `Decisions.md`, `Ingest-Log.md` - the tracking layer
-- `POINTERS.md` - read-only pointers to code and team-context repositories
+- `POINTERS.md` - read-only pointers to code repositories and the products' context repositories
+  (`<product>-context`)
 - `SENSITIVITY.md` - what may leave the workspace, and the capture rules
 
 `CONVENTIONS.md` is managed by the `pm-workspace` plugin. To upgrade this workspace to a newer
@@ -40,7 +41,7 @@ version of the conventions, run the `pm-workspace-setup` skill; do not edit that
   were saved.
 - Ask before anything destructive: deleting or overwriting a document, restructuring folders, or
   sending content outside this workspace. Applying staged changes to Jira, and graduating a feature
-  into a team-context repository, always need an explicit go-ahead.
+  into a context repository, always need an explicit go-ahead.
 - Ground claims about current system behaviour in the code the `POINTERS.md` repositories point to,
   and cite where you looked. If something was not verified, say so instead of presenting it as a fact.
 - Respect the sensitivity gate in `SENSITIVITY.md`, in both directions: what may leave the workspace,
