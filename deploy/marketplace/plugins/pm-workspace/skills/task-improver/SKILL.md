@@ -1,7 +1,7 @@
 ---
 name: task-improver
 description: Conversational refinement loop that takes a weak ticket and improves it to a readiness score of 85+ through targeted one-at-a-time questions. Use when the user wants to improve, refine, or work on a ticket - e.g. "improve this ticket", "refine this story", "make this ticket better", "help me write a better ticket", "work on this task with me", or when the user pastes a ticket and asks for help. Do not use it to score a ticket without refining it (that is `readiness-evaluator`), to break a ticket into sub-tasks (that is `task-splitter`), or to apply anything to Jira - this skill never writes to Jira, only to a staged file already under `Jira/`.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Task improver
@@ -54,8 +54,10 @@ tracker key.
 When a gap could be answered from existing documentation, look it up first rather than asking the
 user. Two sources, in this order:
 
-1. **The team-context repository**, via the `POINTERS.md` entry (connector first, read-only;
-   section 13 R1/R2 in `CONVENTIONS.md`). Match the ticket topic to a spec file in that repository.
+1. **The context repository**, via the `POINTERS.md` entry (a `<product>-context` repository, or a
+   legacy `*-team-context` / `*-team-specs` / `*-context-repo` one; connector first, read-only;
+   section 13 R1/R2 in `CONVENTIONS.md`). Match the ticket topic to a spec file in that repository;
+   when more than one context repository is listed, use the one for the ticket's product.
 2. **The workspace itself**: `Features/`, `Discovery/`, and `Reference/`, searched recursively for
    files matching the ticket topic.
 

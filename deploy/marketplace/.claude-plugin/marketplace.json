@@ -10,8 +10,8 @@
     {
       "name": "pm-workspace",
       "displayName": "Product Manager",
-      "description": "Runs a product-management workspace in a plain folder: setup and upgrade, ingest, ticket, readiness-evaluator, task-improver, task-splitter, apply, graduate. Stages every hand-off and tracker change for your review; nothing leaves the workspace without your go-ahead. Apply sends a staged ticket to the tracker only at an evaluator-recorded readiness of 85 or above, learning each project's required fields and workflow once. Graduation into an agent-managed context/spec repo opens the PR and merges it on that go-ahead (adr 0011); code repositories are never auto-merged.",
-      "version": "1.8.0",
+      "description": "Runs a product-management workspace in a plain folder: setup and upgrade, ingest, ticket, readiness-evaluator, task-improver, task-splitter, apply, graduate. Stages every hand-off and tracker change for your review; nothing leaves the workspace without your go-ahead. Apply sends a staged ticket to the tracker only at an evaluator-recorded readiness of 85 or above, learning each project's required fields and workflow once. Setup offers the organisation's product context repositories (`<product>-context`) for the workspace's pointers. Graduation opens the PR into the context/spec repo and stops; it merges only where that repo's `.graduation.yml` opts in (adr 0018).",
+      "version": "1.9.1",
       "source": "./plugins/pm-workspace",
       "category": "product-management"
     },

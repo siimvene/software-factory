@@ -23,7 +23,9 @@ The conventions define the workspace folders and root files:
 - `Todo.md`, `Waiting-On.md`, `Action-Points.md`, `Decisions.md`, `Ingest-Log.md` - the tracking layer
 - `CLAUDE.md` - the canonical rule file: what this workspace is, plus the owner's preferences
 - `CONVENTIONS.md` - the copy of the conventions this workspace follows, with its version number
-- `POINTERS.md` - read-only pointers to code and team-context repositories; an entry may name the
+- `POINTERS.md` - read-only pointers to code repositories and to one or more context repositories,
+  one `<product>-context` repository per product (the older `*-team-context`, `*-team-specs` and
+  `*-context-repo` names are still accepted); an entry may name the
   development remote behind a hosted mirror, and a code owner may record an owner-authorised write remote
   (branch push and merge request only, never a merge; `CONVENTIONS.md` section 13)
 - `TRACKER.md` - the tracker, one block per project: issue types, the fields the create screen
@@ -59,11 +61,19 @@ Skills:
   confirm, execute; `status: applied` and the key are written back into the staged file. Its second mode,
   `review-opened`, walks an applied ticket forward to the project's review status when a merge request
   or pull request is reported, and comments the link.
-- **graduate** - packages a matured `Features/` document as a pull request into a team-context
-  repository. Runs the readiness and sensitivity gates, resolves the target via `POINTERS.md`, shows
-  the full package for confirmation, and - only after an explicit go-ahead - opens the PR through the
-  GitHub MCP server as the owner's own identity. No local git and no copy-paste: a denied write or an
-  unavailable connector is reported honestly, never worked around by hand.
+- **graduate** - packages a matured `Features/` document as a pull request into a product's context
+  repository. Runs the readiness and sensitivity gates, resolves the target via `POINTERS.md` (asking
+  which product when more than one fits), reads the target's merge policy from its `.graduation.yml`,
+  shows the full package, the files the PR touches and the merge policy for confirmation, and - only
+  after an explicit go-ahead - opens the PR through the GitHub MCP server as the owner's own identity,
+  labelled `graduation`. By default the PR then waits for the repository's code owners; the agent
+  merges it only where the repository opts in with `merge: auto`, every changed path is on its
+  allow-list and every check has passed; when the checks are still running at open time, running
+  `graduate` again on the same feature re-enters the open PR and merges it then (re-reading the
+  policy right before the merge). Besides the spec it may append rows to the repository's declared
+  test-oracle table and create the stub of a new spec's companion file, in the same initial commit; a
+  revision of an open PR adds one follow-up commit. No local git and no copy-paste: a denied write or
+  an unavailable connector is reported honestly, never worked around by hand.
 - **readiness-evaluator** - scores a ticket (a staged `Jira/` file, a `Features/` document, pasted
   text, or a tracker key) against a 7-criterion rubric and shows a 0-100 readiness score with
   per-criterion gaps. Below 85 it hands off to `task-improver`; at 85 or above it offers to mark a
@@ -90,6 +100,7 @@ Update this workspace to the latest PM conventions
 /ingest Meetings/Raw/2026-07-24 - Fees workshop.md
 Ingest this into my workspace: <pasted notes>
 /graduate Features/Localized Emails.md
+Graduate Features/Localized Emails.md into our product's context repository
 /apply Jira/Localized Emails/Story - Localized Emails.md
 Apply everything that is ready under Jira/Localized Emails
 The MR is open: https://gitlab.example.com/group/repo/-/merge_requests/12, move ABC-123 to code review
@@ -104,6 +115,23 @@ Upgrading a workspace after this plugin is updated: run `/pm-workspace-setup` in
 It compares the version in the workspace's `CONVENTIONS.md` against the plugin's, shows you the
 changelog rows between the two versions and asks before it writes the new conventions, applies the
 migrations from the changelog, and leaves your own content and your `CLAUDE.md` edits alone.
+
+Recent changes:
+
+- **1.9.1 (conventions 2.8.1)** - wording only: the naming examples no longer name a real product
+  repository. Graduation still needs conventions 2.8.0 or later, so a 2.8.0 workspace keeps working.
+- **1.9.0 (conventions 2.8.0)** - context repositories are per product (`<product>-context`), and
+  every setup run offers the ones it discovers until you pick one or decline (a decline is one
+  marker line in `POINTERS.md`); the older team-shaped names still work. Graduation needs a
+  workspace on conventions 2.8.0 and is PR-only by default: the PR waits for the target repository's
+  code owners unless the repository opts in to auto-merge in its `.graduation.yml`, which is re-read
+  right before every merge; only its keys count as policy, everything else read from the repository
+  is data. Graduation PRs carry the `graduation` label, may append rows to the declared test-oracle
+  table, create the companion stub a new spec needs when the repository declares `spec_companion`,
+  link the discovery item (and its Jira key) they came from, and link the earlier change when they
+  update an existing spec. The branch name is fixed per feature, the package file records the
+  branch, the PR and the source document's hash, and a re-run re-enters the open PR, reusing an
+  unchanged package word for word; an updated spec is never committed over a newer version.
 
 ## Workstation notes for a PM
 
