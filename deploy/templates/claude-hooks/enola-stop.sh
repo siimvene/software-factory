@@ -19,13 +19,6 @@ command -v enola >/dev/null 2>&1 || exit 0
 # pointing at the checkout the session started in after it enters a worktree).
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-$PWD}")" || exit 0
 input=$(cat 2>/dev/null || :)
-# No baseline here: a worktree entered mid-session never ran SessionStart, and .enola/ is
-# gitignored. Checking would only report "no baseline", and grading another checkout would
-# grade the wrong code; say so once and leave this change to CI's enola job, which pins at base.
-if [ ! -d .enola ]; then
-  echo "enola: no baseline in $(pwd) (worktree entered mid-session?); the architecture delta is left to CI's enola job. Pin one at the base commit to check locally." >&2
-  exit 0
-fi
 enola hook stop <<<"$input" >/dev/null 2>&1 || :
 out=$(enola check --fail-on=layers,cycles,intent 2>&1)
 code=$?
