@@ -200,7 +200,7 @@ something the harness runs regardless. Three moments are worth wiring.
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; command -v <arch tool> >/dev/null 2>&1 && <arch tool> hook session-start || :",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; command -v <arch tool> >/dev/null 2>&1 && <arch tool> hook session-start || :",
             "timeout": 60
           }
         ]
@@ -220,7 +220,7 @@ hundreds already present.
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --guard; fi"
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --guard; fi"
           }
         ]
       }
@@ -238,7 +238,7 @@ on refusal so the harness actually blocks the call.
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --hook --changed; fi"
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --hook --changed; fi"
           }
         ]
       },
@@ -246,7 +246,7 @@ on refusal so the harness actually blocks the call.
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; command -v <arch tool> >/dev/null 2>&1 && <arch tool> hook stop || :",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; command -v <arch tool> >/dev/null 2>&1 && <arch tool> hook stop || :",
             "timeout": 60
           }
         ]
@@ -263,11 +263,14 @@ that turns a gate from a report someone reads into a loop the agent has to close
 Both commands use the same defensive shape, and it matters:
 
 ```sh
-PATH="$HOME/.local/bin:$PATH"; command -v <tool> >/dev/null 2>&1 && <tool> hook stop || :
+PATH="$HOME/.local/bin:$PATH"; cd "$(git rev-parse --show-toplevel 2>/dev/null || echo .)" || exit 0; command -v <tool> >/dev/null 2>&1 && <tool> hook stop || :
 ```
 
 The `PATH=` prefix exists because a hook runs in a non-interactive shell that never sourced
-the profile, so a tool installed in a user directory is simply absent. The `command -v`
+the profile, so a tool installed in a user directory is simply absent. The `cd` to the git top
+level exists because a hook runs in the session's working directory: a session started from a
+package subdirectory would otherwise find no `quality/bin/gate.py` and skip the gate in silence,
+and pin the architecture baseline below the root. The `command -v`
 test plus the trailing `|| :` make the hook a no-op in a checkout where the tool is not
 installed, instead of failing every session with a confusing error. A hook that breaks
 clean checkouts gets deleted by the next person, which is worse than a hook that quietly

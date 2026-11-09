@@ -12,6 +12,8 @@ Two fixes from reviewing an onboarding PR and #13.
   already fixed it.
 - `deploy/templates/claude-hooks/enola-stop.sh`: same, git top level first, `CLAUDE_PROJECT_DIR` as
   the fallback.
+- `templates/sensor-config-examples.md` §3: the documented hook shapes carry the same `cd`, with
+  the reason.
 - `deploy/01-workstation-macos.md` §4: the ripwire check runs `~/.local/bin/ripwire` by path, since
   that directory may not be on PATH yet at that step (and another `ripwire` on PATH would be checked
   instead).
