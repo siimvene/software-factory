@@ -72,7 +72,7 @@ What is wired where, as of 2026-09-07:
 | # | Layer | Checks in use | kvart | The legacy core |
 |---|---|---|---|---|
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired; index correct per worktree `[measured 2026-09-29]`; unused by a headless builder | not wired |
-| 2 | chisle | plugin installed at user scope and off there, switched on per project, marketplace source pinned to tag v3.0.0; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
+| 2 | chisle | optional; plugin copied into the software-factory marketplace at commit `a5486fa112` (v3.0.0), installed at user scope and off there, switched on per project; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
 | 3 | cleat | escapes, duplication, complexity, layering, changed-line coverage, conventions, test hygiene, doc size, public API loss | 6 gates on main, 4 sites accepted into the baselines | ratchets adopted, 0 layering violations, no exemptions |
 | 4 | enola | layers, cycles and intent (provable); scope spillover and cross-repo seams (heuristic) | wired, 12 module-level crossings pinned; Stop check on the three provable explainers, blocks once; backtest 201 merges, 0 regressions `[measured 2026-09-29]` | not wired |
 | 5 | consort | Codex backend, Gemini backend, blind security side-pass, browser QA pass (CLI-driven, headless, per-persona sessions, see adr/0008), rule packs | 3 runs, 4 real defects; QA runtime shaken down 2026-09-10 | measured |
@@ -131,11 +131,11 @@ promise. Under a subscription model less code compounds: less future agent work 
 Caveats: "made my agent lazy" stays a real risk on complex domain tasks, the ladder is unchanged;
 the plugin ships three Node.js lifecycle hooks (session start, prompt submit, post tool use),
 read in full before adoption: no child process spawn, one 1.5 s update check against the npm
-registry at session start with an environment variable to disable it, state files only under the
-Claude config directory; the marketplace format accepts a tag or branch, not a commit, so the pin
-is the tag v3.0.0 (released 2026-07-28), and the cached plugin content was verified to match that
-tag's commit rather than the branch head; a tag can move, so a fork or the organisation's vetted
-catalog remains the real pin. Tool-output elision is a context-cost mechanism, not a sensor: it
+registry at session start (off in the factory copy unless `CHISLE_UPDATE_CHECK=1`), state files only under the
+Claude config directory; the marketplace format accepts a tag or branch, not a commit, and a tag
+can move, so since 2026-11-09 the plugin is a copy in the software-factory marketplace at the v3.0.0
+commit (released 2026-07-28), with the npm update check switched off, and the tracked settings no
+longer name the upstream source. Tool-output elision is a context-cost mechanism, not a sensor: it
 changes what the model reads, and a compressed result that hid an error line the agent needed
 would be a new failure class. The audit so far: 67 elisions in kvart sessions, none followed by a
 re-fetch that the elision caused, and 1 suspected silent loss, where an orchestrator was shown

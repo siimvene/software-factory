@@ -192,7 +192,7 @@ shasum -a 256 -c "enola-$V-$A.sha256" && tar -xzf "enola-$V-$A.tar.gz" && instal
 git clone https://github.com/redhat-et/ripwire /tmp/ripwire && git -C /tmp/ripwire checkout e663ca8f8
 less /tmp/ripwire/install.sh && RIPWIRE_INSTALL_PREFIX="$HOME/.local" bash /tmp/ripwire/install.sh
 ripwire --version                          # expect 0.4.0 ... built_from=e663ca8f8
-# sensor 2: chisle is a plugin, installed at user scope in the plugins section below
+# sensor 2 (optional): chisle is a plugin from the software-factory marketplace, see the plugins section below
 ```
 
 Make sure `~/.local/bin` is on PATH in `~/.zshrc`. The reference machine keeps lizard in its own
@@ -242,7 +242,7 @@ claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"   
 
 The `software-factory` marketplace is a directory source, so it points at your clone of this
 repository; `git pull` is the update. It holds the eight plugins the loop uses from the group's
-catalog at pinned versions ([README.md](README.md) has the pins). Install per role:
+catalog at pinned versions, plus a copy of chisle at a pinned commit ([README.md](README.md) has the pins). Install per role:
 
 | Role | Install | Why |
 |---|---|---|
@@ -251,28 +251,33 @@ catalog at pinned versions ([README.md](README.md) has the pins). Install per ro
 | Engineer | `secret-guard`, `spec-repos`, `team-memory`, `rule-packs`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |
 
-`chisle` (sensor 2) is installed at user scope, switched off at user scope, and switched on per
-project by the scaffold's tracked settings. The install is user scope because a project-scope
-install is keyed to one exact directory, so every new worktree runs without the plugin; on the
-reference implementation it stopped loading for a week that way
-([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)). The switch stays per project because
-its output hook sees every tool result, and a repository that did not opt in should not run it.
+`chisle` (sensor 2) is optional: it makes the agent's code and prose leaner and gates nothing. It
+comes from the `software-factory` marketplace, which holds a copy of the upstream plugin at a
+reviewed commit (`plugins/chisle/VENDORED.md`), so no session fetches it from its author and an
+upgrade lands only as a pull request here that re-copies a newer commit after it was checked. It is
+installed at user scope, switched off at user scope, and switched on per project by the scaffold's
+tracked settings. The install is user scope because a project-scope install is keyed to one exact
+directory, so every new worktree runs without the plugin; on the reference implementation it
+stopped loading for a week that way ([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)). The
+switch stays per project because its output hook sees every tool result, and a repository that did
+not opt in should not run it.
 
-1. Pin the marketplace: an `extraKnownMarketplaces` entry `chisle` in `$CFG/settings.json`
-   with source `{"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}`.
-2. `claude plugin install chisle@chisle --scope user`.
-3. Set `"chisle@chisle": false` under `enabledPlugins` in `$CFG/settings.json`. The install
-   writes `true`, which would switch it on in every repository.
-4. Check the installed commit against the literal pin, not against the tag (a tag can move and
-   the install would follow it): `gitCommitSha` in `$CFG/plugins/installed_plugins.json`
-   must be `a5486fa112c961f9b25349a29ede38cc9f2a1a5c`. `check-workstation.sh` does this.
+1. `claude plugin install chisle@software-factory --scope user`.
+2. Set `"chisle@software-factory": false` under `enabledPlugins` in `$CFG/settings.json`. The
+   install writes `true`, which would switch it on in every repository.
+3. A machine set up before the copy existed still has the upstream install: `claude plugin
+   uninstall chisle@chisle`, `claude plugin marketplace remove chisle`, and drop the `chisle`
+   entry from `extraKnownMarketplaces` in `$CFG/settings.json`. `check-workstation.sh` flags it.
 
 Repeat in every `CLAUDE_CONFIG_DIR` the machine uses.
 
 The `claude plugin marketplace add` commands above track each source's default branch, and a
-plugin runs code. Where the source has tags, pin it the way the scaffold pins chisle: an
-`extraKnownMarketplaces` entry in `$CFG/settings.json` with a `ref` (consort tags its
-releases; check the other two before pinning). An unpinned marketplace is a named shortcut.
+plugin runs code. Where the source has tags, pin it: an `extraKnownMarketplaces` entry in
+`$CFG/settings.json` with a `ref` (consort tags its releases; check the other two before
+pinning). A `ref` names a branch or tag, never a commit (Claude Code's marketplace source has no
+commit field), and the author can move a tag; a plugin that loads in every session of a team's
+repos is copied into the `software-factory` marketplace instead, the way chisle is. An unpinned
+marketplace is a named shortcut.
 
 Known trap: two config directories. A canvas or terminal-multiplexer runtime may start Claude
 Code with its own `CLAUDE_CONFIG_DIR`; a marketplace, plugin or MCP server registered in one
