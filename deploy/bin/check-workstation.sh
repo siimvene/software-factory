@@ -50,19 +50,20 @@ d=json.load(open(p)) if os.path.exists(p) else {}
 sys.exit(0 if d.get('enabledPlugins',{}).get(sys.argv[1]) else 1)
 PY
 }
-CHISLE_SHA=a5486fa112c961f9b25349a29ede38cc9f2a1a5c
-chisle_install_state() { CFG="$CFG" SHA="$CHISLE_SHA" python3 - <<'PY' 2>/dev/null || echo broken
+# chisle (sensor 2, optional) installs from the software-factory marketplace, whose copy is the pin.
+chisle_install_state() { CFG="$CFG" python3 - <<'PY' 2>/dev/null || echo none
 import json, os
 cfg = os.environ['CFG']
-inst = json.load(open(os.path.join(cfg, 'plugins', 'installed_plugins.json')))
-user = [e for e in inst.get('plugins', {}).get('chisle@chisle', []) if e.get('scope') == 'user']
-known = json.load(open(os.path.join(cfg, 'plugins', 'known_marketplaces.json'))).get('chisle', {})
-src = known.get('source', {})
-loadable = [e for e in user if e.get('gitCommitSha') == os.environ['SHA']
-            and os.path.isfile(os.path.join(e.get('installPath') or '/nonexistent', '.claude-plugin', 'plugin.json'))]
-ok = (bool(loadable) and src.get('source') == 'github'
-      and src.get('repo') == 'JayPokale/Chisle' and src.get('ref') == 'v3.0.0')
-print('pinned' if ok else 'unpinned')
+try: plugins = json.load(open(os.path.join(cfg, 'plugins', 'installed_plugins.json'))).get('plugins', {})
+except Exception: plugins = {}
+try: known = json.load(open(os.path.join(cfg, 'plugins', 'known_marketplaces.json')))
+except Exception: known = {}
+def loadable(key):
+    return any(e.get('scope') == 'user' and os.path.isfile(os.path.join(e.get('installPath') or '/nonexistent', '.claude-plugin', 'plugin.json'))
+               for e in plugins.get(key, []))
+state = 'copy' if loadable('chisle@software-factory') else 'none'
+if plugins.get('chisle@chisle') or 'chisle' in known: state += '+upstream'
+print(state)
 PY
 }
 marketplace_known() { CFG="$CFG" python3 - "$1" <<'PY' 2>/dev/null
@@ -154,13 +155,19 @@ fi
 plugin_enabled consort@consort && ok "plugin consort@consort" || { [ $PM -eq 1 ] && skip "plugin consort@consort" "PM profile" || miss "plugin consort@consort" "claude plugin marketplace add siimvene/consort && claude plugin install consort@consort"; }
 marketplace_known software-factory && ok "marketplace software-factory" || miss "marketplace software-factory" "claude plugin marketplace add <path>/software-factory/deploy/marketplace"
 if [ $PM -eq 1 ]; then
-  skip "plugin chisle@chisle" "PM profile"
+  skip "plugin chisle@software-factory" "PM profile"
 else
-  case "$(chisle_install_state)" in
-    pinned) ok "plugin chisle@chisle (user scope, pinned commit, marketplace ref v3.0.0)" ;;
-    *) miss "plugin chisle@chisle" "pin the marketplace (github JayPokale/Chisle, ref v3.0.0), claude plugin install chisle@chisle --scope user; installed commit must be $CHISLE_SHA and its installPath must exist" ;;
+  cs="$(chisle_install_state)"
+  case "$cs" in
+    copy*) ok "plugin chisle@software-factory (user scope, the factory copy)" ;;
+    *) warn "plugin chisle@software-factory" "optional, sensor 2: claude plugin install chisle@software-factory --scope user, then switch it off at user scope" ;;
   esac
-  plugin_enabled chisle@chisle && miss "chisle off at user scope" "enabledPlugins chisle@chisle is on for every repository: set it to false in $CFG/settings.json; projects switch it on"
+  case "$cs" in
+    *+upstream) warn "upstream chisle still registered" "claude plugin uninstall chisle@chisle; claude plugin marketplace remove chisle (the factory copy replaces it)" ;;
+  esac
+  for p in chisle@software-factory chisle@chisle; do
+    plugin_enabled "$p" && miss "chisle off at user scope" "enabledPlugins $p is on for every repository: set it to false in $CFG/settings.json; projects switch it on"
+  done
 fi
 
 if [ $PM -eq 1 ]; then

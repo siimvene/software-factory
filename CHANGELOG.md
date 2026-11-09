@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.2.27 (2026-11-09)
+
+chisle comes from the factory's own marketplace, and it is optional. An onboarding run flagged
+that the scaffold's tracked settings fetched chisle from its author's marketplace by tag, which
+the author can move, so different code could load on every machine; Claude Code's marketplace
+source takes a branch or tag, never a commit.
+
+- `deploy/marketplace/plugins/chisle`: a copy of `JayPokale/Chisle` at `a5486fa112` (v3.0.0,
+  MIT): the manifest, hooks, skills and license. One change: the npm update check is off unless
+  `CHISLE_UPDATE_CHECK=1`, since upstream it tells every session to update past the pin.
+  `VENDORED.md` records the pin and how to move it.
+- `deploy/templates/claude/settings.json`: enables `chisle@software-factory`; the
+  `extraKnownMarketplaces` entry for the upstream source is gone.
+- `check-project.sh`: chisle not enabled is `OPTIONAL` (was `MISSING`); tracked settings that still
+  name `chisle@chisle` or an upstream `chisle` marketplace are `MISSING`. Six new fixtures,
+  red-proofed against the previous checker.
+- `check-workstation.sh`: checks the user-scope install of the copy (optional), flags a leftover
+  upstream install, and fails when either name is on at user scope. The commit and tag checks are
+  gone: the copy is the pin.
+- `deploy/01-workstation-macos.md`, `deploy/02-scaffold-a-project.md`, `deploy/README.md`,
+  `docs/05-sensor-stack.md`, `docs/16-inventory.md`, `STATUS.md`: the install, the opt-out, the
+  migration from the upstream install, and the exception to "third-party tools are not vendored".
+
 ## 0.2.26 (2026-11-09)
 
 The ripwire install line in the workstation runbook installs the binary.

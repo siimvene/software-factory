@@ -7,7 +7,7 @@ them in order.
 
 | File | Goes to | Edit | Why it exists |
 |---|---|---|---|
-| `claude/settings.json` | `.claude/settings.json`, tracked | nothing for a first run; add project hooks below the sensor ones | the sensor hooks (cleat guard and Stop, enola Stop and SessionStart) and the chisle plugin pinned to a tag; PATH-guarded no-ops without the binaries |
+| `claude/settings.json` | `.claude/settings.json`, tracked | nothing for a first run; add project hooks below the sensor ones | the sensor hooks (cleat guard and Stop, enola Stop and SessionStart) and the optional chisle plugin from the software-factory marketplace (a copy at a pinned commit); PATH-guarded no-ops without the binaries |
 | `claude/mcp.json` | `.mcp.json` | nothing | the ripwire and enola MCP servers, found on `~/.local/bin` |
 | `claude/rules/ripwire.md` | `.claude/rules/ripwire.md` | nothing | the orientation-map verbs and the three "do not" defaults |
 | `claude/rules/enola.md` | written by `enola install --targets=claude`; this copy is the reference | nothing | the architecture-map verbs; `enola install` overwrites it |

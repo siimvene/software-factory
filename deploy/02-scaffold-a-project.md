@@ -212,16 +212,20 @@ enola baseline pin . && enola check --fail-on=layers,cycles,intent .
 # sensor 1: ripwire, rule file and MCP server
 cp $SF/deploy/templates/claude/rules/ripwire.md .claude/rules/ripwire.md
 cp $SF/deploy/templates/claude/mcp.json .mcp.json
-# sensor 2: chisle enabled per project (installed at user scope, see the workstation guide); and the hooks that make 3 and 4 gates
+# sensor 2 (optional): chisle enabled per project (installed at user scope, see the workstation guide); and the hooks that make 3 and 4 gates
 cp $SF/deploy/templates/claude/settings.json .claude/settings.json
 mkdir -p scripts/claude-hooks && cp $SF/deploy/templates/claude-hooks/enola-stop.sh scripts/claude-hooks/
 ```
 
 Read the settings file you just copied: a PreToolUse guard that refuses edits to the gate
 policy, a Stop hook that runs the ratchets on changed files and then the architecture check,
-a SessionStart hook for the architecture snapshot, `chisle` enabled from a marketplace pinned
-to tag v3.0.0 (the install itself is user scope and switched off there; a project-scope install would
-bind to this directory and miss every worktree). Every entry is PATH-guarded so it is a no-op where a binary is absent. Make sure
+a SessionStart hook for the architecture snapshot, and `chisle@software-factory` enabled. chisle
+is optional: it trims code and prose and gates nothing, so a team that does not want it deletes
+that `enabledPlugins` line and the check reports it as `OPTIONAL`. When it stays, it comes from
+the factory's own marketplace, a copy pinned to a reviewed commit, and the tracked settings name no
+outside source (the install itself is user scope and switched off there; a project-scope install
+would bind to this directory and miss every worktree). A repo scaffolded earlier that still names
+`chisle@chisle` or an `extraKnownMarketplaces` entry `chisle` fails the check until it switches. Every entry is PATH-guarded so it is a no-op where a binary is absent. Make sure
 `.gitignore` tracks `.claude/settings.json`, `.claude/rules/` and any skill you want every
 worktree to have, and ignores the rest of `.claude/` (kvart's pattern: `.claude/*` then
 `!.claude/rules/`, `!.claude/settings.json`).

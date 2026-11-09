@@ -31,13 +31,18 @@ work it points to rather than repeats.
 | `01-workstation-macos.md` | tools, plugins, credentials and settings for one macOS workstation; engineer and PM profiles | written from the operator's machine, 2026-09-16 |
 | `02-scaffold-a-project.md` | the agent runbook: team-context repo, context standard, memory binding, sensors, verify gate, CI, ruleset, ledger, PM workspace, test-the-test | written from kvart's wiring at `e6b90e18`, 2026-09-16 |
 | `bin/check-workstation.sh` | one line per requirement, exit 1 on a missing required item; `--pm` for the PM profile; route-aware reviewer checks from process env | original checker tested on the operator's Mac; route-aware changes tested with Linux CLI fixtures in `bin/test_check_workstation.py`; macOS rerun pending |
-| `bin/check-project.sh` | one line per scaffold artifact in a code repo, exit 1 on a missing required one | kvart passes (0 MISSING, 2026-11-07); accepts the brownfield layouts the runbook lists (hooks dir, memspec-bound team store, classic protection, local or poller ledger); fixtures in `bin/test_check_project.sh` (33 cases, red-proofed against the previous checker) |
-| `marketplace/` | a Claude Code plugin marketplace named `software-factory`: the eight plugins the loop uses, seven from the group's catalog and one written here | `pm-workspace` 1.9.1 from the group catalog's `main` @ `ff7c175`; the other six from its `main` @ `f2bc651`; `rule-packs` is this repository's own generic example, not vendored |
+| `bin/check-project.sh` | one line per scaffold artifact in a code repo, exit 1 on a missing required one | kvart passes (0 MISSING, 2026-11-07); accepts the brownfield layouts the runbook lists (hooks dir, memspec-bound team store, classic protection, local or poller ledger); fixtures in `bin/test_check_project.sh` (39 cases, red-proofed against the previous checker) |
+| `marketplace/` | a Claude Code plugin marketplace named `software-factory`: nine plugins: the eight the loop uses, seven from the group's catalog and one written here, plus the optional `chisle` | `pm-workspace` 1.9.1 from the group catalog's `main` @ `ff7c175`; the other six from its `main` @ `f2bc651`; `rule-packs` is this repository's own generic example, not vendored; `chisle` 3.0.0 from `JayPokale/Chisle` @ `a5486fa112` (MIT) |
 | `standard/` | the group standard: `context-standard/` v0.5 (AGENTS.md contract + CLAUDE.md stub; ahead of the group repo, which is still v0.4) with `adopt.sh`, `agents-core.md` (the operating contract every session loads), the team-context and instructions-file templates | group standards repo @ `7cb157f` |
 | `templates/` | the wiring files kvart runs: tracked agent settings with the sensor hooks, MCP servers, sensor rule files, git hooks, the ledger sync script with its tests, the gate and ledger workflows, the ruleset body, the memory binding, the Jira workflow payload | kvart @ `e6b90e18`; see [templates/README.md](templates/README.md) for per-file notes |
 
 Third-party tools are not vendored; the workstation guide installs them from their own releases
-at the versions below. Vendoring them would turn a version pin into a fork.
+at the versions below. Vendoring them would turn a version pin into a fork. One exception:
+chisle. The scaffold enables it in every team repo's tracked settings, and a marketplace source
+in those settings can pin only a tag, which its author can move, so different code could load on
+each machine. The `software-factory` marketplace holds a copy at the reviewed commit instead
+(`marketplace/plugins/chisle/VENDORED.md` lists what was copied and the one change made); moving
+the pin is a pull request that re-copies a newer commit.
 
 | Tool | Role | Version on the reference machine | Source |
 |---|---|---|---|
@@ -51,7 +56,7 @@ at the versions below. Vendoring them would turn a version pin into a fork.
 | cleat | quality ratchets (sensor 3) | fork `siimvene/cleat` @ `c2947a5` | vendored into each project by `attach.py` |
 | enola | architecture diff (sensor 4) | 0.4.19, the same pin in `templates/github/workflows/gates.yml` | `enola-labs/enola` releases, sha256-verified |
 | ripwire | orientation map (sensor 1) | 0.4.0 | `redhat-et/ripwire` installer |
-| chisle | YAGNI ladder (sensor 2) | tag v3.0.0, commit `a5486fa112` | marketplace `JayPokale/Chisle` pinned to the tag; installed at user scope and switched off there, switched on per project |
+| chisle | YAGNI ladder (sensor 2), optional | 3.0.0, commit `a5486fa112` | copied into `marketplace/plugins/chisle` (the exception below); installed at user scope and switched off there, switched on per project |
 | claude-hud | status line | 0.6.0 | marketplace `jarrodwatts/claude-hud` |
 | lizard | complexity analyzer for cleat | 1.23.0 | `uv tool install lizard==1.23.0` |
 | Trivy | secrets, misconfig, dependency scan | 0.74.0 | Homebrew `trivy` |
