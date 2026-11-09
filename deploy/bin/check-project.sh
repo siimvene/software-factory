@@ -111,6 +111,7 @@ else
 fi
 if [ $CLEAT -eq 1 ] || [ $ENOLA -eq 1 ]; then
   f .claude/settings.json "tracked hooks for the installed sensors"
+  fo scripts/claude-hooks/at-root.sh "hooks run at the root of the session's repo (stdin cwd); without it they fall back to the process directory"
   [ $CLEAT -eq 1 ] && g .claude/settings.json 'gate.py --guard' "PreToolUse cleat guard"
   [ $CLEAT -eq 1 ] && g .claude/settings.json 'gate.py --hook' "Stop cleat hook"
   [ $ENOLA -eq 1 ] && g .claude/settings.json 'enola-stop.sh' "Stop enola hook"
