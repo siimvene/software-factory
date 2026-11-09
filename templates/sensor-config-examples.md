@@ -270,7 +270,10 @@ The `PATH=` prefix exists because a hook runs in a non-interactive shell that ne
 the profile, so a tool installed in a user directory is simply absent. The `cd` to the git top
 level exists because a hook runs in the session's working directory: a session started from a
 package subdirectory would otherwise find no `quality/bin/gate.py` and skip the gate in silence,
-and pin the architecture baseline below the root. The `command -v`
+and pin the architecture baseline below the root. The scaffold template goes one step further:
+`scripts/claude-hooks/at-root.sh` takes the directory from the `cwd` field of the hook's stdin
+JSON, because Claude Code can start a hook outside the session's directory (a worktree the
+session entered, a call sent from a cloud session). The `command -v`
 test plus the trailing `|| :` make the hook a no-op in a checkout where the tool is not
 installed, instead of failing every session with a confusing error. A hook that breaks
 clean checkouts gets deleted by the next person, which is worse than a hook that quietly
