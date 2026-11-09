@@ -15,8 +15,10 @@ Two fixes from reviewing an onboarding PR and #13.
   `CLAUDE_PROJECT_DIR` or the stdin `cwd`. A project without the wrapper falls back to the git top
   level of the process directory.
 - `deploy/templates/claude-hooks/enola-stop.sh`: git top level first, `CLAUDE_PROJECT_DIR` as the
-  fallback; with no `.enola/` baseline in the checkout (a worktree entered mid-session) it says so
-  and leaves the delta to CI's enola job instead of blocking on "no baseline".
+  fallback. The settings run the launch checkout's copy of the script (and of `at-root.sh`, found at
+  `CLAUDE_PROJECT_DIR`'s git top level) inside the session's worktree, so a branch's own edit to
+  the hook script does not run on Stop. A worktree without an `.enola/` baseline still blocks once
+  ("the gate did not run"), as before.
 - `check-project.sh`: `scripts/claude-hooks/at-root.sh` is reported (`OPTIONAL` when absent); the
   scaffold runbook copies it.
 - `templates/sensor-config-examples.md` §3: the documented hook shapes carry the same `cd`, with
