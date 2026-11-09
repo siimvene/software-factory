@@ -214,7 +214,7 @@ cp $SF/deploy/templates/claude/rules/ripwire.md .claude/rules/ripwire.md
 cp $SF/deploy/templates/claude/mcp.json .mcp.json
 # sensor 2 (optional): chisle enabled per project (installed at user scope, see the workstation guide); and the hooks that make 3 and 4 gates
 cp $SF/deploy/templates/claude/settings.json .claude/settings.json
-mkdir -p scripts/claude-hooks && cp $SF/deploy/templates/claude-hooks/enola-stop.sh scripts/claude-hooks/
+mkdir -p scripts/claude-hooks && cp $SF/deploy/templates/claude-hooks/{enola-stop.sh,at-root.sh} scripts/claude-hooks/
 ```
 
 Read the settings file you just copied: a PreToolUse guard that refuses edits to the gate
