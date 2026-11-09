@@ -115,11 +115,21 @@ if [ $CLEAT -eq 1 ] || [ $ENOLA -eq 1 ]; then
   [ $CLEAT -eq 1 ] && g .claude/settings.json 'gate.py --hook' "Stop cleat hook"
   [ $ENOLA -eq 1 ] && g .claude/settings.json 'enola-stop.sh' "Stop enola hook"
 fi
-if [ -f .claude/settings.json ] && python3 -I -c 'import json,sys; sys.exit(0 if json.load(open(".claude/settings.json")).get("enabledPlugins",{}).get("chisle@chisle") is True else 1)' 2>/dev/null; then
-  ok "chisle on for this project" "sensor 2, enabledPlugins in the tracked settings"
-else
-  miss "chisle on for this project" "enabledPlugins chisle@chisle: true in .claude/settings.json (the install is user scope and off there)"
-fi
+# sensor 2 is optional; what must not happen is tracked settings that fetch it from the outside source.
+chisle_state() { python3 -I -c '
+import json
+try: d = json.load(open(".claude/settings.json"))
+except Exception: print("none"); raise SystemExit
+on = d.get("enabledPlugins", {}) or {}
+mk = d.get("extraKnownMarketplaces", {}) or {}
+if on.get("chisle@chisle") or "chisle" in mk: print("upstream")
+elif on.get("chisle@software-factory") is True: print("copy")
+else: print("none")' 2>/dev/null || echo none; }
+case "$(chisle_state)" in
+  copy) ok "chisle on for this project" "sensor 2, the software-factory copy (pinned commit)" ;;
+  upstream) miss "chisle from the factory copy" "tracked settings fetch chisle from its upstream marketplace: enable chisle@software-factory and drop chisle@chisle and the extraKnownMarketplaces chisle entry" ;;
+  *) warn "chisle on for this project" "sensor 2 is opt-in: enabledPlugins chisle@software-factory: true in .claude/settings.json" ;;
+esac
 f .mcp.json "ripwire + enola MCP servers"
 fo .claude/rules/ripwire.md "orientation-map rule"
 
