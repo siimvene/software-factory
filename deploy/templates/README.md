@@ -11,7 +11,7 @@ them in order.
 | `claude/mcp.json` | `.mcp.json` | nothing | the ripwire and enola MCP servers, found on `~/.local/bin` |
 | `claude/rules/ripwire.md` | `.claude/rules/ripwire.md` | nothing | the orientation-map verbs and the three "do not" defaults |
 | `claude/rules/enola.md` | written by `enola install --targets=claude`; this copy is the reference | nothing | the architecture-map verbs; `enola install` overwrites it |
-| `claude-hooks/enola-stop.sh` | `scripts/claude-hooks/` | nothing | `enola hook stop` cannot fail; this runs `enola check` and blocks once on a violation; with no baseline in the checkout it says so and leaves the delta to CI |
+| `claude-hooks/enola-stop.sh` | `scripts/claude-hooks/` | nothing | `enola hook stop` cannot fail; this runs `enola check` and blocks once on a violation; a worktree with no baseline of its own is graded against the main checkout's, and no baseline anywhere blocks once |
 | `claude-hooks/at-root.sh` | `scripts/claude-hooks/` | nothing | runs each hook at the git top level of the directory in the hook's stdin `cwd` (the session's real location), replaying stdin to the wrapped command |
 | `git-hooks/pre-push` | `scripts/git-hooks/` | the receipt section names the reference project's surfaces; drop or port it | the ratchets before code leaves the machine; coverage gate only with a fresh report |
 | `git-hooks/commit-msg` | `scripts/git-hooks/` | nothing | `Provenance: human` or `Provenance: agent:<name>` on every commit; merges exempt |
