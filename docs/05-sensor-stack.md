@@ -131,7 +131,7 @@ promise. Under a subscription model less code compounds: less future agent work 
 Caveats: "made my agent lazy" stays a real risk on complex domain tasks, the ladder is unchanged;
 the plugin ships three Node.js lifecycle hooks (session start, prompt submit, post tool use),
 read in full before adoption: no child process spawn, one 1.5 s update check against the npm
-registry at session start with an environment variable to disable it, state files only under the
+registry at session start (off in the factory copy unless `CHISLE_UPDATE_CHECK=1`), state files only under the
 Claude config directory; the marketplace format accepts a tag or branch, not a commit, and a tag
 can move, so since 2026-11-09 the plugin is a copy in the software-factory marketplace at the v3.0.0
 commit (released 2026-07-28), with the npm update check switched off, and the tracked settings no

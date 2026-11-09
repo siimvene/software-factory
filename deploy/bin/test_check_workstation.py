@@ -557,6 +557,24 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertIn("OPTIONAL plugin chisle@software-factory", out)
         self.assertIn("OPTIONAL upstream chisle still registered", out)
 
+    def test_chisle_upstream_in_user_settings_flagged(self) -> None:
+        self.fx.write_settings(
+            {
+                "enabledPlugins": {
+                    "claude-hud@claude-hud": True,
+                    "secret-guard@software-factory": True,
+                    "consort@consort": True,
+                },
+                "extraKnownMarketplaces": {
+                    "chisle": {"source": {"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}}
+                },
+            }
+        )
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       plugin chisle@software-factory", out)
+        self.assertIn("OPTIONAL upstream chisle still registered", out)
+
     def test_chisle_factory_name_on_remote_source_not_ok(self) -> None:
         self.fx.chisle_install(factory_source={"source": "github", "repo": "JayPokale/Chisle"})
         out, code = self._reference_run()

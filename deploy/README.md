@@ -91,6 +91,8 @@ the runbooks carry.
 | `marketplace/plugins/secret-guard/hooks/` | intercepts Read and Bash only (a Grep call reads the file); the Bash path passes when an allowlisted template name appears in the same command; fails open without `jq` | described as a deterrent, not a boundary, in both guides and the marketplace index; upstream: add Grep and per-path checks |
 | `marketplace/plugins/pm-workspace/skills/pm-workspace-setup` | repository discovery needs the hosted GitHub connector and leaves `POINTERS.md` blank otherwise | the engineer fills `POINTERS.md` from the local clones (runbook M0); upstream: discover adjacent clones |
 | `marketplace/plugins/team-memory/skills/promote/SKILL.md` | `grep` invocations without `--`, a pattern starting with `-` is parsed as an option | cosmetic; upstream |
+| `marketplace/plugins/chisle/hooks/chisle-compress-output.js` | the elision keeps at most 12 error-like lines and its pattern misses CRITICAL, HIGH, SERIOUS and CVE, so a mid-output scanner or review finding, or a late failure after 12 warnings, can be elided; a repeat of an earlier output becomes a marker even after `/compact` summarised the original away (gate 2026-11-09) | known risk in `docs/05-sensor-stack.md`; set `CHISLE_COMPRESS=0` in a session that reads scanner or panel output through Bash; upstream: widen the pattern, reset the dedup cache on compaction |
+| `marketplace/plugins/chisle/hooks/chisle-mode-tracker.js`, `chisle-activate.js` | the on/off flag is one file per config directory, so `/chisle off` in one session switches it off in every concurrent session; after `/clear` the full ruleset is not re-injected (gate 2026-11-09) | upstream: a per-session flag, `clear` in the full-inject sources |
 
 ## Keeping the vendored copies honest
 
