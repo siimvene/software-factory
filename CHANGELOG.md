@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.2.28 (2026-11-09)
+
+Two fixes from reviewing an onboarding PR and #13.
+
+- `deploy/templates/claude-hooks/at-root.sh` (new) and `deploy/templates/claude/settings.json`: every
+  hook runs at the git top level of the directory named by the `cwd` field of its stdin JSON, then
+  the process directory, then `CLAUDE_PROJECT_DIR`, with stdin replayed to the hook. Before, the
+  cleat guard and Stop hooks looked for `quality/bin/gate.py` in the process directory, so a session
+  started from a package subdirectory ran no gate at all (silently); the SessionStart enola hook
+  pinned `.enola/` there; and the enola Stop hook followed `CLAUDE_PROJECT_DIR`, which stays on the
+  starting checkout after the session enters a worktree. The process directory itself is not
+  reliable either: Claude Code starts some hooks in the home directory and says to use
+  `CLAUDE_PROJECT_DIR` or the stdin `cwd`. A project without the wrapper falls back to the git top
+  level of the process directory.
+- `deploy/templates/claude-hooks/enola-stop.sh`: git top level first, `CLAUDE_PROJECT_DIR` as the
+  fallback. The settings run the launch checkout's copy of the script (and of `at-root.sh`, found at
+  `CLAUDE_PROJECT_DIR`'s git top level) inside the session's worktree, so a branch's own edit to
+  the hook script does not run on Stop. A worktree without an `.enola/` baseline still blocks once
+  ("the gate did not run"), as before.
+- `check-project.sh`: `scripts/claude-hooks/at-root.sh` is reported (`OPTIONAL` when absent); the
+  scaffold runbook copies it.
+- `templates/sensor-config-examples.md` §3: the documented hook shapes carry the same `cd`, with
+  the reason.
+- `deploy/01-workstation-macos.md` §4: the ripwire check runs `~/.local/bin/ripwire` by path, since
+  that directory may not be on PATH yet at that step (and another `ripwire` on PATH would be checked
+  instead).
+
 ## 0.2.27 (2026-11-09)
 
 chisle comes from the factory's own marketplace, and it is optional. An onboarding run flagged
