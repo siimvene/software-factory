@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.29 (2026-11-09)
+
+The enola Stop hook grades a worktree against the main checkout's baseline, taken from the
+reference implementation.
+
+- `deploy/templates/claude-hooks/enola-stop.sh`: roots on the stdin `cwd` (as the wrapper does,
+  so the script also works without it); when the checkout has no `.enola/baseline`, it passes the
+  main checkout's (the common git dir's `core.worktree`, as in a submodule, else the first entry
+  of `git worktree list`) with
+  `--baseline`. `deploy/templates/README.md` describes it. Before, a worktree entered
+  mid-session blocked once on "no baseline" every time. Measured on a two-layer fixture with a
+  remote: clean worktree exit 0, a planted `bottom -> top` import exit 2 ("Layer violation:
+  bottom -> top"). Without a remote, enola declines the pair as different repositories (exit 3,
+  blocks once, as before). A main-checkout baseline from another producer set yields a partial
+  verdict; the comment says to re-pin it after pulling.
+
 ## 0.2.28 (2026-11-09)
 
 Two fixes from reviewing an onboarding PR and #13.
