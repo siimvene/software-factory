@@ -224,11 +224,12 @@ class Fixture:
         key: str = "chisle@software-factory",
         scope: str = "user",
         loadable: bool = True,
-        upstream_marketplace: bool = False,
+        upstream_marketplace: str | None = None,
+        factory_source: dict | None = None,
     ) -> None:
-        known: dict = {"software-factory": {"source": {"source": "directory", "path": "/sf/deploy/marketplace"}}}
+        known: dict = {"software-factory": {"source": factory_source or {"source": "directory", "path": "/sf/deploy/marketplace"}}}
         if upstream_marketplace:
-            known["chisle"] = {"source": {"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}}
+            known[upstream_marketplace] = {"source": {"source": "github", "repo": "JayPokale/Chisle", "ref": "v3.0.0"}}
         (self.cfg / "plugins" / "known_marketplaces.json").write_text(json.dumps(known))
         install = self.cfg / "plugins" / "cache" / key.split("@")[1] / "chisle" / "3.0.0"
         (install / ".claude-plugin").mkdir(parents=True, exist_ok=True)
@@ -543,11 +544,24 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertIn("OPTIONAL plugin chisle@software-factory", out)
 
     def test_chisle_upstream_install_flagged(self) -> None:
-        self.fx.chisle_install(key="chisle@chisle", upstream_marketplace=True)
+        self.fx.chisle_install(key="chisle@chisle", upstream_marketplace="chisle")
         out, code = self._reference_run()
         self.assertEqual(code, 0, out)
         self.assertIn("OPTIONAL plugin chisle@software-factory", out)
         self.assertIn("OPTIONAL upstream chisle still registered", out)
+
+    def test_chisle_upstream_under_other_name_flagged(self) -> None:
+        self.fx.chisle_install(key="chisle@jp", upstream_marketplace="jp")
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OPTIONAL plugin chisle@software-factory", out)
+        self.assertIn("OPTIONAL upstream chisle still registered", out)
+
+    def test_chisle_factory_name_on_remote_source_not_ok(self) -> None:
+        self.fx.chisle_install(factory_source={"source": "github", "repo": "JayPokale/Chisle"})
+        out, code = self._reference_run()
+        self.assertIn("OPTIONAL plugin chisle@software-factory", out)
+        self.assertNotIn("OK       plugin chisle@software-factory", out)
 
     def _chisle_on_everywhere(self, key: str) -> None:
         self.fx.write_settings(

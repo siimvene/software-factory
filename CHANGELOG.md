@@ -14,10 +14,11 @@ source takes a branch or tag, never a commit.
 - `deploy/templates/claude/settings.json`: enables `chisle@software-factory`; the
   `extraKnownMarketplaces` entry for the upstream source is gone.
 - `check-project.sh`: chisle not enabled is `OPTIONAL` (was `MISSING`); tracked settings that still
-  name `chisle@chisle` or an upstream `chisle` marketplace are `MISSING`. Six new fixtures,
+  name chisle's upstream source, under any marketplace name, are `MISSING`. Eight new fixtures,
   red-proofed against the previous checker.
-- `check-workstation.sh`: checks the user-scope install of the copy (optional), flags a leftover
-  upstream install, and fails when either name is on at user scope. The commit and tag checks are
+- `check-workstation.sh`: checks the user-scope install of the copy (optional, and only from a
+  directory-source `software-factory` marketplace), flags a leftover upstream install under any
+  marketplace name, and fails when either name is on at user scope. The commit and tag checks are
   gone: the copy is the pin.
 - `deploy/01-workstation-macos.md`, `deploy/02-scaffold-a-project.md`, `deploy/README.md`,
   `docs/05-sensor-stack.md`, `docs/16-inventory.md`, `STATUS.md`: the install, the opt-out, the
