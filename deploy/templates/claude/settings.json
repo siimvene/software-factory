@@ -22,7 +22,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --guard; fi"
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --guard; fi"
           }
         ]
       }
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --hook --changed; fi"
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; if [ -f quality/bin/gate.py ]; then python3 quality/bin/gate.py --hook --changed; fi"
           }
         ]
       },
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PATH=\"$HOME/.local/bin:$PATH\"; if [ -f \"${CLAUDE_PROJECT_DIR:-.}/scripts/claude-hooks/enola-stop.sh\" ]; then bash \"${CLAUDE_PROJECT_DIR:-.}/scripts/claude-hooks/enola-stop.sh\"; fi",
+            "command": "PATH=\"$HOME/.local/bin:$PATH\"; cd \"$(git rev-parse --show-toplevel 2>/dev/null || echo .)\" || exit 0; if [ -f scripts/claude-hooks/enola-stop.sh ]; then bash scripts/claude-hooks/enola-stop.sh; fi",
             "timeout": 60,
             "source": "enola"
           }

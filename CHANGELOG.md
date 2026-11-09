@@ -4,9 +4,14 @@
 
 Two fixes from reviewing an onboarding PR and #13.
 
-- `deploy/templates/claude/settings.json`: the `SessionStart` enola hook `cd`s to the git top level
-  first, like both Stop hooks. A session started from a package subdirectory pinned `.enola/` there,
-  and the Stop check compared against the root.
+- `deploy/templates/claude/settings.json`: every hook `cd`s to the git top level first. Before, the
+  cleat guard and Stop hooks looked for `quality/bin/gate.py` in the cwd, so a session started from a
+  package subdirectory ran no gate at all (silently); the SessionStart enola hook pinned `.enola/` in
+  that subdirectory; and the enola Stop hook followed `CLAUDE_PROJECT_DIR`, which stays on the
+  starting checkout after the session enters a worktree. Taken from an onboarding repo that had
+  already fixed it.
+- `deploy/templates/claude-hooks/enola-stop.sh`: same, git top level first, `CLAUDE_PROJECT_DIR` as
+  the fallback.
 - `deploy/01-workstation-macos.md` §4: the ripwire check runs `~/.local/bin/ripwire` by path, since
   that directory may not be on PATH yet at that step (and another `ripwire` on PATH would be checked
   instead).
