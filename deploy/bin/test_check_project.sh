@@ -131,5 +131,27 @@ reject protection-trivy-ok "$T/o8p" 'required checks lack'
 GH_MODE=ruleset run "$T/r8" "$T/o8r"
 expect ruleset "$T/o8r" '^OK +branch ruleset \(main\) +required checks: cleat enola trivy'
 
+# 9. chisle is optional; the factory copy is OK; the upstream marketplace in tracked settings fails.
+repo "$T/r9"; mkdir -p .claude
+run "$T/r9" "$T/o9a"
+expect chisle-absent-optional "$T/o9a" '^OPTIONAL +chisle on for this project'
+reject chisle-absent-not-missing "$T/o9a" '^MISSING +chisle'
+printf '{"enabledPlugins":{"chisle@software-factory":true}}' > .claude/settings.json
+run "$T/r9" "$T/o9b"
+expect chisle-copy-ok "$T/o9b" '^OK +chisle on for this project'
+printf '{"enabledPlugins":{"chisle@chisle":true},"extraKnownMarketplaces":{"chisle":{"source":{"source":"github","repo":"JayPokale/Chisle","ref":"v3.0.0"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9c"
+expect chisle-upstream-neg "$T/o9c" '^MISSING +chisle from the factory copy'
+reject chisle-upstream-not-ok "$T/o9c" '^OK +chisle on for this project'
+printf '{"enabledPlugins":{"chisle@software-factory":true},"extraKnownMarketplaces":{"chisle":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9d"
+expect chisle-leftover-marketplace-neg "$T/o9d" '^MISSING +chisle from the factory copy'
+printf '{"enabledPlugins":{"chisle@jp":true},"extraKnownMarketplaces":{"jp":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9e"
+expect chisle-renamed-upstream-neg "$T/o9e" '^MISSING +chisle from the factory copy'
+printf '{"enabledPlugins":{"chisle@software-factory":true},"extraKnownMarketplaces":{"software-factory":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9f"
+expect chisle-hijacked-factory-neg "$T/o9f" '^MISSING +chisle from the factory copy'
+
 echo "check-project tests: $pass passed, $failn failed"
 [ $failn -eq 0 ]

@@ -1,15 +1,6 @@
 {
   "enabledPlugins": {
-    "chisle@chisle": true
-  },
-  "extraKnownMarketplaces": {
-    "chisle": {
-      "source": {
-        "source": "github",
-        "repo": "JayPokale/Chisle",
-        "ref": "v3.0.0"
-      }
-    }
+    "chisle@software-factory": true
   },
   "hooks": {
     "SessionStart": [
