@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.28 (2026-11-09)
+
+Two fixes from reviewing an onboarding PR and #13.
+
+- `deploy/templates/claude/settings.json`: the `SessionStart` enola hook `cd`s to the git top level
+  first, like both Stop hooks. A session started from a package subdirectory pinned `.enola/` there,
+  and the Stop check compared against the root.
+- `deploy/01-workstation-macos.md` §4: the ripwire check runs `~/.local/bin/ripwire` by path, since
+  that directory may not be on PATH yet at that step (and another `ripwire` on PATH would be checked
+  instead).
+
 ## 0.2.27 (2026-11-09)
 
 chisle comes from the factory's own marketplace, and it is optional. An onboarding run flagged
