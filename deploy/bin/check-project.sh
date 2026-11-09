@@ -122,7 +122,8 @@ try: d = json.load(open(".claude/settings.json"))
 except Exception: print("none"); raise SystemExit
 on = d.get("enabledPlugins", {}) or {}
 mk = d.get("extraKnownMarketplaces", {}) or {}
-if on.get("chisle@chisle") or "chisle" in mk: print("upstream")
+up = {n for n, m in mk.items() if "chisle" in json.dumps(m).lower()} | {"chisle"}
+if any(v and k.split("@")[-1] in up for k, v in on.items()) or set(mk) & up: print("upstream")
 elif on.get("chisle@software-factory") is True: print("copy")
 else: print("none")' 2>/dev/null || echo none; }
 case "$(chisle_state)" in

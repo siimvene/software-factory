@@ -51,7 +51,7 @@ sys.exit(0 if d.get('enabledPlugins',{}).get(sys.argv[1]) else 1)
 PY
 }
 # chisle (sensor 2, optional) installs from the software-factory marketplace, whose copy is the pin.
-chisle_install_state() { CFG="$CFG" python3 - <<'PY' 2>/dev/null || echo none
+chisle_install_state() { CFG="$CFG" python3 -I - <<'PY' 2>/dev/null || echo none
 import json, os
 cfg = os.environ['CFG']
 try: plugins = json.load(open(os.path.join(cfg, 'plugins', 'installed_plugins.json'))).get('plugins', {})
@@ -61,8 +61,12 @@ except Exception: known = {}
 def loadable(key):
     return any(e.get('scope') == 'user' and os.path.isfile(os.path.join(e.get('installPath') or '/nonexistent', '.claude-plugin', 'plugin.json'))
                for e in plugins.get(key, []))
-state = 'copy' if loadable('chisle@software-factory') else 'none'
-if plugins.get('chisle@chisle') or 'chisle' in known: state += '+upstream'
+# The copy counts only when software-factory is a directory source (the clone), not a remote repo.
+sf = (known.get('software-factory') or {}).get('source') or {}
+state = 'copy' if sf.get('source') == 'directory' and loadable('chisle@software-factory') else 'none'
+# Upstream under any name: a non-directory marketplace whose source names chisle.
+up = {n for n, m in known.items() if 'chisle' in json.dumps(m).lower() and not (isinstance(m, dict) and (m.get('source') or {}).get('source') == 'directory')}
+if 'chisle@chisle' in plugins or any(k.split('@')[-1] in up for k in plugins): state += '+upstream'
 print(state)
 PY
 }

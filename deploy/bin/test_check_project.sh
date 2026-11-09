@@ -146,6 +146,12 @@ reject chisle-upstream-not-ok "$T/o9c" '^OK +chisle on for this project'
 printf '{"enabledPlugins":{"chisle@software-factory":true},"extraKnownMarketplaces":{"chisle":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
 run "$T/r9" "$T/o9d"
 expect chisle-leftover-marketplace-neg "$T/o9d" '^MISSING +chisle from the factory copy'
+printf '{"enabledPlugins":{"chisle@jp":true},"extraKnownMarketplaces":{"jp":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9e"
+expect chisle-renamed-upstream-neg "$T/o9e" '^MISSING +chisle from the factory copy'
+printf '{"enabledPlugins":{"chisle@software-factory":true},"extraKnownMarketplaces":{"software-factory":{"source":{"source":"github","repo":"JayPokale/Chisle"}}}}' > .claude/settings.json
+run "$T/r9" "$T/o9f"
+expect chisle-hijacked-factory-neg "$T/o9f" '^MISSING +chisle from the factory copy'
 
 echo "check-project tests: $pass passed, $failn failed"
 [ $failn -eq 0 ]
