@@ -15,7 +15,9 @@
 set -u
 export PATH="$HOME/.local/bin:$PATH"
 command -v enola >/dev/null 2>&1 || exit 0
-cd "${CLAUDE_PROJECT_DIR:-$PWD}" || exit 0
+# The checkout the session is working in, worktrees included (CLAUDE_PROJECT_DIR keeps
+# pointing at the checkout the session started in after it enters a worktree).
+cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-$PWD}")" || exit 0
 input=$(cat 2>/dev/null || :)
 enola hook stop <<<"$input" >/dev/null 2>&1 || :
 out=$(enola check --fail-on=layers,cycles,intent 2>&1)

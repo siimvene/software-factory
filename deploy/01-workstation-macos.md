@@ -191,7 +191,7 @@ shasum -a 256 -c "enola-$V-$A.sha256" && tar -xzf "enola-$V-$A.tar.gz" && instal
 # Read it before running it: it is a script from a third-party checkout, not a signed release.
 git clone https://github.com/redhat-et/ripwire /tmp/ripwire && git -C /tmp/ripwire checkout e663ca8f8
 less /tmp/ripwire/install.sh && RIPWIRE_INSTALL_PREFIX="$HOME/.local" bash /tmp/ripwire/install.sh
-ripwire --version                          # expect 0.4.0 ... built_from=e663ca8f8
+"$HOME/.local/bin/ripwire" --version      # expect 0.4.0 ... built_from=e663ca8f8 (by path: ~/.local/bin may not be on PATH yet)
 # sensor 2 (optional): chisle is a plugin from the software-factory marketplace, see the plugins section below
 ```
 
