@@ -39,8 +39,17 @@ cd "$root" || exit 0
 cd "$(git rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR:-$PWD}")" || exit 0
 baseline_args=()
 if [ ! -f .enola/baseline/facts.jsonl ]; then
-  common=$(git rev-parse --git-common-dir 2>/dev/null) && common=$(cd "$common" 2>/dev/null && pwd -P)
-  main_root=$(dirname "${common:-/nonexistent}")
+  # The main working tree: the common git dir's core.worktree when set (a submodule's git
+  # dir lives under the superproject's .git/modules), else the first entry git lists
+  # (a plain repository, or one made with --separate-git-dir).
+  common=$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
+  wt=$(git --git-dir="${common:-/nonexistent}" config core.worktree 2>/dev/null)
+  if [ -n "$wt" ]; then
+    main_root=$(cd "$common" 2>/dev/null && cd "$wt" 2>/dev/null && pwd -P)
+  else
+    main_root=$(git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')
+  fi
+  main_root=${main_root:-/nonexistent}
   [ -f "$main_root/.enola/baseline/facts.jsonl" ] && baseline_args=(--baseline="$main_root/.enola/baseline")
 fi
 enola hook stop <<<"$input" >/dev/null 2>&1 || :
