@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.30 (2026-11-11)
+
+The marketplace's copy of chisle no longer tells the model to offer an edit of the user's settings.
+
+- `deploy/marketplace/plugins/chisle/hooks/chisle-activate.js`: the status-line nudge is off unless
+  `CHISLE_STATUSLINE_NUDGE=1`. Upstream, when `settings.json` has no `statusLine`, the SessionStart
+  hook tells the model to proactively offer to add one. This is the second change to upstream; the
+  first (0.2.27) switched the npm update check off. `VENDORED.md` lists both.
+- New `deploy/bin/test_chisle_copy.sh` runs the hook against throwaway config directories: by
+  default it emits the ruleset and no settings instruction, and writes no update-check cache.
+
 ## 0.2.29 (2026-11-09)
 
 The enola Stop hook grades a worktree against the main checkout's baseline, taken from the

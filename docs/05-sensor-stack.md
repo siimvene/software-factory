@@ -134,7 +134,8 @@ read in full before adoption: no child process spawn, one 1.5 s update check aga
 registry at session start (off in the factory copy unless `CHISLE_UPDATE_CHECK=1`), state files only under the
 Claude config directory; the marketplace format accepts a tag or branch, not a commit, and a tag
 can move, so since 2026-11-09 the plugin is a copy in the software-factory marketplace at the v3.0.0
-commit (released 2026-07-28), with the npm update check switched off, and the tracked settings no
+commit (released 2026-07-28), with the npm update check and the status-line nudge (an instruction to
+offer an edit of the user's settings) switched off, and the tracked settings no
 longer name the upstream source. Tool-output elision is a context-cost mechanism, not a sensor: it
 changes what the model reads, and a compressed result that hid an error line the agent needed
 would be a new failure class. The audit so far: 67 elisions in kvart sessions, none followed by a
