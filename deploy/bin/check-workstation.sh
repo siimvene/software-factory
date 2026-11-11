@@ -67,6 +67,13 @@ def loadable(key):
 # The copy counts only when software-factory is a directory source (the clone), not a remote repo.
 sf = (known.get('software-factory') or {}).get('source') or {}
 state = 'copy' if sf.get('source') == 'directory' and loadable('chisle@software-factory') else 'none'
+# An install is cached under its version: when the copy's manifest names another version, the
+# machine still runs the older hooks until the plugin is updated.
+if state == 'copy':
+    try: want = json.load(open(os.path.join(sf.get('path') or '/nonexistent', 'plugins', 'chisle', '.claude-plugin', 'plugin.json'))).get('version')
+    except Exception: want = None
+    have = {e.get('version') for e in plugins.get('chisle@software-factory', []) if e.get('scope') == 'user'}
+    if want and have and want not in have: state = 'stale'
 # Upstream under any name: a non-directory marketplace whose source names chisle.
 up = {n for n, m in known.items() if 'chisle' in json.dumps(m).lower() and not (isinstance(m, dict) and (m.get('source') or {}).get('source') == 'directory')}
 extra_up = [n for n, m in extra.items() if 'chisle' in json.dumps(m).lower()]
@@ -168,6 +175,7 @@ else
   cs="$(chisle_install_state)"
   case "$cs" in
     copy*) ok "plugin chisle@software-factory (user scope, the factory copy)" ;;
+    stale*) warn "plugin chisle@software-factory" "installed version is not the factory copy's: claude plugin update chisle@software-factory --scope user (the copy changed; VENDORED.md lists how)" ;;
     *) warn "plugin chisle@software-factory" "optional, sensor 2: claude plugin install chisle@software-factory --scope user, then switch it off at user scope" ;;
   esac
   case "$cs" in

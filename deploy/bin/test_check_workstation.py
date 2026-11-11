@@ -525,6 +525,27 @@ class CheckWorkstationTests(unittest.TestCase):
         self.assertNotIn("chisle off at user scope", out)
         self.assertNotIn("upstream chisle still registered", out)
 
+    def _factory_marketplace(self, version: str) -> dict:
+        root = self.fx.cfg / "sf-marketplace"
+        manifest = root / "plugins" / "chisle" / ".claude-plugin"
+        manifest.mkdir(parents=True, exist_ok=True)
+        (manifest / "plugin.json").write_text(json.dumps({"name": "chisle", "version": version}))
+        return {"source": "directory", "path": str(root)}
+
+    def test_chisle_install_older_than_the_copy_is_reported(self) -> None:
+        self.fx.chisle_install(factory_source=self._factory_marketplace("3.0.0+sf.2"))
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertNotIn("OK       plugin chisle@software-factory", out)
+        self.assertIn("OPTIONAL plugin chisle@software-factory", out)
+        self.assertIn("claude plugin update chisle@software-factory", out)
+
+    def test_chisle_install_at_the_copy_version_ok(self) -> None:
+        self.fx.chisle_install(factory_source=self._factory_marketplace("3.0.0"))
+        out, code = self._reference_run()
+        self.assertEqual(code, 0, out)
+        self.assertIn("OK       plugin chisle@software-factory (user scope, the factory copy)", out)
+
     def test_chisle_absent_is_optional(self) -> None:
         (self.fx.cfg / "plugins" / "installed_plugins.json").write_text(json.dumps({"version": 2, "plugins": {}}))
         out, code = self._reference_run()

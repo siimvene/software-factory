@@ -74,8 +74,8 @@
     {
       "name": "chisle",
       "displayName": "chisle",
-      "description": "YAGNI ladder and terse prose for the agent (sensor 2), optional. A copy of JayPokale/Chisle at commit a5486fa112 (v3.0.0, MIT) with the upstream update check off; see plugins/chisle/VENDORED.md. Install at user scope, switch off there, switch on per project.",
-      "version": "3.0.0",
+      "description": "YAGNI ladder and terse prose for the agent (sensor 2), optional. A copy of JayPokale/Chisle at commit a5486fa112 (v3.0.0, MIT) with the upstream update check and status-line nudge off; see plugins/chisle/VENDORED.md. Install at user scope, switch off there, switch on per project.",
+      "version": "3.0.0+sf.2",
       "source": "./plugins/chisle",
       "category": "quality"
     }
