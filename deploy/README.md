@@ -41,7 +41,7 @@ at the versions below. Vendoring them would turn a version pin into a fork. One 
 chisle. The scaffold enables it in every team repo's tracked settings, and a marketplace source
 in those settings can pin only a tag, which its author can move, so different code could load on
 each machine. The `software-factory` marketplace holds a copy at the reviewed commit instead
-(`marketplace/plugins/chisle/VENDORED.md` lists what was copied and the one change made); moving
+(`marketplace/plugins/chisle/VENDORED.md` lists what was copied and the two changes made); moving
 the pin is a pull request that re-copies a newer commit.
 
 | Tool | Role | Version on the reference machine | Source |
