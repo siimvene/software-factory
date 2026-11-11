@@ -8,8 +8,13 @@ The marketplace's copy of chisle no longer tells the model to offer an edit of t
   `CHISLE_STATUSLINE_NUDGE=1`. Upstream, when `settings.json` has no `statusLine`, the SessionStart
   hook tells the model to proactively offer to add one. This is the second change to upstream; the
   first (0.2.27) switched the npm update check off. `VENDORED.md` lists both.
-- New `deploy/bin/test_chisle_copy.sh` runs the hook against throwaway config directories: by
-  default it emits the ruleset and no settings instruction, and writes no update-check cache.
+- The copy's version is `3.0.0+sf.2` (plugin manifest and marketplace entry). Claude Code caches an
+  install under its version, so without a new version the change would not reach a machine that
+  already installed the copy. `check-workstation.sh` reports an install whose version is not the
+  copy's (`claude plugin update chisle@software-factory --scope user`).
+- New `deploy/bin/test_chisle_copy.sh` runs the hook against throwaway config directories with a
+  recorder in place of `fetch`: by default it emits the ruleset, no settings instruction, and makes
+  no network call; each opt-in still works.
 
 ## 0.2.29 (2026-11-09)
 
