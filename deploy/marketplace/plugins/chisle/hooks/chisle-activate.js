@@ -4,7 +4,7 @@
 // 1. Writes flag at $CLAUDE_CONFIG_DIR/.chisle-active
 // 2. Resets session turn counter
 // 3. Emits the chisle ruleset as system context
-// 4. Nudges user to configure statusline if missing
+// 4. Nudges user to configure statusline if missing (software-factory copy: opt-in)
 // 5. Major-version update notice (majors only, cached, fail-silent)
 
 const fs = require('fs');
@@ -116,10 +116,12 @@ function run(source) {
       'No unrequested abstractions. Deletion over addition. Shortest diff wins.';
   }
 
-  // 3. Detect missing statusline config
+  // 3. Detect missing statusline config. software-factory copy: off unless
+  // CHISLE_STATUSLINE_NUDGE=1. Upstream this tells the model to proactively offer an
+  // edit of the user's settings.json; a plugin does not get to ask for that by default.
   try {
-    let hasStatusline = false;
-    if (fs.existsSync(settingsPath)) {
+    let hasStatusline = process.env.CHISLE_STATUSLINE_NUDGE !== '1';
+    if (!hasStatusline && fs.existsSync(settingsPath)) {
       const raw = fs.readFileSync(settingsPath, 'utf8').replace(/^﻿/, '');
       const settings = JSON.parse(raw);
       if (settings.statusLine) hasStatusline = true;

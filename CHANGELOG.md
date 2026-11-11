@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.30 (2026-11-11)
+
+The marketplace's copy of chisle no longer tells the model to offer an edit of the user's settings.
+
+- `deploy/marketplace/plugins/chisle/hooks/chisle-activate.js`: the status-line nudge is off unless
+  `CHISLE_STATUSLINE_NUDGE=1`. Upstream, when `settings.json` has no `statusLine`, the SessionStart
+  hook tells the model to proactively offer to add one. This is the second change to upstream; the
+  first (0.2.27) switched the npm update check off. `VENDORED.md` lists both.
+- The copy's version is `3.0.0+sf.2` (plugin manifest and marketplace entry). Claude Code caches an
+  install under its version, so without a new version the change would not reach a machine that
+  already installed the copy. `check-workstation.sh` reports an install whose version is not the
+  copy's (`claude plugin update chisle@software-factory --scope user`).
+- New `deploy/bin/test_chisle_copy.sh` runs the hook against throwaway config directories with a
+  recorder in place of `fetch`: by default it emits the ruleset, no settings instruction, and makes
+  no network call; each opt-in still works.
+
 ## 0.2.29 (2026-11-09)
 
 The enola Stop hook grades a worktree against the main checkout's baseline, taken from the
