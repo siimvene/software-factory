@@ -154,6 +154,10 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 
 ## Read in this order
 
+On a team that is adopting the line, or about to? Start with the
+[field guide](docs/19-field-guide.md): what each person installs, what a day looks like, and the
+three prompts that have an agent do the setup. The list below is the design behind it.
+
 1. [Glossary](docs/00-glossary.md)
 2. [Principles](docs/01-principles.md): gates not instructions, verification discipline, humans inspect output
 3. [The loop](docs/02-loop.md): SPEC, program design, BUILD, VERIFY, SHIP, LEARN and the two write-backs
@@ -173,7 +177,8 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 17. [Inventory](docs/16-inventory.md): every mechanism mapped to the tool or template that provides it, and what an adopter without a standard must build
 18. [Onboarding a repository](docs/17-onboarding.md): the Day 1 runbook, retro-generated specs, mined decision records, the team-context repo, the memory move
 19. [Flightlist](docs/18-flightlist.md): the tickable setup sequence for the next project, one mechanical check and one evidence pointer per leg
-20. [Deploying the factory](deploy/README.md): the macOS workstation guide, the agent runbook that scaffolds a project, two checkers, and the vendored plugins, standard and wiring files
+20. [Field guide](docs/19-field-guide.md): the people's view of all of the above, for engineers, PMs and leads: how to start, the workstation, the everyday loop, the ticket bar, a first-assessment sheet, and the questions people ask
+21. [Deploying the factory](deploy/README.md): the macOS workstation guide, the agent runbook that scaffolds a project, two checkers, and the vendored plugins, standard and wiring files
 
 Then the [evidence](evidence/), the [templates](templates/), the [skills](templates/skills/) a
 team copies into its workspaces, the [deployment directory](deploy/) an engineer runs, and this
