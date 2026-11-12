@@ -185,13 +185,14 @@ V=0.4.19; A=darwin-arm64
 curl -fsSLO "https://github.com/enola-labs/enola/releases/download/v$V/enola-$V-$A.tar.gz"
 curl -fsSLO "https://github.com/enola-labs/enola/releases/download/v$V/enola-$V-$A.sha256"
 shasum -a 256 -c "enola-$V-$A.sha256" && tar -xzf "enola-$V-$A.tar.gz" && install -m 0755 "enola-$V-$A" ~/.local/bin/enola
-# sensor 1: ripwire, built from source at the pinned commit the reference binary was built from (0.4.0).
-# The repository-root install.sh builds the binary (CMake from section 1, Xcode's clang) and installs it
-# with its skills and hooks under the prefix. It edits no agent config unless RIPWIRE_ACTIVATE_CODEX=1.
-# Read it before running it: it is a script from a third-party checkout, not a signed release.
-git clone https://github.com/redhat-et/ripwire /tmp/ripwire && git -C /tmp/ripwire checkout e663ca8f8
-less /tmp/ripwire/install.sh && RIPWIRE_INSTALL_PREFIX="$HOME/.local" bash /tmp/ripwire/install.sh
-"$HOME/.local/bin/ripwire" --version      # expect 0.4.0 ... built_from=e663ca8f8 (by path: ~/.local/bin may not be on PATH yet)
+# sensor 1: ripwire, pinned release binary, checksum-verified like enola. 0.6.10 was released
+# 2026-11-08 (tag commit ac869640e); the 30-day release-age floor was waived for this pin by the
+# repository owner on 2026-11-12. Apple silicon only: the 0.6 line publishes no Intel macOS asset.
+RV=0.6.10; RA=macos-arm64
+curl -fsSLO "https://github.com/redhat-et/ripwire/releases/download/v$RV/ripwire-$RV-$RA.tar.gz"
+curl -fsSLO "https://github.com/redhat-et/ripwire/releases/download/v$RV/ripwire-$RV-$RA.tar.gz.sha256"
+shasum -a 256 -c "ripwire-$RV-$RA.tar.gz.sha256" && tar -xzf "ripwire-$RV-$RA.tar.gz" && install -m 0755 "ripwire-$RV-$RA/ripwire" ~/.local/bin/ripwire
+"$HOME/.local/bin/ripwire" --version      # expect 0.6.10 ... built_from=ac869640e (by path: ~/.local/bin may not be on PATH yet)
 # sensor 2 (optional): chisle is a plugin from the software-factory marketplace, see the plugins section below
 ```
 
@@ -200,12 +201,14 @@ virtualenv with a symlink; `uv tool install` is the same thing with less ceremon
 CI does. Why enola is pinned by checksum and not `brew`: the CI job installs the same release
 the same way, so the local check and the required check agree.
 
-`skills/install.sh` is not the installer. At `e663ca8f8` it only links ripwire's agent skills
-into `~/.claude/skills` and puts no `ripwire` on PATH, so the checker keeps reporting it missing.
-The root script built and installed 0.4.0 on a fresh workstation `[measured 2026-11-09]`.
-`RIPWIRE_NO_ACTIVATE` belongs to the release installer (`scripts/install.sh`, which fetches the
-latest release unless `RIPWIRE_VERSION` names a tag); neither script used here reads it. The prefix is `~/.local` because the root script otherwise picks
-Homebrew's when `brew` is on PATH, and the sensors live in the user's local bin.
+None of the repository's scripts is used. `skills/install.sh` is not an installer: it only links
+ripwire's agent skills into `~/.claude/skills` and puts no `ripwire` on PATH. The root `install.sh`
+builds from source for the host CPU, which is how 0.4.0 was installed here until 2026-11-12.
+`scripts/install.sh` fetches the latest release unless `RIPWIRE_VERSION` names a tag. The release
+archive and its published `.sha256` give the same binary on every machine, which a source build
+does not. The 0.6.10 archive verified and ran on the reference machine `[measured 2026-11-12]`;
+against 0.4.0 it keeps every MCP tool (and adds `affected` and `rank_by`) and every CLI flag the
+rule file `templates/claude/rules/ripwire.md` names.
 
 `enola install` and `ripwire wrap claude` write instructions into agent files. Run them in the
 project, from the scaffold runbook, not globally: the reference implementation tracks the
