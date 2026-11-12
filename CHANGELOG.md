@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.31 (2026-11-12)
+
+ripwire moves from 0.4.0 to 0.6.10, installed from the release archive.
+
+- `deploy/01-workstation-macos.md` section 4: the pinned release binary, verified against its published
+  `.sha256`, replaces the source build at `e663ca8f8`. 0.6.10 was released 2026-11-08; the 30-day
+  release-age floor was waived for this pin by the repository owner. Checked against 0.4.0: every MCP
+  tool is kept (`affected` and `rank_by` are new) and every CLI flag the rule file names still exists.
+  Apple silicon only: the 0.6 line has no Intel macOS asset.
+
 ## 0.2.30 (2026-11-11)
 
 The marketplace's copy of chisle no longer tells the model to offer an edit of the user's settings.
