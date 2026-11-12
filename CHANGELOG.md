@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.32 (2026-11-12)
+
+A field guide for the people on the line.
+
+- New `docs/19-field-guide.md`: the design from the seat of an engineer, a PM or a team lead. The
+  three prompts that have an agent do the setup, the five principles, where context lives, the
+  brownfield onboarding day, what the workstation runbook installs per role and per platform, the
+  everyday loop with who does each step, the ticket bar, memory and the review gate in brief, the
+  hygiene list, a blank first-assessment sheet, and the questions people ask. It adds no mechanism:
+  every section links to the design document or decision record it summarises.
+- `README.md`: the reading order points to it first for a team adopting the line, and lists it as
+  item 20.
+
 ## 0.2.31 (2026-11-12)
 
 ripwire moves from 0.4.0 to 0.6.10, installed from the release archive.
