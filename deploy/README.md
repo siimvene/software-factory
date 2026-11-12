@@ -55,7 +55,7 @@ the pin is a pull request that re-copies a newer commit.
 | memspec | memory engine and MCP server | 0.12.3 | npm `memspec` |
 | cleat | quality ratchets (sensor 3) | fork `siimvene/cleat` @ `c2947a5` | vendored into each project by `attach.py` |
 | enola | architecture diff (sensor 4) | 0.4.19, the same pin in `templates/github/workflows/gates.yml` | `enola-labs/enola` releases, sha256-verified |
-| ripwire | orientation map (sensor 1) | 0.4.0 | `redhat-et/ripwire` installer |
+| ripwire | orientation map (sensor 1) | 0.6.10 | `redhat-et/ripwire` release binary, checksum-verified |
 | chisle | YAGNI ladder (sensor 2), optional | 3.0.0+sf.2 (upstream 3.0.0, commit `a5486fa112`) | copied into `marketplace/plugins/chisle` (the exception below); installed at user scope and switched off there, switched on per project |
 | claude-hud | status line | 0.6.0 | marketplace `jarrodwatts/claude-hud` |
 | lizard | complexity analyzer for cleat | 1.23.0 | `uv tool install lizard==1.23.0` |
