@@ -75,7 +75,7 @@ Deterministic sensors have zero hallucination risk and near-zero cost per run. A
 of code that a ratchet would have failed wastes the most expensive resource. So the mechanical
 stack runs first and the cross-vendor reviewer sees only what survived it.
 
-Paid for: the cross-vendor review is 52 to 58 % of the dev-hat wall-clock in the kvart cycles
+Paid for: the cross-vendor review is 52 to 58 % of the dev-hat wall-clock in the reference product cycles
 `[measured 2026-09-07]`. Anything the ratchets can take off that reviewer's plate is minutes
 saved per turn.
 

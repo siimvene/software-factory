@@ -4,14 +4,14 @@ A design system is a knowledge-plane artifact, not a design deliverable. In a fa
 agents write the user interface, it is the only place a human designer's intent survives after
 the designer leaves the room. This document says what the artifact contains, where it sits in
 the four layers of [04-knowledge-plane](04-knowledge-plane.md), how it enters the build loop,
-and what the kvart adoption measured on 2026-09-07.
+and what the reference product adoption measured on 2026-09-07.
 
 ## Why this is a knowledge-plane layer and not a style guide
 
 Three separate readers need it, and only one of them is a person.
 
 - **The builder reads it before writing a screen.** Without it, an agent asked for "an
-  apartments page" reconstructs the visual language from whichever three pages it happened to
+  list page" reconstructs the visual language from whichever three pages it happened to
   open. That is the same cost specs exist to remove ([04-knowledge-plane](04-knowledge-plane.md)),
   applied to the frontend: current state has to be readable without being re-derived per ticket.
   Re-derivation does not just cost tokens, it drifts. Two agents reconstructing "how a card
@@ -23,7 +23,7 @@ Three separate readers need it, and only one of them is a person.
   empty state". The finding class changes from broken to wrong.
 - **The intent survives its author.** A design decision made once, in a review, in a canvas, or
   in a chat message, is gone by the next session. Written next to the value it explains, with
-  its date, it is still there in six months. kvart's card radius went 8px in the canvas, 32px in
+  its date, it is still there in six months. The reference product's card radius went 8px in the canvas, 32px in
   the implementation, then down to 24px because the owner judged 32px too aggressive. Only the
   last number is in the code. All three are in the design system, and the middle one is why
   nobody re-raises the first `[measured 2026-09-07]`.
@@ -32,7 +32,7 @@ Which layer it sits in: the team layer. It describes one product across its repo
 by agents and merged by the code owner, and code repos bind to it rather than carry it. Same
 topology as the spec store and the memory store.
 
-That is the shape kvart has: the design system is derived from the code and the code is the only
+That is the shape the reference product has: the design system is derived from the code and the code is the only
 thing that ships. When the design system is its own repository with its own commits (a package
 the product repos install, a home for design-tool exports a product repo reads, a structural
 catalogue), it is a repo in the loop as well as a knowledge layer. See
@@ -42,7 +42,7 @@ catalogue), it is a repo in the loop as well as a knowledge layer. See
 
 **A token that no code reads is not a standard, it is a suggestion.**
 
-Two thirds of kvart's original 2026-08-09 canvas token file was never implemented, and nothing
+Two thirds of the reference product's original 2026-08-09 canvas token file was never implemented, and nothing
 noticed for a month `[measured 2026-09-07]`. The mechanism that prevents a repeat is an ordering
 rule with a check behind it:
 
@@ -52,7 +52,7 @@ rule with a check behind it:
 3. The dated rationale travels with it. A token change without its reason is how the system lost
    its history the first time.
 
-The check, for the one rule that had a mechanical form worth building: kvart swept 942 hardcoded
+The check, for the one rule that had a mechanical form worth building: the reference product swept 942 hardcoded
 corner-radius classes into a single CSS card primitive and left a build gate behind that fails
 when the hand-rolled pattern regrows `[measured 2026-08-11]`. It is wired into the project's
 validation script, so an agent-built page cannot silently replant the forest that was just
@@ -87,7 +87,7 @@ That split is the interesting part. Each token records what shipped and, where i
 the design file said. A token the canvas defined and the code never implemented is present and
 marked `shipped: false` rather than deleted. Deleting it would lose the information that someone
 intended it; keeping it unmarked would make the file lie about the product. The marked form makes
-the gap queryable: 14 tokens in kvart's case, mostly an alias layer the canvas added so that dark
+the gap queryable: 14 tokens in the reference product's case, mostly an alias layer the canvas added so that dark
 mode would be a one-line swap, on a product that later closed the door on dark mode deliberately.
 
 The cost of two formats is that they can disagree. That is why the update rule says both files or
@@ -116,14 +116,14 @@ A divergence is one difference between what the design file specified and what t
 Not a bug and not a violation. It is a fact with three possible readings, and the log's job is to
 force the reading to be chosen rather than left ambiguous:
 
-- **the implementation is right** and the canvas is superseded (kvart: the base radius was raised
+- **the implementation is right** and the canvas is superseded (the reference product: the base radius was raised
   so the derived scale would land on round pixel values; the font is self-hosted because the
   content security policy would have blocked the canvas's font import outright)
 - **the canvas is right** and the code has drift to fix
-- **the canvas value was never load-bearing**, so it is recorded and closed (kvart: an eight-step
+- **the canvas value was never load-bearing**, so it is recorded and closed (the reference product: an eight-step
   type scale as tokens, against an app that defines no size tokens at all)
 
-kvart's log holds 20 divergences as of 2026-09-07: 12 changed in implementation, 5 defined in the
+The reference product's log holds 20 divergences as of 2026-09-07: 12 changed in implementation, 5 defined in the
 canvas and never implemented, 3 added by the implementation with no canvas equivalent
 `[measured 2026-09-07]`. The palette itself survived contact with the code apart from one shade,
 which is the log's most useful single finding: it says the disagreements are about structure, not
@@ -155,7 +155,7 @@ or from the owner's recorded adjustment. Editing the design-standards repo direc
 either upstream moving, produces exactly the failure the whole layer exists to prevent: a standard
 that no code reads.
 
-## What kvart measured
+## What the reference product measured
 
 All on 2026-09-07 unless the row says otherwise.
 
@@ -207,11 +207,11 @@ every product that installs it.
 
 ### Four shapes, one rule
 
-The group runs three shapes next to kvart's, checked on 2026-11-09 `[measured 2026-11-09]`:
+The group runs three shapes next to the reference product's, checked on 2026-11-09 `[measured 2026-11-09]`:
 
 | Shape | What the repo holds | Where a value comes from | What ships |
 |---|---|---|---|
-| derived (kvart) | tokens, patterns, components written by reading the shipped frontend | the product code | nothing; the product repo ships |
+| derived (the reference product) | tokens, patterns, components written by reading the shipped frontend | the product code | nothing; the product repo ships |
 | package | a token package and a component package, synced from the design tool, released with versioned changesets, with a generated-output check and visual tests | the design tool, through a sync step | a versioned package; product repos install or vendor a copy |
 | export home | the design tool's exports pulled on a weekly schedule, an inventory, tests on the pull | the design tool | the exports; one product repo reads them |
 | structural catalogue | categories, rules and past decisions as machine-readable files beside the design tool | the design tool for values, the repo for structure | nothing; designers and agents read it |
@@ -220,7 +220,7 @@ The rule from the top of this document holds in every shape: a value nothing rea
 suggestion. What changes is the direction of the mirror. In the derived shape the product code
 moves first and the design-standards repo mirrors it in the same pull request. In the package
 shape the design-system repo moves first, releases a version, and each product repo adopts that
-version in a pull request of its own. Writing kvart's ordering rule into a package repo would
+version in a pull request of its own. Writing the reference product's ordering rule into a package repo would
 invert it: the product would edit a value the next sync overwrites.
 
 ### What the loop looks like in a package repo
@@ -266,7 +266,7 @@ code, so the run record names them as the expected residue.
 
 ## For an adopter
 
-The minimum useful version is not the kvart shape. It is three files:
+The minimum useful version is not the reference product shape. It is three files:
 
 1. The tokens, in whatever format the code already reads, with a source path and a dated reason
    per block.

@@ -218,7 +218,7 @@ ladder with a smaller and rarer downside on these numbers, and it adds the input
 in the stack touches. This is the vendor of one tool benchmarking the other on generic prompts:
 field class, not measured here.
 
-**Pre-adoption audit on kvart `[measured 2026-09-10]`.** Hooks and plugin manifest read in full:
+**Pre-adoption audit on the reference product `[measured 2026-09-10]`.** Hooks and plugin manifest read in full:
 no child process spawn; one 1.5 s update check against the npm registry at session start, disabled
 by an environment variable; state files only under the Claude config directory, refusing symlinks.
 Skill exfiltration scan: 0 findings in 59 files. Marketplace source pinned to tag v3.0.0; the
@@ -357,7 +357,7 @@ the recipe is reviewed, the diff is proven to be its output.
 **Caveats.** The cost figure is a marketing sheet: no task list, no N, no variance, the unaided
 arms on older models, and no full paper behind it (the linked paper directory returned 404 on
 2026-10-14). Its "guaranteed correctness" means repeatable, not semantically right. The plugin is
-a routing instruction, not a measurement. No mechanical change has been measured on kvart.
+a routing instruction, not a measurement. No mechanical change has been measured on the reference product.
 
 ## 10. Ponytail 5: a caller-reading review `[field: Ponytail 5]`
 

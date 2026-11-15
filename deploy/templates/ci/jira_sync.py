@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""jira_sync — keep the KVART Jira ledger in step with what GitHub observed.
+"""jira_sync — keep the REFAPP Jira ledger in step with what GitHub observed.
 
 The flywheel's ticket states used to be set by hand by whoever ran the loop,
 at whatever moment they remembered. This module makes the transitions follow
 observed events instead, and stamps the person who picked a ticket up:
 
-  pickup    --key KVART-N                 assign the ticket to the token's own
+  pickup    --key REFAPP-N                 assign the ticket to the token's own
                                           account and walk it Backlog -> Ready
                                           -> In Progress (the human/operator
                                           side; run locally, see bin wrapper)
@@ -34,7 +34,7 @@ the merge or the deploy. A ticket the text does not name is simply not touched.
 Auth is HTTP basic from the environment: JIRA_BASE_URL, JIRA_USER_EMAIL,
 JIRA_API_TOKEN (in Actions: a repository variable plus two secrets; locally:
 the ~/.memspec/bin/jira wrapper fills them from the keychain). The token is
-never printed. JIRA_PROJECT_KEY (default KVART) scopes the key regex.
+never printed. JIRA_PROJECT_KEY (default REFAPP) scopes the key regex.
 
 Stdlib only, on purpose: it runs on a bare ubuntu-latest python3 and inside
 deploy.sh on the operator's machine without a venv.
@@ -80,14 +80,14 @@ CHAIN = [BACKLOG, READY, IN_PROGRESS, IN_TEST, READY_FOR_LIVE, DONE]
 # ── pure helpers (unit-tested, no I/O) ──────────────────────────────────────
 
 
-def extract_keys(text: str, project: str = "KVART") -> list[str]:
+def extract_keys(text: str, project: str = "REFAPP") -> list[str]:
     """Ticket keys in `text`, first occurrence order, de-duplicated.
 
-    Word-bounded so `KVART-1` does not match inside `KVART-10`; the branch
-    name `feat/KVART-8-apartment-list` and the PR title `(KVART-8)` both count.
-    The shorthand `(KVART-5/6/7)` names all three ONLY in that parenthesised
-    title form: a bare `KVART-8/4-hotfix` in a branch name or `KVART-8/2026`
-    in a subject is KVART-8 alone, so a slash used for something else can
+    Word-bounded so `REFAPP-1` does not match inside `REFAPP-10`; the branch
+    name `feat/REFAPP-8-item-list` and the PR title `(REFAPP-8)` both count.
+    The shorthand `(REFAPP-5/6/7)` names all three ONLY in that parenthesised
+    title form: a bare `REFAPP-8/4-hotfix` in a branch name or `REFAPP-8/2026`
+    in a subject is REFAPP-8 alone, so a slash used for something else can
     never reach another ticket.
     """
     seen: list[str] = []
@@ -103,7 +103,7 @@ def extract_keys(text: str, project: str = "KVART") -> list[str]:
     return seen[:MAX_KEYS]
 
 
-def deployed_keys(subjects: str, project: str = "KVART") -> list[str]:
+def deployed_keys(subjects: str, project: str = "REFAPP") -> list[str]:
     """Keys of the changes a range of commit SUBJECTS actually delivers.
 
     A `Revert "..."` subject names the ticket whose change is being removed;
@@ -287,7 +287,7 @@ def _move(jira: Jira, key: str, event: str, conclusion: str | None = None) -> st
     """Walk the ticket along the planned path; the status reached, or None if it did not move.
 
     Epics are never moved by an event: a branch named after the epic
-    (`feat/KVART-4-access-trail`) delivers stories, and the epic closes when
+    (`feat/REFAPP-4-access-trail`) delivers stories, and the epic closes when
     a person says the whole thing is done.
     """
     if jira.is_epic(key):
@@ -443,8 +443,8 @@ def build_parser(project: str) -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     # `or`, not a get() default: the workflows always export the variable, and an unset
-    # repository variable arrives as "" (which would turn KVART-12 into "-12").
-    project = os.environ.get("JIRA_PROJECT_KEY") or "KVART"
+    # repository variable arrives as "" (which would turn REFAPP-12 into "-12").
+    project = os.environ.get("JIRA_PROJECT_KEY") or "REFAPP"
     args = build_parser(project).parse_args(argv)
     jira = None if getattr(args, "offline", False) else Jira.from_env()
     return int(args.fn(jira, args))

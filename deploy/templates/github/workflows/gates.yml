@@ -1,6 +1,6 @@
 # The mechanical gates on main, as required status checks. Job names are STABLE
 # (cleat, enola, trivy): the branch ruleset names them, so renaming a job silently
-# drops its protection. Source: the reference implementation's ci.yml (kvart), the
+# drops its protection. Source: the reference implementation's ci.yml, the
 # three gate jobs lifted out; the project's own lint + test job(s) live in the
 # project's ci.yml and are named in the same ruleset.
 #

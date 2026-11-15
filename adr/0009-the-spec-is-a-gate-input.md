@@ -12,11 +12,11 @@ mechanical signal `[designed 2026-07-21]`; no cycle since has run it. A parallel
 principles; this record folds the two and adds the plumbing that note assumed was present.
 
 ADR 0007 makes specs the implemented state and keeps them current by a sister PR on every
-behaviour-changing code PR, at LEARN, after merge. Two consequences were measured on kvart.
+behaviour-changing code PR, at LEARN, after merge. Two consequences were measured on the reference product.
 
 The reviewer never sees the spec. The cross-vendor review reads the diff plus injected rule
 packs; the spec lives in a different repository. In cycle 4 the repo-reading leg raised the
-management-company scope question from the code alone, the principal dismissed it "by the spec"
+service-company scope question from the code alone, the principal dismissed it "by the spec"
 and escalated it as D1. The three panels ran 11:16 to 12:36Z; the escalation thread with D1 to
 D5 was posted at 12:53Z, so no reviewer had the decisions either `[measured 2026-09-09]`. The
 one party holding the spec was the authoring session, whose solo judgement the gate exists to
@@ -68,8 +68,8 @@ Scope: behaviour-changing diffs. A pure refactor carries a delta that says "none
   already names. Cross-repo: the station's tree needs the team-context checkout, or a fetched
   copy at the pinned commit.
 - **Follow-ups:** the review tool: spec pack injection and the scope-drift instruction (owner:
-  the tool's maintainer; kvart KVART-24); the reference implementation: delta receipt in the
-  pre-push hook and REFINE-SPEC in the report templates (owner: the operator; kvart KVART-23); measurement: the class is tested
+  the tool's maintainer; the reference product REFAPP-24); the reference implementation: delta receipt in the
+  pre-push hook and REFINE-SPEC in the report templates (owner: the operator; the reference product REFAPP-23); measurement: the class is tested
   against a planted drift and a known-conformant diff before it is trusted, and demoted to
   advisory if more than half of its findings on the first live cycle are dismissed.
 

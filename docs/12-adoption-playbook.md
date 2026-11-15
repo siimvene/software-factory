@@ -23,7 +23,7 @@ you skip.
 
 ## Turn 0: adopt (one day for a healthy repo)
 
-The full runbook, with the kvart numbers, is [17-onboarding](17-onboarding.md). The table
+The full runbook, with the reference product numbers, is [17-onboarding](17-onboarding.md). The table
 below is the short checklist; the tickable one, leg by leg with evidence columns and the gate
 and sandbox wiring included, is [18-flightlist](18-flightlist.md).
 
@@ -72,11 +72,11 @@ Run [02-loop](02-loop.md). After each turn:
 
 First turns are deliberately small and risky in the right way: a one-line fix through the
 whole loop (proves the loop), then a money-path change with an owner decision inside it
-(proves the gate). kvart did exactly these two.
+(proves the gate). The reference product did exactly these two.
 
 ## Variant: solo owner
 
-Wear all three hats and record it. The named shortcuts kvart took, each now a measured cost:
+Wear all three hats and record it. The named shortcuts the reference product took, each now a measured cost:
 
 | Shortcut | Consequence | What a team keeps |
 |---|---|---|

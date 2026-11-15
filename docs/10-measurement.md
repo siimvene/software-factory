@@ -15,7 +15,7 @@ Every cycle report carries them. See [templates/dogfood-cycle-report.md](../temp
    it changed in the diff.
 4. **Skipped or shortcut steps.** Each one is a finding about the process, not the product.
 
-Measured on kvart, cycles 1 and 2 `[measured 2026-09-07]`:
+Measured on the reference product, cycles 1 and 2 `[measured 2026-09-07]`:
 
 | Stage | Cycle 1 (route fix, +47/−1) | Cycle 2 (retire a payment path, +121/−679) |
 |---|---|---|
@@ -49,11 +49,11 @@ Outcome-denominated cost (per merged PR, per feature, per review) replaces per-t
 the primary metric once agents author most PRs `[field: Uber Engineering]`. Under a
 subscription model, cost per feature = subscription ÷ features delivered.
 
-Measured on kvart, 2026-08-08 to 09-07, list-price equivalents `[measured 2026-09-07]`:
+Measured on the reference product, 2026-08-08 to 09-07, list-price equivalents `[measured 2026-09-07]`:
 
 | Unit | Number |
 |---|---|
-| kvart sessions in the window | 217, $9,414 |
+| the reference product sessions in the window | 217, $9,414 |
 | session cost | median $18.7, p75 $41, p90 $117, max $416 |
 | orchestrator-tree burn (sessions ≥ 30 min) | median $14/h, p75 $30/h, p90 $57/h |
 | feature groups (feat commits sharing scope and day) | 98 |
@@ -127,7 +127,7 @@ Idle waits and CI reruns are excluded, as everywhere.
 
 Raw fix:feat lies in a review-gated repo: about half of fix commits are the review apparatus
 succeeding. Re-cut on non-review fixes (subject and body not matching review, audit, panel,
-finding, scanner, QA keywords). kvart, four weeks `[measured 2026-09-07]`:
+finding, scanner, QA keywords). The reference product, four weeks `[measured 2026-09-07]`:
 
 | Week of | commits | raw fix:feat | non-review fix:feat | $/commit |
 |---|---|---|---|---|
@@ -149,7 +149,7 @@ The share of merges that are the line fixing its own machinery, not shipping pro
 loop-infrastructure merges divided by all merges, cut weekly. It is the number that says
 whether the line has settled or is still being built.
 
-kvart, 2026-09-09 `[measured 2026-09-09]`: 8 of 13 merges were loop infrastructure. Loop:
+The reference product, 2026-09-09 `[measured 2026-09-09]`: 8 of 13 merges were loop infrastructure. Loop:
 runner routing (#31, #32), coverage floor and concurrency (#34), Jira ledger (#39, #40), test
 selection and merge base (#41), browser gate (#42, #44). Product: #30, #33, #36, #37, #38.
 

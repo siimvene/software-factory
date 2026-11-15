@@ -24,7 +24,7 @@ Three mechanisms touch it today, and none of them hands the reviewer a set:
   search. The diff-only transport cannot sweep at all
   ([06-verify-gate](../docs/06-verify-gate.md)), and a repo-reading leg can skip it: in one trial
   run the second-vendor leg made 0 tool calls, so it reviewed the diff without reading the
-  repository ([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)). No report says which
+  repository ([evidence](../evidence/reference-sensor-trial-2026-09-29.md)). No report says which
   consumers a leg looked at, so a clean verdict cannot be told from an unswept one.
 
 A static call graph alone does not close this. The escapes measured so far cross edges that
@@ -33,11 +33,11 @@ static analysis does not model:
 - **A whole-tree fence.** A PR added 2 error codes without translations. Impact selection ran 78
   targets and never picked the translation fence, because the selector maps a file to the tests
   that import it and a fence that scans the tree imports nothing specific
-  ([evidence](../evidence/kvart-stale-green-merges-2026-09-29.md), case B,
+  ([evidence](../evidence/reference-stale-green-merges-2026-09-29.md), case B,
   `[measured 2026-09-29]`).
 - **A registration.** Cycle 2's payment status poller had no caller in the web client; it ran
   because a job registry and a timer unit scheduled it, and it was the only hop that closed a
-  payment state (adr/0012, `wired_by`; [evidence](../evidence/kvart-dogfood-cycle-2.md),
+  payment state (adr/0012, `wired_by`; [evidence](../evidence/reference-dogfood-cycle-2.md),
   `[measured 2026-09-07]`).
 - **Framework dispatch.** On a service of the group's estate built on command dispatch, a code
   graph tool that resolved dependency injection returned 0 callers for a command whose handler a
@@ -127,7 +127,7 @@ leg still reports consumers it finds outside it.
   to cover.
 - **Follow-ups:** the review tool: impact pack injection, the `coverage` field in the findings
   schema, the coverage check over the merged panel output (owner: the tool's maintainer); the
-  reference implementation: kvart's `seams.yaml` seeded with the translation and error-code
+  reference implementation: the reference product's `seams.yaml` seeded with the translation and error-code
   fences, the job registry and timer units, and the shared tables, plus the resolver with planted
   true and false cases (owner: the operator); rehearse the blocked direction: replay case B and
   cycle 2's poller removal against the set and show each module listed and each unswept verdict
@@ -158,11 +158,11 @@ leg still reports consumers it finds outside it.
 
 ## Evidence
 
-- [evidence/kvart-stale-green-merges-2026-09-29.md](../evidence/kvart-stale-green-merges-2026-09-29.md):
+- [evidence/reference-stale-green-merges-2026-09-29.md](../evidence/reference-stale-green-merges-2026-09-29.md):
   case B, the fence impact selection never picked `[measured 2026-09-29]`.
-- [evidence/kvart-dogfood-cycle-2.md](../evidence/kvart-dogfood-cycle-2.md): the poller with no
+- [evidence/reference-dogfood-cycle-2.md](../evidence/reference-dogfood-cycle-2.md): the poller with no
   web caller `[measured 2026-09-07]`.
-- [evidence/kvart-sensor-trial-2026-09-29.md](../evidence/kvart-sensor-trial-2026-09-29.md): the
+- [evidence/reference-sensor-trial-2026-09-29.md](../evidence/reference-sensor-trial-2026-09-29.md): the
   headless builder's 0 orientation-map calls; the review leg with 0 tool calls.
 - The command-dispatch A/B on a group service `[measured 2026-07-21]`: the operator's notes, not
   yet copied into `evidence/`.

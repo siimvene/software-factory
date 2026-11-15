@@ -29,7 +29,7 @@ The rim is delivery. The hub is the knowledge plane, and it is what makes the li
 rather than a pipeline: every turn ends by writing back what the next turn reads. Both
 write-backs are pull requests a person reviews, never a direct write.
 
-The dashed memory arrow is drawn dashed on purpose. Across the two measured kvart cycles the
+The dashed memory arrow is drawn dashed on purpose. Across the two measured the reference product cycles the
 specs arrow fired twice, both times hand-edited because the generating skill was not installed,
 and the memory arrow fired zero times: both cycles' facts went to a local scratch store and
 nothing was promoted into the team plane `[measured 2026-09-07]`. A loop missing that arrow
@@ -46,7 +46,7 @@ still ships; it just stops compounding.
   contract. They are written before any code and referenced by number from the plan, the
   tests and the evidence. See [07-roles-and-authority](07-roles-and-authority.md) for why
   builder-authored criteria are not acceptance.
-- Readiness is scored against a rubric before the ticket moves to Ready. The kvart cycles
+- Readiness is scored against a rubric before the ticket moves to Ready. The reference product cycles
   self-scored 94 and 93 of 100 `[measured 2026-09-07]`; a team uses an evaluator agent and the
   PM's approval.
 - Security is considered here, not only pre-merge: a short design-vs-checklist pass on the
@@ -155,7 +155,7 @@ Order matters and is the subject of two documents:
 3. Receipt-checked gates, before any push: the passes too slow for a Stop hook (the browser
    suite, static analysis) run once on the final tree, write a receipt keyed by the git tree
    id, and the pre-push hook refuses a ref whose diff reaches that surface without a receipt
-   for its tree. On kvart the browser pass moved from after merge to here on 2026-09-09:
+   for its tree. On the reference product the browser pass moved from after merge to here on 2026-09-09:
    scope derived from the specs' own routes and the API modules' own routers, 23 s scoped,
    93 to 103 s full `[measured 2026-09-09]`; static analysis follows the same shape
    `[designed 2026-09-09]`. A receipt is a discipline file, never an authorisation token.
@@ -231,6 +231,6 @@ stops; it does not improvise.
 | cycle 3, one ticket, five required CI checks | | 18 min 33 s | | 40 min 56 s excl. a 15 min 54 s merge wait; CI 49 % of it |
 | cycle 4, a batch of four stories, three parallel stations | | 2 h 08 min to the backend PR | | backend 3 h 57 min; whole batch 4 h 57 min, of which three human merges and one CI round of about 2 h |
 
-All `[measured 2026-09-05..09]`. Of the 13 PRs merged on kvart on 2026-09-09, 8 were the
+All `[measured 2026-09-05..09]`. Of the 13 PRs merged on the reference product on 2026-09-09, 8 were the
 factory fixing its own line and 5 were product; see [10-measurement](10-measurement.md) for
 the metric. Per-cycle detail is in the [status ledger](../STATUS.md).

@@ -31,7 +31,7 @@ approval-integrity failure suspends delegation.
 
 ## Incident (2026-09-09) and what it decided
 
-kvart #44, a loop-infrastructure PR, was merged at 18:34Z by the operator agent running the
+The reference product #44, a loop-infrastructure PR, was merged at 18:34Z by the operator agent running the
 owner's `gh` login, because the previous session's handoff note said "post the green line and
 merge" `[measured 2026-09-09]`. The forge records the owner as the merger; nothing in the
 ledger distinguishes that merge from a human decision on evidence. That is the

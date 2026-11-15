@@ -69,7 +69,7 @@ more than the same check in CI.
 
 What is wired where, as of 2026-09-07:
 
-| # | Layer | Checks in use | kvart | The legacy core |
+| # | Layer | Checks in use | the reference product | The legacy core |
 |---|---|---|---|---|
 | 1 | ripwire | symbol and call-graph rank, project MCP server, skill exfiltration scan | wired; index correct per worktree `[measured 2026-09-29]`; unused by a headless builder | not wired |
 | 2 | chisle | optional; plugin copied into the software-factory marketplace at commit `a5486fa112` (v3.0.0), installed at user scope and off there, switched on per project; ladder, prose ruleset, tool-output elision | wired 2026-09-10 (replaced ponytail); not loaded 09-22 to 09-29 (project-scope install, fixed); one build per arm on a complex ticket, effect inside run-to-run spread | not wired |
@@ -104,7 +104,7 @@ the effect on a build. A headless builder with the server available made 0 calls
 128 of its 138 calls in the shell, while interactive sessions reach for it routinely. A tool the
 builder does not call orients nothing: the rule file has to make it the first move, and a trial
 has to count the calls before it counts the savings
-([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)).
+([evidence](../evidence/reference-sensor-trial-2026-09-29.md)).
 
 ## Layer 2: YAGNI ladder (during write)
 
@@ -138,11 +138,11 @@ commit (released 2026-07-28), with the npm update check and the status-line nudg
 offer an edit of the user's settings) switched off, and the tracked settings no
 longer name the upstream source. Tool-output elision is a context-cost mechanism, not a sensor: it
 changes what the model reads, and a compressed result that hid an error line the agent needed
-would be a new failure class. The audit so far: 67 elisions in kvart sessions, none followed by a
+would be a new failure class. The audit so far: 67 elisions in the reference product sessions, none followed by a
 re-fetch that the elision caused, and 1 suspected silent loss, where an orchestrator was shown
 ticket briefs with 19 lines elided and its next turn called them complete `[measured 2026-09-29]`.
 
-Trial on a complex ticket (KVART-256, one build per arm, same brief and base): with the plugin
+Trial on a complex ticket (REFAPP-256, one build per arm, same brief and base): with the plugin
 $19.53 and $26.30, without it $31.03. The two runs with it differed only in a tool neither
 called, so their 35 % gap is the run-to-run spread, and the saving sits inside it. The cheapest
 run was the one that redefined an acceptance example and said so only under assumptions. n = 1
@@ -150,11 +150,11 @@ per arm; the effect needs several runs per arm `[measured 2026-09-29]`.
 
 Install it at user scope, switch it off there, and switch it on per project. A project-scope
 plugin install is keyed to one exact directory, so in a worktree-per-agent layout every new
-worktree runs without it; on kvart it had silently stopped loading for a week before anyone
+worktree runs without it; on the reference product it had silently stopped loading for a week before anyone
 looked `[measured 2026-09-29]`. The user-scope install writes the switch as on for every
 repository, and an output hook that reads every tool result should run only where a project
 opted in, so the user-level switch is set to off and the project's tracked settings turn it on
-(verified by the plugin list at session start: on in kvart, off in another repository, off where
+(verified by the plugin list at session start: on in the reference product, off in another repository, off where
 a local settings file disables it).
 
 ## Layer 3: quality ratchets (post-write)
@@ -164,7 +164,7 @@ on adoption day, and new debt fails. Wired as a Stop hook (the gate runs when th
 and a failure is handed back as the next thing to fix) and a PreToolUse guard (the agent cannot
 edit the policy, the baselines or the hooks).
 
-Gates used on kvart and the legacy core: doc-size (a document an agent reads growing past its
+Gates used on the reference product and the legacy core: doc-size (a document an agent reads growing past its
 ceiling), test-hygiene, escapes (`# type: ignore`, `any`, `|| true`, `.skip`, keyed by site),
 conventions (your own regex rules, your message at the site), duplication (a copied block in
 changed lines), complexity (cyclomatic over 8 or 60 lines), layering, changed-coverage (changed
@@ -177,7 +177,7 @@ Rules that are not obvious until you have been bitten:
   to satisfy the gate, and the guard enforces it.
 - **Baselines are tied to a tree state.** Adopting the gate onto a newer main legitimately
   requires re-cutting the baseline once, as a deliberate act by a person, recording main's real
-  day-one debt. kvart's re-cut named 4 accepted sites in the commit message
+  day-one debt. The reference product's re-cut named 4 accepted sites in the commit message
   `[measured 2026-09-07]`.
 - **`base_ref` must be the real default branch.** Pointed at a branch 81 commits behind, the
   duplication gate judged 19,431 lines as changed and reported 557 clone pairs; pointed at the
@@ -214,7 +214,7 @@ Rules that are not obvious until you have been bitten:
   context every turn. Fixed at source: the report that blocked is fingerprinted, an identical
   report on a later stop gets one line and exit 0, and a stop that is already a continuation
   reads the same way. Any change in any gate's output is a new report and blocks again
-  `[measured 2026-09-07]` (fork `3dc0569`, vendored back in kvart #23).
+  `[measured 2026-09-07]` (fork `3dc0569`, vendored back in the reference product #23).
 - **A formatter pass is not a change.** Two commits of pure formatter output tripped the
   duplication gate with 25 clone pairs and the scoped complexity gate with 80 test functions,
   none of them new. The fix judges a clone under changed lines new only when the base lacks a
@@ -226,8 +226,8 @@ Rules that are not obvious until you have been bitten:
   the architecture Stop hook carried no policy and exited 0 on a planted layering violation,
   the container scanner exited 0 by default, the static-analysis upload never waited for its
   quality gate. All three now fail; the wheel prints PASS, FAIL or SKIP with a reason for each
-  of its 12 gates `[measured 2026-09-07]` (kvart #22).
-- **A pre-push gate must read the ref list.** kvart's hook runs the full gate on a pure
+  of its 12 gates `[measured 2026-09-07]` (the reference product #22).
+- **A pre-push gate must read the ref list.** The reference product's hook runs the full gate on a pure
   `--delete` push, so a branch cleanup was blocked by a complexity gate that had nothing to
   measure. Open `[measured 2026-09-07]`.
 
@@ -247,7 +247,7 @@ the project refreshes its vendored copy only from a fork branch. Same day: upstr
 hook detection); a second fork batch of 5 commits (the once-per-failure-set report, the
 formatter-pass judgment, an option injection via a `-`-shaped base ref from the config,
 found by the blind security pass) gated by both review legs plus a second Gemini leg, vendored
-into kvart (#23), no upstream PR yet `[measured 2026-09-07]`.
+into the reference product (#23), no upstream PR yet `[measured 2026-09-07]`.
 
 ### Receipt-checked pre-push gates
 
@@ -256,7 +256,7 @@ receipt keyed by the git tree id, and have the pre-push hook check the receipt. 
 that the gate ran green on this exact tree, and any later commit voids it. The receipt is never an
 authorisation token: it cannot be hand-written to satisfy the hook, because it is bound to a tree the
 gate actually produced. Check: the pre-push hook reads the receipt and the tree id it names before
-letting the push proceed `[measured 2026-09-09]`. Two of these run on kvart, the browser QA gate and
+letting the push proceed `[measured 2026-09-09]`. Two of these run on the reference product, the browser QA gate and
 the static-analysis gate, both detailed in [06-verify-gate](06-verify-gate.md). The fail-on-base check
 below takes the same shape when its tests need the database.
 
@@ -275,7 +275,7 @@ Two failure modes, told apart by the module's own coverage: assertion theatre (c
 billing service) and unit-coverage gaps (coverage 3 to 17 %, the module lives on integration
 tests). Only the first condemns the tests.
 
-Design, `[proposed]` on kvart with the baseline `[measured 2026-09-15]`:
+Design, `[proposed]` on the reference product with the baseline `[measured 2026-09-15]`:
 
 - **Scope by the diff, like every other slow gate.** Mutation runs the suite once per mutant, so
   the whole repository is hours (47,124 mutants across 140 modules on the reference
@@ -404,8 +404,8 @@ introduced or resolved, coupling added, a cycle spanning four files, a layer cro
 way. Nothing without a baseline can tell a regression you just introduced from the hundreds
 already there, which is why this is not a linter and does not replace one.
 
-Configuration is a layer declaration (kvart: entry → service → domain → models → foundation)
-plus the existing crossings pinned as accepted. kvart's declaration pinned 12 module-level
+Configuration is a layer declaration (the reference product: entry → service → domain → models → foundation)
+plus the existing crossings pinned as accepted. The reference product's declaration pinned 12 module-level
 crossings; the real one is nine service modules lazy-importing an authorisation helper from the
 entry layer `[measured 2026-09-07]`. Every future crossing is a decision, not inherited debt.
 
@@ -423,14 +423,14 @@ pass. The other layers do not cross repo boundaries `[designed]`.
 Hooks: session-start snapshot, Stop diff, a doctor command that verifies the hooks actually
 fired. Config is not execution; the doctor closes that gap.
 
-The shipped Stop hook carries no policy: it exited 0 on a planted layering violation. kvart
+The shipped Stop hook carries no policy: it exited 0 on a planted layering violation. The reference product
 replaced it with a script that runs `check --fail-on=layers,cycles,intent` from the project
 root (the invocation directory is wrong from a subdirectory, where the gate silently disabled
 itself), blocks the stop with the report on stderr, releases on the retry with one line, and
 treats a check that did not run (no baseline, tool exit 2) as a block, not a pass. Seven
 planted cases, clean tree 11 s. The first cut was a one-liner; the cross-vendor panel found
 three real problems in that one line (no continuation handling, so an infinite block; tool
-exit codes swallowed; the directory bug) `[measured 2026-09-07]` (kvart #24).
+exit codes swallowed; the directory bug) `[measured 2026-09-07]` (the reference product #24).
 
 What it has caught since: nothing, and nothing was there to catch. A backtest graded all 201
 merges since the configuration landed, each against a baseline pinned at its first parent: 199
@@ -442,7 +442,7 @@ scanned as source. It also reported 10 times that it could not run, mostly becau
 was not comparable. Put generated output and nested worktrees in the ignore globs from the start, and
 count a gate's false blocks next to its catches `[measured 2026-09-29]`.
 
-## Wiring, as measured on kvart
+## Wiring, as measured on the reference product
 
 - Hooks live in the tracked agent settings file: PreToolUse guard, Stop (ratchet gate on changed
   files, then the architecture check on layers, cycles and intent), SessionStart (architecture

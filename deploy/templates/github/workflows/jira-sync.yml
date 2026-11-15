@@ -1,7 +1,7 @@
-# Jira ledger sync — the KVART ticket follows what GitHub observed.
+# Jira ledger sync — the REFAPP ticket follows what GitHub observed.
 #
 # Before this workflow the ticket states were set by hand by whoever ran the
-# flywheel, at whatever moment they remembered (KVART-8 read "Ready for LIVE"
+# flywheel, at whatever moment they remembered (REFAPP-8 read "Ready for LIVE"
 # 14 minutes before its checks were green). Now:
 #
 #   PR opened / reopened / edited / ready    ->  In Progress -> In Test, and a
@@ -16,16 +16,16 @@
 #                                                is the deploy's call: deploy/deploy.sh
 #                                                runs `jira_sync.py deployed`
 #
-# Ticket keys come from the head branch name and the PR title only (`KVART-N`,
-# word-bounded; the parenthesised title form `(KVART-5/6/7)` names three, a
-# bare `KVART-8/4` anywhere is KVART-8 alone), never the body: bodies cite
-# other tickets ("epic KVART-4", "filed as KVART-9") that must not move. Epics
+# Ticket keys come from the head branch name and the PR title only (`REFAPP-N`,
+# word-bounded; the parenthesised title form `(REFAPP-5/6/7)` names three, a
+# bare `REFAPP-8/4` anywhere is REFAPP-8 alone), never the body: bodies cite
+# other tickets ("epic REFAPP-4", "filed as REFAPP-9") that must not move. Epics
 # are linked but never moved. A PR that names no ticket is ignored. Every
 # transition is conditional on the ticket's current status, so replays are
 # no-ops (scripts/ci/jira_sync.py, unit-tested at tests/unit/test_ci_jira_sync.py).
 #
 # Who picks a ticket up is NOT this workflow's business: the operator runs
-# `jira pickup KVART-N` (~/.memspec/bin/jira -> the same script) which assigns
+# `jira pickup REFAPP-N` (~/.memspec/bin/jira -> the same script) which assigns
 # the ticket to the token's own account and walks it to In Progress.
 #
 # Identity: the Jira calls run as the account behind JIRA_USER_EMAIL +
@@ -64,7 +64,7 @@ env:
   JIRA_BASE_URL: ${{ vars.JIRA_BASE_URL }}
   JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
   JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-  JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}   # jira_sync.py's key regex; default KVART when unset
+  JIRA_PROJECT_KEY: ${{ vars.JIRA_PROJECT_KEY }}   # jira_sync.py's key regex; default REFAPP when unset
 
 jobs:
   pull-request:

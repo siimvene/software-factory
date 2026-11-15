@@ -1,7 +1,7 @@
-# Sensor trial: orientation map, YAGNI ladder, architecture diff (kvart, 2026-09-29)
+# Sensor trial: orientation map, YAGNI ladder, architecture diff (the reference product, 2026-09-29)
 
 Goal: move sensors 1, 2 and 4 from `designed` towards `measured`. Five instruments, all run on
-2026-09-29 against kvart at `eaac0496b` unless stated.
+2026-09-29 against the reference product at `eaac0496b` unless stated.
 
 ## 1. Orientation map (ripwire 0.4.0): index across worktrees
 
@@ -21,10 +21,10 @@ inside a session, and does not read nested worktrees `[measured 2026-09-29]`.
 
 ## 2. YAGNI ladder (chisle 3.0.0): install scope and output elision
 
-**Install scope.** chisle was enabled in kvart's tracked settings but installed at project
+**Install scope.** chisle was enabled in the reference product's tracked settings but installed at project
 scope, and a project-scope install is keyed to one exact directory. The install was recorded
 for a scratchpad path only, so the main checkout and every worktree ran without it: no elision
-in any kvart transcript after 2026-09-22, and a session's startup plugin list did not contain it
+in any the reference product transcript after 2026-09-22, and a session's startup plugin list did not contain it
 `[measured 2026-09-29]`. Fixed the same day: a user-scope install at the same pin (installed
 commit `a5486fa112` equals the `v3.0.0` tag), the user-level switch set to off because the install
 writes it as on for every repository, and the project's tracked settings switching it on. Checked
@@ -32,7 +32,7 @@ by the plugin list at session start: on in the main checkout, off in another rep
 a local settings file disables it. The blind security pass on this change caught the user-level
 switch: the first cut had left chisle on in every repository.
 
-**Elision audit.** Every kvart transcript on the reference machine (2,751 files):
+**Elision audit.** Every the reference product transcript on the reference machine (2,751 files):
 - 67 elisions: 59 shell outputs, 7 memory searches, 1 tracker search.
 - 4 candidate re-fetches by heuristic (the same command within the next three shell calls). All
   4 were read by hand and none was caused by an elision.
@@ -58,7 +58,7 @@ regression, and the gate had nothing real to catch `[measured 2026-09-29]`.
 
 **Live record.** The same period in the agent transcripts:
 - 12 Stop-hook blocks. All 12 were false positives: a cycle between `frontend` and generated
-  `frontend/.nuxt` (fixed in kvart #285), nested worktrees scanned as source, and one block in a
+  `frontend/.nuxt` (fixed in the reference product #285), nested worktrees scanned as source, and one block in a
   session that had edited nothing.
 - 10 did-not-run results, mostly exit 3 (baseline not comparable). The hook treats these as
   blocks, so each cost the agent one turn.
@@ -68,8 +68,8 @@ Every false block came from working-tree state that committed code does not have
 
 ## 4. Controlled build: one brief, three runs, one variable each
 
-KVART-256 slice 1: a new association role (`valitseja`) that reads what the board tier reads on
-one association, has two write powers, and ends a management company's access with billing
+REFAPP-256 slice 1: a new organisation role (`manager`) that reads what the admin tier reads on
+one organisation, has two write powers, and ends a service company's access with billing
 effects. Seven numbered examples; the acceptance test must enumerate the app's routes. Auth,
 tenant scoping and billing, about 1,000 to 1,500 changed lines.
 
@@ -108,18 +108,18 @@ run one after another on one machine. Only the sensor configuration differed.
 In r3 the Gemini leg made 0 tool calls, so it reviewed the diff without reading the repository.
 
 - **Shared by all three runs, so a gap in the spec:**
-  - The contract-end teardown deletes board roles that it cannot prove the company created.
+  - The contract-end teardown deletes admin roles that it cannot prove the company created.
     Both vendors raised it on every run.
   - Ordering between the new powers and the existing link writers.
   - No production caller for the grant. This is by design: a later slice owns the grant.
 - **Specific to one run:**
   - r1: former staff whose membership is inactive keep their roles (both vendors).
-  - r2: a person who is both valitseja and management staff loses the portfolio view.
+  - r2: a person who is both manager and service-company staff loses the portfolio view.
   - r3: invoices can be left with no delivery route after contract end.
   - r3: a read on the billing routes creates default rows. r2's own report shows the same
     behaviour.
 - **Unverified, shape shared by all three:** the role gate treats a mixed scope as authorised if
-  any association in it is a valitseja read. Raised by one leg on r3 only; must be settled before
+  any organisation in it is a manager read. Raised by one leg on r3 only; must be settled before
   any of the three becomes a pull request.
 
 ## What this measures, and what it does not

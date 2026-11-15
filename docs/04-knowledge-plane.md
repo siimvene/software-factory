@@ -2,7 +2,7 @@
 
 Everything an agent reads that is not the code, where each piece lives, who may write it, and
 how it stays true. The design follows a repository context standard with four layers; this
-document says what the layers are for in a software factory and what the kvart adoption measured.
+document says what the layers are for in a software factory and what the reference product adoption measured.
 
 ## The four layers
 
@@ -15,7 +15,7 @@ document says what the layers are for in a software factory and what the kvart a
 
 Conformance is graded (L0: instructions, memory binding, decision records, current-state docs
 present; L1: a decision record for every live architectural decision; L2: a docs-lint gate),
-and a repo adopts gradually. kvart adopted at L0 on 2026-09-07 and bootstrapped L1's decision
+and a repo adopts gradually. The reference product adopted at L0 on 2026-09-07 and bootstrapped L1's decision
 records the same day.
 
 ## Repo layer: instructions that stay lean
@@ -33,7 +33,7 @@ Two rules about the rule files:
   routing table in the root is the fallback: read the rule file before planning work in its area
   even if no matching source file has been opened.
 
-A rule file that is wrong is worse than none: kvart's authentication rule file described a
+A rule file that is wrong is worse than none: the reference product's authentication rule file described a
 one-year web token while the code had used a 15-minute access token plus role-tiered refresh
 since 2026-06-25. The spec bootstrap found it, and it was rewritten before any auth work
 `[measured 2026-09-07]`. Doc-vs-code drift in a file that loads into every session is a
@@ -47,7 +47,7 @@ enum values are English, agents never move money, vote or delete, durable memory
 team-context repo) live in the team-context repo.
 
 Bootstrap: candidates are mined from the existing design documents and confirmed against code
-before being written. kvart's bootstrap produced 13 repo ADRs from a candidate table of 30, plus
+before being written. The reference product's bootstrap produced 13 repo ADRs from a candidate table of 30, plus
 8 team ADRs, with every evidence path verified `[measured 2026-09-07]`. A decision that cannot
 be tied to code is a candidate, not a record.
 
@@ -59,7 +59,7 @@ Current-state specs describe what the code does today, one feature per file, in 
 language, with a technical-references sibling that names the code paths. They are generated:
 
 - **Bootstrap** by retro-generation over the code: mode 1 maps features, mode 2 produces a
-  candidate table the owner reviews in the PM role, mode 3 writes the specs. kvart: 3 feature
+  candidate table the owner reviews in the PM role, mode 3 writes the specs. The reference product: 3 feature
   maps → 264 candidate slugs → owner review → 20 parallel writers → 247 spec pairs across 20
   subdomains, 5 marked NOT IMPLEMENTED, every folder passing a checker (both files present, every
   cited path exists, no code identifiers in the business spec) `[measured 2026-09-07]`.
@@ -101,7 +101,7 @@ Rules that make it work as infrastructure rather than as a diary:
 
 Topology: the code repo carries no store of its own, only a config binding it read-only to the
 team store. Local writes land in the operator's scratch store under the project's scope.
-Durable team knowledge travels by promote PR; into an agent-managed context repo that PR auto-merges rather than waiting on a human (adr 0011). kvart's 316-record
+Durable team knowledge travels by promote PR; into an agent-managed context repo that PR auto-merges rather than waiting on a human (adr 0011). The reference product's 316-record
 store moved out of the code repo into the team-context repo with history preserved
 `[measured 2026-09-07]`.
 
@@ -126,7 +126,7 @@ ticket drafts, meeting and stakeholder notes, outputs. Its skills read the team-
 first and produce tickets scored for readiness. No git operations by the PM; review of specs
 flows through the code owner.
 
-What the kvart adoption found: the template's skills hardcode organisation specifics and
+What the reference product adoption found: the template's skills hardcode organisation specifics and
 reference files the copy did not have, so one skill drafted from the story template alone
 `[measured 2026-09-07]`. A template that ships with its lookups broken is a finding for the
 template, and it is in the cycle report.
@@ -143,7 +143,7 @@ team-context/
   docs/bootstrap-<date>/findings.md   what retro-generation found
 ```
 
-Branch protection is the merge gate. On a plan that refuses it (kvart: private repo, free
+Branch protection is the merge gate. On a plan that refuses it (the reference product: private repo, free
 personal plan, HTTP 403), the gate is a habit: every change lands through a PR the owner reads.
 "The gates are mechanics, not etiquette" is the standard's own line, and on that plan they can
 only be etiquette. That is a finding the dogfood exists to surface, recorded as a decision

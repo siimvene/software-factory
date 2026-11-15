@@ -261,7 +261,7 @@ upgrade lands only as a pull request here that re-copies a newer commit after it
 installed at user scope, switched off at user scope, and switched on per project by the scaffold's
 tracked settings. The install is user scope because a project-scope install is keyed to one exact
 directory, so every new worktree runs without the plugin; on the reference implementation it
-stopped loading for a week that way ([evidence](../evidence/kvart-sensor-trial-2026-09-29.md)). The
+stopped loading for a week that way ([evidence](../evidence/reference-sensor-trial-2026-09-29.md)). The
 switch stays per project because its output hook sees every tool result, and a repository that did
 not opt in should not run it.
 

@@ -296,7 +296,7 @@ What a ticket at 85 carries:
 - **Acceptance criteria:** "a [who] does [what] and sees [exact result]", one line each, edge
   cases included.
 - **Out of scope:** at least one thing a reader would assume is included.
-- **Who:** the role by name (the buyer, the accountant, the board member, the support agent).
+- **Who:** the role by name (the buyer, the accountant, the admin user, the support agent).
   Never just "user".
 - **Depends on:** other tickets, content, another team, permissions.
 - **Design:** the graduated prototype, or a screenshot, for anything with a screen. A link

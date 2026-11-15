@@ -18,7 +18,7 @@ Before any push containing code changes:
 4. **Surface QA pass** on every UI surface the diff touches, as the right persona, on the
    platform's real runtime: a browser for the web client, a simulator or emulator through the
    platform harness for a native client. Rendering, console, interactions and locales; findings
-   with screenshots. Two rules that the 2026-09-17 kvart-app incident added (below, "Native
+   with screenshots. Two rules that the 2026-09-17 mobile-app incident added (below, "Native
    client QA"): a platform the diff touches with no runtime available is a **FAILED** line in the
    gate report, never a skipped one; and where the ticket names a prototype view for a surface,
    the surface's screenshot is placed next to that view and compared, and a mismatch is a
@@ -82,20 +82,20 @@ is read from disk when a finding needs it. Until 2026-09-10 the pass ran either 
 browser extension or through a script the agent wrote for the occasion, and the skill that describes
 it was gitignored, so a station worktree could not run it at all. Check: the skill is tracked, and
 the pass refuses to start when the runtime is missing instead of writing a script. Shakedown against
-the running kvart stack `[measured 2026-09-10]`: persona login through the dev-login redirect chain,
+the running the reference product stack `[measured 2026-09-10]`: persona login through the dev-login redirect chain,
 state saved after the callback restores a logged-in session in a fresh browser, console and network
 extracts as text, recording and trace per surface, teardown leaves no process.
 
 **Native client QA.** The gate list above was written for a web client, and a native client
-walked through it without step 4 for a whole release train `[measured 2026-09-17]`. The kvart
-mobile overhaul (seven stacked PRs, four Suhtlus stories) passed scanners, cross-vendor review by
+walked through it without step 4 for a whole release train `[measured 2026-09-17]`. The reference product
+mobile overhaul (seven stacked PRs, four messaging stories) passed scanners, cross-vendor review by
 two vendors, a blind security pass, a three-lens verify panel and every ratchet, and the owner
 still opened the app to the old notice-board screen under a new hub card, a colour monogram
 misused for a role slot and a help screen whose human routes scrolled away under the chat. Every
 gate had read a diff; no gate had looked at a screen. The clickable prototype was attached to each
 ticket as the design input; no PR carried a single screenshot as the build's output; the device
 harness that shoots one launch screenshot as smoke evidence existed and was never a gate. Two
-causes, both of process: a story's acceptance criterion read "Teadetetahvel opens the announcement
+causes, both of process: a story's acceptance criterion read "Notice board opens the announcement
 list", which the old screen satisfied, so the destination screens behind the new cards were never
 anyone's story; and the gate report's browser-QA row had nothing to say for a native client, so it
 said nothing. The rules: a UI ticket names the prototype view per screen (14-pm-surface), every
@@ -141,7 +141,7 @@ On a sized ticket the program design note travels with them
 decision, a signature or the slice order is the same `spec-drift` class citing the note's
 section, and intended drift takes REFINE-SPEC into the note `[proposed, adr/0010]`.
 The rule itself is then one paragraph. In cycle 4 the repo-reading leg raised the
-management-company scope question from the code alone, the principal dismissed it "by the spec"
+service-company scope question from the code alone, the principal dismissed it "by the spec"
 and escalated it, and the thread was posted at 12:53Z, after all three panels had finished; with
 the spec in front of it the finding would have cited the section `[measured 2026-09-09]`.
 
@@ -190,8 +190,8 @@ decision record is [adr/0009](../adr/0009-the-spec-is-a-gate-input.md).
 
 Every check result above is a statement about one tree: the PR merged onto the main it saw.
 When main moves between the run and the merge, the result says nothing about the tree that
-lands. Two green PRs turned kvart's main red within 20 minutes on 2026-09-29, by two different
-routes `[measured 2026-09-29]` ([evidence](../evidence/kvart-stale-green-merges-2026-09-29.md)):
+lands. Two green PRs turned the reference product's main red within 20 minutes on 2026-09-29, by two different
+routes `[measured 2026-09-29]` ([evidence](../evidence/reference-stale-green-merges-2026-09-29.md)):
 
 - **Stale base.** A tests-only PR went green on a main that lacked a verdict refactor; merged
   after it, its tests imported a deleted function (1 module) and under-mocked a new query

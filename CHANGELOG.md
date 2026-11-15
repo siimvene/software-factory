@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.33 (2026-11-15)
+
+No product is named anywhere in this repository.
+
+- The reference implementation is "the reference product" throughout. Its name, its repository
+  names and the vocabulary of its market are gone: ticket keys read `REFAPP-N`, repositories
+  `<org>/refapp`, customers are "organisations". `WRITING.md` states the rule.
+- The five evidence reports are renamed `evidence/reference-*.md`; links follow.
+- `deploy/templates/ci/jira_sync.py` and the two ledger workflows default the project key to
+  `REFAPP`, a placeholder. An adopter sets `JIRA_PROJECT_KEY`, as before; with it unset the
+  ledger matches no ticket of theirs, which was already the case with the previous default.
+- A compiled `.pyc` that had been committed under `deploy/templates/ci/__pycache__/` is removed.
+- `.gitignore` no longer lists a canvas runtime's directory.
+
 ## 0.2.32 (2026-11-12)
 
 A field guide for the people on the line.
@@ -295,7 +309,7 @@ unmerged merge-serialization branch.)
 - `adr/0014-agents-merge-on-green-in-the-operators-own-repositories.md` (accepted, 2026-09-30):
   the agent arms auto-merge when it opens a PR and the forge merges on green; a capped watcher
   merges directly, pinned to the checked head with `--match-head-commit`, when armed auto-merge
-  does not fire (kvart #333 and #356). Arming only where required checks exist: elsewhere
+  does not fire (the reference product #333 and #356). Arming only where required checks exist: elsewhere
   `--auto` merges at once, so the watcher is the only path; with no checks at all the merge is
   the owner's. Never red, never unrun, never a head the checks did not see, never admin. Organisations keep adr 0006. 0006's weekly identity check is retired for
   these repositories; its replacement counts merges on red, target 0. The named-human sign-off
@@ -319,9 +333,9 @@ unmerged merge-serialization branch.)
 
 ## 0.2.15 (2026-09-29)
 
-A green is valid only on its base: two green PRs turned kvart's main red in 20 minutes.
+A green is valid only on its base: two green PRs turned the reference product's main red in 20 minutes.
 
-- `evidence/kvart-stale-green-merges-2026-09-29.md`: the stale-base break, the selection-gap
+- `evidence/reference-stale-green-merges-2026-09-29.md`: the stale-base break, the selection-gap
   break, the stale local ref, and the re-check applied to the last three merges.
 - `docs/06-verify-gate.md`: "A green is bound to its base": repo-wide fences on every PR,
   merges only on the current base.
@@ -341,7 +355,7 @@ A green is valid only on its base: two green PRs turned kvart's main red in 20 m
 
 Sensors 1, 2 and 4 on the ledger: what a trial could measure and what it could not.
 
-- `evidence/kvart-sensor-trial-2026-09-29.md`: five instruments on kvart. The ripwire index
+- `evidence/reference-sensor-trial-2026-09-29.md`: five instruments on the reference product. The ripwire index
   across worktrees (4 of 4 cases). chisle's install scope and an audit of its output elisions (67,
   1 suspected silent loss). An enola backtest over 201 merges (0 regressions, planted control
   caught) with the live false-block record. One brief built three times with one sensor varied
@@ -408,7 +422,7 @@ The setup becomes a runbook a second engineer can execute.
   case); `marketplace/` (a Claude Code marketplace holding the eight plugins from the group's
   catalog the loop uses, verbatim at pinned commits, `pm-workspace` at 1.6.0); `standard/` (the
   group's context standard v0.4 with its adopt script, the operating contract, the team-context
-  and instructions templates); `templates/` (kvart's wiring: tracked agent settings with the
+  and instructions templates); `templates/` (the reference product's wiring: tracked agent settings with the
   sensor hooks, MCP servers, rule files, git hooks including the provenance trailer, the ledger
   script with its tests, the gate and ledger workflows, the ruleset body, the memory binding, the
   Jira workflow payload). Two changes to the copied workflows: both ledger workflows now pass
@@ -551,7 +565,7 @@ Sensor 2 changes tool: chisle replaces ponytail on the reference implementation,
 
 ## 0.2.4 (2026-09-10)
 
-The browser QA runtime, after evaluating the Playwright CLI against the kvart stack.
+The browser QA runtime, after evaluating the Playwright CLI against the reference product stack.
 
 - `adr/0008`: the browser QA pass drives a CLI, not a protocol server or a browser extension;
   one session per persona, state saved once and restored; evidence on disk, a few lines in
@@ -567,7 +581,7 @@ The browser QA runtime, after evaluating the Playwright CLI against the kvart st
 
 ## 0.2.3 (2026-09-09, evening)
 
-The evening's eight loop-infrastructure PRs on kvart, and two decisions the day forced.
+The evening's eight loop-infrastructure PRs on the reference product, and two decisions the day forced.
 
 - `adr/0004`: decided, option (b): the guard permits a baseline write that only lowers a
   number. The day's seven collisions split into five from a merge-base diff bug and two real
@@ -596,7 +610,7 @@ The evening's eight loop-infrastructure PRs on kvart, and two decisions the day 
 
 ## 0.2.2 (2026-09-09)
 
-Cycle 4 on kvart: first batch (an epic with four stories) through the loop with three parallel
+Cycle 4 on the reference product: first batch (an epic with four stories) through the loop with three parallel
 stations against a written contract. What it exposed, and where it landed:
 
 - `docs/03-operating-contract.md` §11: agent-surfaced decisions (questions, dismissals,
@@ -633,7 +647,7 @@ Coverage of the surfaces the first cut only named.
   without an organisational standard must build.
 - `docs/17-onboarding.md`: the Day 1 runbook (team-context repo, standard adoption, instruction
   split, memory move, three-mode spec retro-generation with owner review, ADR candidate table
-  and mining, PM workspace, design system), with the kvart numbers.
+  and mining, PM workspace, design system), with the reference product numbers.
 - `templates/pm-skill.md`: a generic skill skeleton.
 - `STATUS.md` and the README reading order extended.
 
@@ -648,7 +662,7 @@ Visuals. The design had none: every mechanism was prose and tables only.
   are now edges, and the memory arrow is drawn dashed because it fired zero times in two
   measured cycles.
 - `docs/05-sensor-stack.md`: where each sensor fires inside one agent turn, plus a table of
-  which checks are wired on kvart and on the legacy core.
+  which checks are wired on the reference product and on the legacy core.
 
 Diagrams are mermaid so they render on the forge, diff as text and can be adapted by a reader.
 Fill encodes the evidence class from `WRITING.md`, never severity. `STATUS.md` stays the ledger.
@@ -657,9 +671,9 @@ Fill encodes the evidence class from `WRITING.md`, never severity. `STATUS.md` s
 
 First consolidation. Derived from:
 
-- the kvart dogfood, 2026-09-07: Day 1 bootstrap, cycle 1 (public-route fix), cycle 2
+- The reference product dogfood, 2026-09-07: Day 1 bootstrap, cycle 1 (public-route fix), cycle 2
   (retire a payment path), the sensor-stack wiring;
-- the head-and-hands harness trial on kvart, 2026-09-05;
+- the head-and-hands harness trial on the reference product, 2026-09-05;
 - the legacy-core flywheel work, 2026-09-04 to 09-07: design v0 and re-base, turn 0 adoption,
   turn 1 verification net, money tiering, ratchets, layering gate, complexity ratchet, sandbox
   boot;

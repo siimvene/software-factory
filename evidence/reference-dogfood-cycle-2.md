@@ -1,13 +1,13 @@
-# kvart dogfood, cycle 2 (2026-09-07)
+# The reference product dogfood, cycle 2 (2026-09-07)
 
 > Source: the cycle-2 report written into the PM workspace's outputs folder at the end of the run, 2026-09-07.
 > Copied near-verbatim, anonymised.
 
-# The group SDLC dogfood on kvart — cycle 2 report (2026-09-07)
+# The group SDLC dogfood on the reference product — cycle 2 report (2026-09-07)
 
 Ticket: the ticket file in the PM workspace, `payments-and-bank / 01 - Vendor auto-pay - retire the Enable Banking path`
-Code PR: siimvene/kvart#18 (3 commits, `d830d406` → `54e93ba1`, +121/−679)
-Sister spec PR: siimvene/kvart-team-context#5
+Code PR: <org>/refapp#18 (3 commits, `d830d406` → `54e93ba1`, +121/−679)
+Sister spec PR: <org>/refapp-team-context#5
 Both open at 04:13; owner merges, then deploy (backend restart, two prod one-offs).
 
 ## Wall-clock per stage

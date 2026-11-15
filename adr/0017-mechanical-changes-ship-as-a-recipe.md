@@ -33,7 +33,7 @@ plugin routes the mechanical deltas of a version uplift to OpenRewrite's dry run
 the model `[field: codemods]`.
 
 Nothing in this design names a codemod: a search for OpenRewrite, codemod and Refaster over the
-repository finds nothing. No mechanical change has been measured on kvart.
+repository finds nothing. No mechanical change has been measured on the reference product.
 
 Assumptions, stated: each stack in scope has an AST-level codemod tool that is deterministic for
 a pinned version (OpenRewrite for Java with Gradle or Maven, Refaster or Error Prone for Java
@@ -117,7 +117,7 @@ grows past a few hand edits, the ticket is reclassified and goes through the nor
 - **Follow-ups:** a `mechanical-check` script (reproduce, residual, exemptions, receipt), with
   planted cases for a hand edit in commit 2 and a missed site (owner: the operator); the class
   row in the sizing table of [02-loop](../docs/02-loop.md) and the ticket template field (owner:
-  the operator, when accepted); the first trial on kvart: a real rename in the Python backend done
+  the operator, when accepted); the first trial on the reference product: a real rename in the Python backend done
   twice, once by hand and once by a LibCST recipe, measuring tokens, wall-clock, review time and
   sites missed (owner: the operator); the legacy core's next library major as the OpenRewrite
   trial (owner: the group's platform role); the review tool: the commit-2 sampling as a pack
@@ -143,8 +143,8 @@ grows past a few hand edits, the ticket is reclassified and goes through the nor
 
 - [docs/09-legacy-adoption.md](../docs/09-legacy-adoption.md): the renamed artifacts and the
   split-brain classpath `[measured 2026-09-04]`.
-- [evidence/kvart-stale-green-merges-2026-09-29.md](../evidence/kvart-stale-green-merges-2026-09-29.md):
+- [evidence/reference-stale-green-merges-2026-09-29.md](../evidence/reference-stale-green-merges-2026-09-29.md):
   why a wide diff on a moving base is expensive.
 - [evidence/field-evidence.md](../evidence/field-evidence.md) §9: the three field sources and
   their caveats `[field: codemods]`. Direction only; no mechanical change has been measured on
-  kvart.
+  the reference product.

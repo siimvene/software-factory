@@ -8,7 +8,7 @@
 ## Context
 
 0006 fixed the merge decision to a human because a merge under the owner's identity from an
-agent session launders a machine decision as a human one (the kvart #44 incident). That reasoning
+agent session launders a machine decision as a human one (the reference product #44 incident). That reasoning
 holds wherever a human is *expected* to review. It does not hold for the context/spec layer:
 those repos are agent-managed, derived from code, and effectively unread by a human before merge.
 There, the human merge is not a decision - it is the etiquette the standard's own line ("gates are

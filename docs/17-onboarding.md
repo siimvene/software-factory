@@ -3,7 +3,7 @@
 The Day 1 runbook: how a codebase that has never had an agent run against it gets its
 knowledge plane before the first ticket. Retro-generated specs, mined decision records, the
 team-context repo, the memory move, the PM workspace. This is turn 0 of the
-[adoption playbook](12-adoption-playbook.md) in full, with the kvart Day 1 numbers.
+[adoption playbook](12-adoption-playbook.md) in full, with the reference product Day 1 numbers.
 
 Why it is part of the factory and not a preamble to it: every later turn reads what this day
 writes. A ticket written against a repo with no specs forces the agent to reconstruct current
@@ -51,7 +51,7 @@ is what CI runs.
 Fill the placeholders from the existing docs, not from memory. Mark seeded docs "for L1
 review" rather than leaving them looking finished.
 
-What kvart found: the standard's team import path did not exist on the operator's platform,
+What the reference product found: the standard's team import path did not exist on the operator's platform,
 so the team layer reached agents only through the memory binding; the docs-lint workflow called
 a reusable workflow in a private organisation and was disabled; the memory engine read its
 store list from its own config, not from the standard's pointer, so both files were kept
@@ -65,7 +65,7 @@ applies to every change, and path-scoped rule files that load when a matching fi
 with a routing table in the root so a rule can be read before its paths are touched. Content
 moves verbatim. Then check every rule file's paths against the tree.
 
-Read every rule file against the code while you are there. kvart's authentication rule
+Read every rule file against the code while you are there. The reference product's authentication rule
 described a token model retired 2026-06-25 and was loading into every session
 `[measured 2026-09-07]`.
 
@@ -78,7 +78,7 @@ operator's scratch store read-write.
 
 From this point durable writes are promote PRs. Local writes at the moment of discovery go to
 scratch under the project's scope. Whether the owner keeps writing under that friction is a
-result to collect; kvart's first two cycles did not promote `[measured 2026-09-07]`.
+result to collect; the reference product's first two cycles did not promote `[measured 2026-09-07]`.
 
 ## 5. Retro-generate the current-state specs
 
@@ -99,7 +99,7 @@ configuration screen, report, integration channel and lifecycle operation is a s
 subdomain, never truncated.
 
 **Owner review.** The table is reviewed for business truth by the person in the PM role:
-merge, split, rename, drop, and mark what is known to be unbuilt. kvart: 3 feature maps →
+merge, split, rename, drop, and mark what is known to be unbuilt. The reference product: 3 feature maps →
 264 candidate slugs → owner review on a shared review artifact with recorded decisions
 `[measured 2026-09-07]`.
 
@@ -110,12 +110,12 @@ customer-facing impact, downstream effects) with no class names, file paths or f
 jargon, and a technical-references sibling listing paths per project under labelled headings.
 The writer verifies each claim against code and flags what it finds inline as a note.
 
-kvart: 20 parallel writers → **247 spec pairs across 20 subdomains, 5 marked NOT
+The reference product: 20 parallel writers → **247 spec pairs across 20 subdomains, 5 marked NOT
 IMPLEMENTED** `[measured 2026-09-07]`.
 
 **Check.** A script over every spec folder: both files present, every cited path exists, no
 code identifiers in the business spec. Run it before the PR, and keep it in the team repo so
-it survives the session that wrote it (kvart's lived in a scratch directory that was gone by
+it survives the session that wrote it (the reference product's lived in a scratch directory that was gone by
 cycle 1, and the three checks were done by hand `[measured 2026-09-07]`).
 
 **Findings file.** Collect every inline note the writers left into one file in the team repo:
@@ -144,10 +144,10 @@ a candidate whose code evidence cannot be found stays a candidate. Keep a "rejec
 ADR-worthy" list with the reasoning so nobody re-raises commercial terms, visual design waves
 or feature-level UX choices as architecture.
 
-kvart: a candidate table of 30, 13 written as repo ADRs (tenant isolation enforced in the
+The reference product: a candidate table of 30, 13 written as repo ADRs (tenant isolation enforced in the
 database, the billing engine as pure functions, ports and adapters for every external system,
 the product as its own OAuth server, read-only in-process MCP excluding money and governance,
-scheduled jobs only under systemd timers, one payment rail per association, document storage
+scheduled jobs only under systemd timers, one payment rail per organisation, document storage
 port with tenant prefix, three bank gateways plus an aggregator, single-VM deploy with
 credential loading, migrations behaviour-preserving with row-level-security DDL outside them),
 8 written as team ADRs (money is decimal end to end, API enum values are English, domain terms
@@ -164,7 +164,7 @@ then write.
 
 Copy the PM workspace template; fill the pointers (repos, team context, design standards,
 ticket tracker or "none"); copy the five skills from [templates/skills](../templates/skills/)
-into `.claude/skills/`. Run one skill against the copy before trusting the rest: kvart's
+into `.claude/skills/`. Run one skill against the copy before trusting the rest: the reference product's
 ticket skill referenced a style file the copy did not have, and its lookups missed until the
 specs PR merged `[measured 2026-09-07]`. See [14-pm-surface](14-pm-surface.md).
 
@@ -177,7 +177,7 @@ with each component as a feature, and name it, with the version each product pin
 team-context front door. It binds to the owning team's context even when other teams consume
 it.
 
-If it does not, recover design-tool handoff exports from wherever they are (kvart's were
+If it does not, recover design-tool handoff exports from wherever they are (the reference product's were
 git-ignored zips in the docs folder), extract tokens, patterns and components into their own
 repo, and write the divergence log between the canvas and what shipped. Either way, see
 [15-design-system](15-design-system.md#the-design-system-repo-in-the-loop).

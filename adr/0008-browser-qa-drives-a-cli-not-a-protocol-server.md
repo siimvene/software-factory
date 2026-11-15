@@ -8,7 +8,7 @@
 
 Step 4 of the verify gate ([06-verify-gate](../docs/06-verify-gate.md)) is a behavioural pass:
 an agent walks every UI surface the diff touches, as the right persona, in a real browser, and
-reports findings with evidence. On kvart this pass had two runtimes. The primary was a browser
+reports findings with evidence. On the reference product this pass had two runtimes. The primary was a browser
 extension that exposes a headed Chrome to the agent through a protocol server; it needs a
 display, a running desktop browser and a human's session. The fallback was a Playwright script
 the agent wrote by hand for each pass, under a gitignored runtime directory, judged from
@@ -78,7 +78,7 @@ on the test runner.
 
 ## Evidence
 
-- Shakedown of the CLI against the running kvart stack `[measured 2026-09-10]`: dev-login
+- Shakedown of the CLI against the running the reference product stack `[measured 2026-09-10]`: dev-login
   redirect chain lands the persona; storage state saved after the callback restores a logged-in
   session in a fresh browser without a second login (saved during the callback it carried the
   refresh cookie alone); console and network extracts as text; recording prints Playwright code

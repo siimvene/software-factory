@@ -17,9 +17,9 @@ Rules, enforced by behaviour and by the worktree tooling:
 
 - Sessions that will commit, branch, merge or rebase enter their own worktree first. Read-only
   sessions may share.
-- A new worktree is based on the remote default branch (`origin/main` in kvart; `develop` in
+- A new worktree is based on the remote default branch (`origin/main` in the reference product; `develop` in
   the legacy core of `09-legacy-adoption.md`) after a fetch, never on the local ref. The local
-  ref is only as fresh as the last person who moved it: kvart's was 114 commits behind while
+  ref is only as fresh as the last person who moved it: the reference product's was 114 commits behind while
   the agent instructions said `git worktree add <path> main`, so every station started that
   stale, read old code as current and took migration numbers from an old directory
   `[measured 2026-09-29]`. Check: the instruction names the remote ref. A session-start hook

@@ -49,7 +49,7 @@ money-lane input of the program design note and of the review.
    to it. A hop also names what it does to the figure, its rounding rule where it rounds, and the
    test that holds it. A hop that runs only because something registers it (a scheduled job, a
    route, a queue consumer) names every registration too, as a `wired_by` list of file and line
-   pairs. One registration is often not enough: on kvart a job is wired twice, once in the job
+   pairs. One registration is often not enough: on the reference product a job is wired twice, once in the job
    registry and once in its systemd timer unit, and removing either one stops it.
 2. **The agreement test.** One per entry, parametrised by exit. One input, then the figure
    asserted at every exit: the stored value, the API response, the view, the rendered document,
@@ -98,7 +98,7 @@ reports its exits as unasserted, advisory, instead of failing.
   surface; upkeep on every money-lane change, carried by the note; one end-to-end test per entry,
   slower than unit tests and needing the test database and the renderers; the first resolver run
   will report many transaction-tier files as unmapped, and each needs a hop or a reason.
-- **Follow-ups:** map kvart's invoice total, per-unit charge and payment status, then measure the
+- **Follow-ups:** map the reference product's invoice total, per-unit charge and payment status, then measure the
   map on the next money-lane ticket (owner: the operator); the resolver with planted true and false
   cases, rehearsed in the blocked direction by replaying cycle 2's poller removal against the map
   (owner: the operator); an assist that proposes hop rows from the orientation map for a person to
@@ -123,7 +123,7 @@ reports its exits as unasserted, advisory, instead of failing.
 
 ## Evidence
 
-- [evidence/kvart-dogfood-cycle-2.md](../evidence/kvart-dogfood-cycle-2.md): the poller HIGH
+- [evidence/reference-dogfood-cycle-2.md](../evidence/reference-dogfood-cycle-2.md): the poller HIGH
   `[measured 2026-09-07]`.
 - [docs/09-legacy-adoption.md](../docs/09-legacy-adoption.md) §2 and §d: the 20-extractor target,
   68 of 68 mutants, and tiering per class `[measured 2026-09-04]`.

@@ -67,4 +67,4 @@ as the reviewer option.
 ## Evidence
 
 - `docs/07-roles-and-authority.md`, head and hands; `docs/10-measurement.md`, the payoff bar
-  and the routing audit; `evidence/kvart-sensor-trial-2026-09-29.md`, run-to-run spread.
+  and the routing audit; `evidence/reference-sensor-trial-2026-09-29.md`, run-to-run spread.

@@ -1,4 +1,4 @@
-# Two green PRs, main red twice (kvart, 2026-09-29)
+# Two green PRs, main red twice (the reference product, 2026-09-29)
 
 An attended session was asked to merge five open PRs in the right order. Two of the merges
 turned main red within 20 minutes, each by a PR whose own CI was green. The causes differ, so
@@ -16,8 +16,8 @@ they are recorded separately. All times UTC, all `[measured 2026-09-29]`.
 
 | Time | Event |
 |---|---|
-| before 13:16 | #340 (KVART-453) merges: the vote verdict moves from a label-matching `_compute_decision` to role-based `decision_line`, and `_decision_frame` adds one query per protocol build |
-| 13:16:19 | #339 (KVART-67, 24 new test files, tests only) merges. Its CI was green on a base without #340; `mergeStateStatus` was `CLEAN` |
+| before 13:16 | #340 (REFAPP-453) merges: the vote verdict moves from a label-matching `_compute_decision` to role-based `decision_line`, and `_decision_frame` adds one query per protocol build |
+| 13:16:19 | #339 (REFAPP-67, 24 new test files, tests only) merges. Its CI was green on a base without #340; `mergeStateStatus` was `CLEAN` |
 | next | on main: 1 test module fails to import (`_compute_decision`), 7 tests fail with `StopIteration` (the mocked session is one `execute` short) |
 
 What would have caught it:
@@ -36,7 +36,7 @@ two-vendor panel 0 findings, merged 13:38:12.
 | Time | Event |
 |---|---|
 | 2026-09-25 | the error-code fence (`test_error_code_translations`) lands: every code the backend emits must have a translation in all 4 locales |
-| 09:13 | #335 (KVART-442/443) CI runs 78 impact-selected targets; the fence is not among them. The diff adds 2 error codes in the reading route with no translations |
+| 09:13 | #335 (REFAPP-442/443) CI runs 78 impact-selected targets; the fence is not among them. The diff adds 2 error codes in the reading route with no translations |
 | 13:16:08 | #335 merges; main's full-suite run on the merge commit fails |
 | 13:43 | a third PR (#331) goes red on both A's import error and B's missing translations, neither of them its own |
 

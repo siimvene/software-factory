@@ -16,11 +16,10 @@ change is the last rung of a ladder
 the measured state of the line: today every code merge is a named human's click, and the ledger
 records who.
 
-The design was derived from running the loop on a real product (kvart, an apartment association
-management SaaS with money paths and a 4-locale UI) and from bootstrapping the same loop onto a
-legacy Java core of 75 modules inside a group of companies. Every mechanism here was either
-measured in one of those two places or is labelled as designed or proposed. `STATUS.md` is the
-ledger.
+The design was derived from running the loop on a real product (a multi-tenant SaaS with money
+paths and a 4-locale UI) and from bootstrapping the same loop onto a legacy Java core of 75
+modules inside a group of companies. Every mechanism here was either measured in one of those
+two places or is labelled as designed or proposed. `STATUS.md` is the ledger.
 
 ![The factory as components: intent from the CEO, PMs and engineers becomes a spec, the agent builds it in a worktree with tests red first, gates (ratchets, architecture diff, cross-vendor review, scanners, CI) verify it, the pull request arrives reviewed and the owner merges, release is separate from merge, and complaints, feature requests and incidents from users and monitoring feed the next spec. Human hours go into writing the ticket and accepting the behaviour; machine time goes into building, verifying and preparing the evidence.](docs/img/factory-components.png)
 
@@ -61,12 +60,12 @@ evidence class from `STATUS.md`:
 |---|---|---|---|
 | Intake | facts, decisions and open questions from a page, an issue, a memo or a document, cross-referenced against what the workspace already holds | `ingest` | `designed` |
 | Ticket drafting | a story or epic under the tickets folder; type, project, epic parent, labels and links deduced from the source, the code and `TRACKER.md`, each shown with its reason, saved on approval, never pushed to the tracker | `ticket` | `measured` |
-| Readiness | a score out of 100 against seven criteria, per-criterion gaps, one highest-impact question; 85 is Ready | `readiness-evaluator` | `measured` (kvart cycles self-scored 94 and 93 of 100 `[measured 2026-09-07]`) |
+| Readiness | a score out of 100 against seven criteria, per-criterion gaps, one highest-impact question; 85 is Ready | `readiness-evaluator` | `measured` (the reference product cycles self-scored 94 and 93 of 100 `[measured 2026-09-07]`) |
 | Refinement | one question at a time until the score clears 85, then a drift check against the original and a session log | `task-improver` | `designed` |
 | Splitting | a ticket over about two person-days becomes an epic with independently deliverable stories, coverage checked | `task-splitter` | `designed` |
 | Applying to the tracker | a staged ticket created in the tracker only at an evaluator-recorded readiness of 85 or above; the project's required fields and workflow learned once per issue type, every write previewed; a reported merge request walks the ticket to review and comments the link | `apply` | `designed` |
 | Graduation | a rewritten features file plus a handoff package; six checks, no partial packages; the human submits | `graduate` | `designed` |
-| Specs from code | feature maps, a candidate table and spec pairs retro-generated on Day 1 and again when a ticket touches unbuilt surface; a sister spec delta after every behaviour-changing merge | `retrogenerate-specs`, `update-specs-for-commits`, `check-specs` | `measured` (run by hand on kvart) |
+| Specs from code | feature maps, a candidate table and spec pairs retro-generated on Day 1 and again when a ticket touches unbuilt surface; a sister spec delta after every behaviour-changing merge | `retrogenerate-specs`, `update-specs-for-commits`, `check-specs` | `measured` (run by hand on the reference product) |
 | Program design note | for a sized ticket, the shape of the change before the plan: which module gains what, where the transaction boundary sits, which slice lands first; the module list is the spillover scope for the architecture diff | [templates/program-design.md](templates/program-design.md), [adr/0010](adr/0010-program-design-before-the-plan.md) | `proposed` (the cycle-4 API contract is the measured precursor) |
 | Spec as a gate input | the committed spec plus the ticket's numbered examples go to the reviewer, so scope drift is a finding with its own disposition | [adr/0009](adr/0009-the-spec-is-a-gate-input.md) | `proposed` |
 
@@ -148,7 +147,7 @@ only real control is branch protection. See [06-verify-gate](docs/06-verify-gate
 | Share of PR-open time spent in the cross-vendor review | 52 to 58 % | cycles 1 and 2 |
 | Real defects the cross-vendor reviewer found that tests and lint passed | 1 SERIOUS perf regression (trial), 1 HIGH money-path regression (cycle 2) | `STATUS.md`, head-and-hands delegation, cross-vendor review |
 | Ticket readiness self-scored before build | 94 and 93 of 100 | [02-loop](docs/02-loop.md), SPEC |
-| All-in cost per shipped feature on kvart, Aug 8 to Sep 7 2026 | ≈ $96 list price | [measurement](docs/10-measurement.md) |
+| All-in cost per shipped feature on the reference product, Aug 8 to Sep 7 2026 | ≈ $96 list price | [measurement](docs/10-measurement.md) |
 | Coverage the legacy core actually had once measured on the aggregate, not per module | 55.6 % (per-module sum said 36.8 %) | [legacy adoption](docs/09-legacy-adoption.md) |
 | Money-path lines the module-level tiering could not see | ~16,700 of 22,143 | legacy adoption |
 
@@ -198,7 +197,7 @@ design's own [decision records](adr/).
 
 ## Provenance
 
-Derived 2026-09-07 from the kvart dogfood (Day 1 bootstrap, cycles 1 and 2, the sensor-stack
+Derived 2026-09-07 from the reference product dogfood (Day 1 bootstrap, cycles 1 and 2, the sensor-stack
 wiring), the 2026-09-05 head-and-hands harness trial, and the 2026-09-04 to 09-07 legacy-core
 flywheel work; extended through cycle 5 and the group's PM planning session of 2026-09-15. See
 [WRITING.md](WRITING.md) for the anonymisation and evidence rules this text follows.

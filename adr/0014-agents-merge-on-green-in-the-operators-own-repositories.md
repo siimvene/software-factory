@@ -60,7 +60,7 @@ otherwise for itself.
 - **The ruleset is the merge gate.** Required checks plus an empty bypass list make "never
   merge red" and "never admin-merge" mechanical: the forge refuses both for the owner and for
   the bot `[measured 2026-09-08]`.
-- **Watcher fallback.** Armed auto-merge did not fire on kvart #333 and #356 with every check
+- **Watcher fallback.** Armed auto-merge did not fire on the reference product #333 and #356 with every check
   green and the merge state `CLEAN` `[measured 2026-09-30]`. Cause not investigated; the
   candidate is a status posted by the out-of-forge poller that does not re-trigger the forge's
   evaluation. So arming is paired with a capped watcher: it records the head commit, polls
@@ -80,7 +80,7 @@ otherwise for itself.
 
 - **Positive:** the merge wait leaves the critical path. Checkable: pickup to live on the next
   cycles against cycle 4's 4 h 57 min, with merge wait reported as its own row.
-- **Cost:** a merge is only as good as the base its green ran on. Two green PRs turned kvart's
+- **Cost:** a merge is only as good as the base its green ran on. Two green PRs turned the reference product's
   main red within 20 minutes on 2026-09-29, one through a stale base and one through impact
   selection skipping a repo-wide fence `[measured 2026-09-29]`. With no person in front of
   the merge, nobody re-checks the base by hand. Closing that needs a strict ruleset or a merge

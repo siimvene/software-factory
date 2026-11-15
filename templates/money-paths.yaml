@@ -36,7 +36,7 @@ paths:
     entry:
       - file: src/readings/service.py
         symbol: record_reading
-        does: accepts the meter reading the charge derives from
+        does: accepts the usage reading the charge derives from
         test: tests/readings/test_service.py::test_record_reading_rejects_regression
     hops:
       - file: src/billing/charges.py

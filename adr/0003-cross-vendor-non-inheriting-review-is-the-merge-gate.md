@@ -39,4 +39,4 @@ fixes do not trigger a re-run.
 
 ## Evidence
 
-- `docs/06-verify-gate.md`; `evidence/kvart-dogfood-cycle-2.md`; `evidence/kvart-head-hands-trial-report.md`.
+- `docs/06-verify-gate.md`; `evidence/reference-dogfood-cycle-2.md`; `evidence/reference-head-hands-trial-report.md`.

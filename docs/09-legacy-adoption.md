@@ -194,7 +194,7 @@ the full suite here ran in 9 min 09 s across 75 projects with 8 workers `[measur
 
 The core's build defaulted its test datasource, and a schema-reaping task, to the standard
 database port on localhost. On the development machine that port belonged to a different
-project's database (kvart's). Two bare test runs wrote schemas into it, and the reaping task
+project's database (the reference product's). Two bare test runs wrote schemas into it, and the reaping task
 had a licence to **drop every test-looking schema older than 24 hours in whatever database it
 reached** `[measured 2026-09-04]`.
 

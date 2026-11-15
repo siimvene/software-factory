@@ -23,20 +23,20 @@ _spec.loader.exec_module(js)
 @pytest.mark.parametrize(
     "text,expected",
     [
-        ("feat/KVART-8-apartment-list-no-owner-names", ["KVART-8"]),
-        ("fix(meters): ... (KVART-3)", ["KVART-3"]),
-        ("KVART-10 then KVART-1 then KVART-10 again", ["KVART-10", "KVART-1"]),
-        ("KVART-1 KVART-10 KVART-100", ["KVART-1", "KVART-10", "KVART-100"]),
+        ("feat/REFAPP-8-item-list-no-owner-names", ["REFAPP-8"]),
+        ("fix(meters): ... (REFAPP-3)", ["REFAPP-3"]),
+        ("REFAPP-10 then REFAPP-1 then REFAPP-10 again", ["REFAPP-10", "REFAPP-1"]),
+        ("REFAPP-1 REFAPP-10 REFAPP-100", ["REFAPP-1", "REFAPP-10", "REFAPP-100"]),
         ("ci: runner wake, no ticket", []),
         ("", []),
-        ("lowercase kvart-4 does not count", []),
-        ("XKVART-4 is another project's suffix", []),
-        ("feat(audit): access trail (KVART-5/6/7)", ["KVART-5", "KVART-6", "KVART-7"]),  # title shorthand
-        ("(KVART-1/10) and (KVART-10/1)", ["KVART-1", "KVART-10"]),
-        ("feat/KVART-8-apartment-list/4", ["KVART-8"]),  # a slash after a word, not after the number
-        ("feat/KVART-8/4-hotfix", ["KVART-8"]),  # bare shorthand outside parentheses never expands
-        ("fix: KVART-8/2026 allocation", ["KVART-8"]),
-        ("(KVART-8/2026 allocation)", ["KVART-8"]),  # not closed right after the numbers
+        ("lowercase refapp-4 does not count", []),
+        ("XREFAPP-4 is another project's suffix", []),
+        ("feat(audit): access trail (REFAPP-5/6/7)", ["REFAPP-5", "REFAPP-6", "REFAPP-7"]),  # title shorthand
+        ("(REFAPP-1/10) and (REFAPP-10/1)", ["REFAPP-1", "REFAPP-10"]),
+        ("feat/REFAPP-8-item-list/4", ["REFAPP-8"]),  # a slash after a word, not after the number
+        ("feat/REFAPP-8/4-hotfix", ["REFAPP-8"]),  # bare shorthand outside parentheses never expands
+        ("fix: REFAPP-8/2026 allocation", ["REFAPP-8"]),
+        ("(REFAPP-8/2026 allocation)", ["REFAPP-8"]),  # not closed right after the numbers
     ],
 )
 def test_extract_keys(text, expected):
@@ -46,10 +46,10 @@ def test_extract_keys(text, expected):
 @pytest.mark.parametrize(
     "subjects,expected",
     [
-        ("feat: a (KVART-1)\nfix: b (KVART-2)", ["KVART-1", "KVART-2"]),
-        ('feat: a (KVART-1)\nRevert "feat: a (KVART-1)"', []),  # merged and reverted in one range
-        ('Revert "feat: old (KVART-3)"\nfeat: new (KVART-4)', ["KVART-4"]),
-        ("Merge pull request #36 from siimvene/feat/KVART-8-apartment-list", ["KVART-8"]),
+        ("feat: a (REFAPP-1)\nfix: b (REFAPP-2)", ["REFAPP-1", "REFAPP-2"]),
+        ('feat: a (REFAPP-1)\nRevert "feat: a (REFAPP-1)"', []),  # merged and reverted in one range
+        ('Revert "feat: old (REFAPP-3)"\nfeat: new (REFAPP-4)', ["REFAPP-4"]),
+        ("Merge pull request #36 from siimvene/feat/REFAPP-8-item-list", ["REFAPP-8"]),
         ("", []),
     ],
 )
@@ -58,13 +58,13 @@ def test_deployed_keys_subtracts_reverts(subjects, expected):
 
 
 def test_extract_keys_is_capped():
-    hostile = "(KVART-" + "/".join(str(n) for n in range(1, 501)) + ")"
+    hostile = "(REFAPP-" + "/".join(str(n) for n in range(1, 501)) + ")"
     assert len(js.extract_keys(hostile)) == js.MAX_KEYS
-    assert js.extract_keys(" ".join(f"KVART-{n}" for n in range(1, 40)))[-1] == f"KVART-{js.MAX_KEYS}"
+    assert js.extract_keys(" ".join(f"REFAPP-{n}" for n in range(1, 40)))[-1] == f"REFAPP-{js.MAX_KEYS}"
 
 
 def test_extract_keys_other_project():
-    assert js.extract_keys("EST-9 and KVART-2", project="EST") == ["EST-9"]
+    assert js.extract_keys("EST-9 and REFAPP-2", project="EST") == ["EST-9"]
 
 
 # ── transition planning (the part that makes replays harmless) ──────────────
@@ -190,62 +190,62 @@ class FakeJira(js.Jira):
 
 
 def run(jira, *argv):
-    args = js.build_parser("KVART").parse_args(list(argv))
+    args = js.build_parser("REFAPP").parse_args(list(argv))
     return args.fn(jira, args)
 
 
 def test_pickup_from_backlog_assigns_and_walks_to_in_progress():
-    j = FakeJira({"KVART-9": "Backlog"})
-    assert run(j, "pickup", "--key", "KVART-9") == 0
-    assert j.assigned == {"KVART-9": "acc-1"}
-    assert j.statuses["KVART-9"] == "In Progress"
+    j = FakeJira({"REFAPP-9": "Backlog"})
+    assert run(j, "pickup", "--key", "REFAPP-9") == 0
+    assert j.assigned == {"REFAPP-9": "acc-1"}
+    assert j.statuses["REFAPP-9"] == "In Progress"
 
 
 def test_pickup_past_in_progress_only_assigns():
-    j = FakeJira({"KVART-8": "Ready for LIVE"})
-    assert run(j, "pickup", "--key", "KVART-8") == 0
-    assert j.assigned == {"KVART-8": "acc-1"}
-    assert j.statuses["KVART-8"] == "Ready for LIVE"
+    j = FakeJira({"REFAPP-8": "Ready for LIVE"})
+    assert run(j, "pickup", "--key", "REFAPP-8") == 0
+    assert j.assigned == {"REFAPP-8": "acc-1"}
+    assert j.statuses["REFAPP-8"] == "Ready for LIVE"
 
 
 def test_pr_opened_links_and_moves_to_in_test():
-    j = FakeJira({"KVART-5": "In Progress", "KVART-6": "In Progress"})
-    run(j, "pr-opened", "--keys", "KVART-5,KVART-6", "--pr-url", "https://gh/pr/40", "--pr-title", "feat (KVART-5)")
-    assert j.statuses == {"KVART-5": "In Test", "KVART-6": "In Test"}
-    assert j.links == [("KVART-5", "https://gh/pr/40", "feat (KVART-5)"), ("KVART-6", "https://gh/pr/40", "feat (KVART-5)")]
+    j = FakeJira({"REFAPP-5": "In Progress", "REFAPP-6": "In Progress"})
+    run(j, "pr-opened", "--keys", "REFAPP-5,REFAPP-6", "--pr-url", "https://gh/pr/40", "--pr-title", "feat (REFAPP-5)")
+    assert j.statuses == {"REFAPP-5": "In Test", "REFAPP-6": "In Test"}
+    assert j.links == [("REFAPP-5", "https://gh/pr/40", "feat (REFAPP-5)"), ("REFAPP-6", "https://gh/pr/40", "feat (REFAPP-5)")]
 
 
 def test_pr_opened_replay_is_a_noop_but_keeps_the_link():
-    j = FakeJira({"KVART-8": "Ready for LIVE"})
-    run(j, "pr-opened", "--keys", "KVART-8", "--pr-url", "https://gh/pr/36", "--pr-title", "t")
-    assert j.statuses["KVART-8"] == "Ready for LIVE"
+    j = FakeJira({"REFAPP-8": "Ready for LIVE"})
+    run(j, "pr-opened", "--keys", "REFAPP-8", "--pr-url", "https://gh/pr/36", "--pr-title", "t")
+    assert j.statuses["REFAPP-8"] == "Ready for LIVE"
     assert len(j.links) == 1
 
 
 def test_checks_success_then_failure_round_trip():
-    j = FakeJira({"KVART-8": "In Test"})
-    run(j, "checks", "--keys", "KVART-8", "--conclusion", "success", "--run-url", "https://gh/run/1")
-    assert j.statuses["KVART-8"] == "Ready for LIVE"
+    j = FakeJira({"REFAPP-8": "In Test"})
+    run(j, "checks", "--keys", "REFAPP-8", "--conclusion", "success", "--run-url", "https://gh/run/1")
+    assert j.statuses["REFAPP-8"] == "Ready for LIVE"
     assert j.comments == []
-    run(j, "checks", "--keys", "KVART-8", "--conclusion", "failure", "--run-url", "https://gh/run/2", "--sha", "abc")
-    assert j.statuses["KVART-8"] == "In Progress"
-    assert j.comments == [("KVART-8", "CI failed on abc: https://gh/run/2. Back to In Progress.")]
+    run(j, "checks", "--keys", "REFAPP-8", "--conclusion", "failure", "--run-url", "https://gh/run/2", "--sha", "abc")
+    assert j.statuses["REFAPP-8"] == "In Progress"
+    assert j.comments == [("REFAPP-8", "CI failed on abc: https://gh/run/2. Back to In Progress.")]
 
 
 def test_checks_cancelled_touches_nothing():
-    j = FakeJira({"KVART-8": "In Test"})
-    run(j, "checks", "--keys", "KVART-8", "--conclusion", "cancelled", "--run-url", "u")
-    assert j.statuses["KVART-8"] == "In Test"
+    j = FakeJira({"REFAPP-8": "In Test"})
+    run(j, "checks", "--keys", "REFAPP-8", "--conclusion", "cancelled", "--run-url", "u")
+    assert j.statuses["REFAPP-8"] == "In Test"
     assert j.comments == []
 
 
 def test_merged_records_sha_and_walks_a_raced_ticket_forward():
-    j = FakeJira({"KVART-8": "Ready for LIVE", "KVART-5": "In Test"})
-    run(j, "merged", "--keys", "KVART-8,KVART-5", "--pr-url", "https://gh/pr/36", "--sha", "1ba9542f")
-    assert j.statuses == {"KVART-8": "Ready for LIVE", "KVART-5": "Ready for LIVE"}
-    assert [c[0] for c in j.comments] == ["KVART-8", "KVART-5"]
+    j = FakeJira({"REFAPP-8": "Ready for LIVE", "REFAPP-5": "In Test"})
+    run(j, "merged", "--keys", "REFAPP-8,REFAPP-5", "--pr-url", "https://gh/pr/36", "--sha", "1ba9542f")
+    assert j.statuses == {"REFAPP-8": "Ready for LIVE", "REFAPP-5": "Ready for LIVE"}
+    assert [c[0] for c in j.comments] == ["REFAPP-8", "REFAPP-5"]
     assert "1ba9542f" in j.comments[0][1]
-    run(j, "merged", "--keys", "KVART-8,KVART-5", "--pr-url", "https://gh/pr/36", "--sha", "1ba9542f")  # replay
+    run(j, "merged", "--keys", "REFAPP-8,REFAPP-5", "--pr-url", "https://gh/pr/36", "--sha", "1ba9542f")  # replay
     assert len(j.comments) == 2
 
 
@@ -256,112 +256,112 @@ def test_move_replans_once_when_a_transition_is_refused():
         def request(self, method, path, body=None):
             if path.endswith("/transitions") and method == "POST" and self.refused == 0:
                 self.refused += 1
-                self.statuses["KVART-8"] = "In Test"  # another job moved it meanwhile
+                self.statuses["REFAPP-8"] = "In Test"  # another job moved it meanwhile
                 raise SystemExit("jira_sync: POST -> HTTP 400: transition not valid")
             return super().request(method, path, body)
 
-    j = RacyJira({"KVART-8": "In Progress"})
-    run(j, "checks", "--keys", "KVART-8", "--conclusion", "success", "--run-url", "u")
-    assert j.statuses["KVART-8"] == "Ready for LIVE"
+    j = RacyJira({"REFAPP-8": "In Progress"})
+    run(j, "checks", "--keys", "REFAPP-8", "--conclusion", "success", "--run-url", "u")
+    assert j.statuses["REFAPP-8"] == "Ready for LIVE"
     assert j.refused == 1
 
 
 def test_epics_are_linked_but_never_moved_or_commented():
-    j = FakeJira({"KVART-4": "In Progress", "KVART-5": "In Progress"}, epics={"KVART-4"})
-    run(j, "pr-opened", "--keys=KVART-4,KVART-5", "--pr-url=https://gh/pr/37", "--pr-title=t (KVART-5)")
-    run(j, "checks", "--keys=KVART-4,KVART-5", "--conclusion=success", "--run-url=u")
-    run(j, "merged", "--keys=KVART-4,KVART-5", "--pr-url=https://gh/pr/37", "--sha=9c21c1af")
-    run(j, "deployed", "--keys=KVART-4,KVART-5", "--sha=9c21c1af")
-    assert j.statuses == {"KVART-4": "In Progress", "KVART-5": "Done"}
-    assert [k for k, *_ in j.links] == ["KVART-4", "KVART-5"]
-    assert [k for k, _ in j.comments] == ["KVART-5", "KVART-5"]
+    j = FakeJira({"REFAPP-4": "In Progress", "REFAPP-5": "In Progress"}, epics={"REFAPP-4"})
+    run(j, "pr-opened", "--keys=REFAPP-4,REFAPP-5", "--pr-url=https://gh/pr/37", "--pr-title=t (REFAPP-5)")
+    run(j, "checks", "--keys=REFAPP-4,REFAPP-5", "--conclusion=success", "--run-url=u")
+    run(j, "merged", "--keys=REFAPP-4,REFAPP-5", "--pr-url=https://gh/pr/37", "--sha=9c21c1af")
+    run(j, "deployed", "--keys=REFAPP-4,REFAPP-5", "--sha=9c21c1af")
+    assert j.statuses == {"REFAPP-4": "In Progress", "REFAPP-5": "Done"}
+    assert [k for k, *_ in j.links] == ["REFAPP-4", "REFAPP-5"]
+    assert [k for k, _ in j.comments] == ["REFAPP-5", "REFAPP-5"]
 
 
 def test_is_epic_is_read_once_per_key():
     j = js.Jira("https://x.atlassian.net", "e", "t")
     reads = []
     j.request = lambda method, path, body=None: (reads.append(path), {"fields": {"issuetype": {"hierarchyLevel": 1}}})[1]
-    assert j.is_epic("KVART-4") is True
-    assert j.is_epic("KVART-4") is True
+    assert j.is_epic("REFAPP-4") is True
+    assert j.is_epic("REFAPP-4") is True
     assert len(reads) == 1
 
 
 def test_pickup_still_walks_an_epic_a_person_chose():
-    j = FakeJira({"KVART-4": "Backlog"}, epics={"KVART-4"})
-    assert run(j, "pickup", "--key", "KVART-4") == 0
-    assert j.statuses["KVART-4"] == "In Progress"
+    j = FakeJira({"REFAPP-4": "Backlog"}, epics={"REFAPP-4"})
+    assert run(j, "pickup", "--key", "REFAPP-4") == 0
+    assert j.statuses["REFAPP-4"] == "In Progress"
 
 
 def test_green_after_red_walks_two_steps():
-    j = FakeJira({"KVART-8": "In Progress"})
-    run(j, "checks", "--keys", "KVART-8", "--conclusion", "success", "--run-url", "u")
-    assert j.statuses["KVART-8"] == "Ready for LIVE"
+    j = FakeJira({"REFAPP-8": "In Progress"})
+    run(j, "checks", "--keys", "REFAPP-8", "--conclusion", "success", "--run-url", "u")
+    assert j.statuses["REFAPP-8"] == "Ready for LIVE"
 
 
 def test_hyphen_leading_values_parse_with_equals_form():
-    j = FakeJira({"KVART-8": "In Progress"})
-    run(j, "pr-opened", "--keys=KVART-8", "--pr-url=https://gh/pr/36", "--pr-title=- odd title (KVART-8)")
-    assert j.statuses["KVART-8"] == "In Test"
-    assert j.links[0][2] == "- odd title (KVART-8)"
+    j = FakeJira({"REFAPP-8": "In Progress"})
+    run(j, "pr-opened", "--keys=REFAPP-8", "--pr-url=https://gh/pr/36", "--pr-title=- odd title (REFAPP-8)")
+    assert j.statuses["REFAPP-8"] == "In Test"
+    assert j.links[0][2] == "- odd title (REFAPP-8)"
 
 
 def test_deployed_closes_everything_shipped_from_any_column_but_not_done():
     # A ticket already Done stays put with no duplicate comment; every other
     # shipped ticket is driven to Done from wherever it sits — including
-    # KVART-11 (Ready), which nobody explicitly picked up. Shipped code closes
+    # REFAPP-11 (Ready), which nobody explicitly picked up. Shipped code closes
     # the ticket; pickup state is irrelevant.
-    j = FakeJira({"KVART-8": "Ready for LIVE", "KVART-3": "Done", "KVART-9": "In Test", "KVART-11": "Ready"})
-    run(j, "deployed", "--keys", "KVART-8 KVART-3 KVART-9 KVART-11", "--sha", "deadbeef")
-    assert j.statuses == {"KVART-8": "Done", "KVART-3": "Done", "KVART-9": "Done", "KVART-11": "Done"}
+    j = FakeJira({"REFAPP-8": "Ready for LIVE", "REFAPP-3": "Done", "REFAPP-9": "In Test", "REFAPP-11": "Ready"})
+    run(j, "deployed", "--keys", "REFAPP-8 REFAPP-3 REFAPP-9 REFAPP-11", "--sha", "deadbeef")
+    assert j.statuses == {"REFAPP-8": "Done", "REFAPP-3": "Done", "REFAPP-9": "Done", "REFAPP-11": "Done"}
     assert j.comments == [
-        ("KVART-8", "Deployed to production at deadbeef."),
-        ("KVART-9", "Deployed to production at deadbeef."),
-        ("KVART-11", "Deployed to production at deadbeef."),
+        ("REFAPP-8", "Deployed to production at deadbeef."),
+        ("REFAPP-9", "Deployed to production at deadbeef."),
+        ("REFAPP-11", "Deployed to production at deadbeef."),
     ]
 
 
 def test_merged_drives_a_backlog_ticket_to_ready_for_live():
-    # The bug KVART-40 fixes: a ticket nobody `jira pickup`'d merged and stayed
+    # The bug REFAPP-40 fixes: a ticket nobody `jira pickup`'d merged and stayed
     # in Backlog. The merge now walks it all the way to Ready for LIVE.
-    j = FakeJira({"KVART-40": "Backlog"})
-    run(j, "merged", "--keys", "KVART-40", "--pr-url", "https://gh/pr/99", "--sha", "cafef00d")
-    assert j.statuses["KVART-40"] == "Ready for LIVE"
-    assert j.comments[0][0] == "KVART-40"
+    j = FakeJira({"REFAPP-40": "Backlog"})
+    run(j, "merged", "--keys", "REFAPP-40", "--pr-url", "https://gh/pr/99", "--sha", "cafef00d")
+    assert j.statuses["REFAPP-40"] == "Ready for LIVE"
+    assert j.comments[0][0] == "REFAPP-40"
     assert "cafef00d" in j.comments[0][1]
 
 
 def test_pr_opened_walks_a_backlog_ticket_up_to_in_test():
-    j = FakeJira({"KVART-40": "Backlog"})
-    run(j, "pr-opened", "--keys", "KVART-40", "--pr-url", "https://gh/pr/99", "--pr-title", "chore (KVART-40)")
-    assert j.statuses["KVART-40"] == "In Test"
-    assert j.links[0][0] == "KVART-40"
+    j = FakeJira({"REFAPP-40": "Backlog"})
+    run(j, "pr-opened", "--keys", "REFAPP-40", "--pr-url", "https://gh/pr/99", "--pr-title", "chore (REFAPP-40)")
+    assert j.statuses["REFAPP-40"] == "In Test"
+    assert j.links[0][0] == "REFAPP-40"
 
 
 def test_keys_argument_rejects_text_without_keys():
-    parser = js.build_parser("KVART")
+    parser = js.build_parser("REFAPP")
     argv = ["merged", "--keys", "no-ticket-here", "--pr-url", "u", "--sha", "s"]
     with pytest.raises(SystemExit):
         parser.parse_args(argv)
 
 
 def test_keys_command_is_offline():
-    args = js.build_parser("KVART").parse_args(["keys", "--text", "feat/KVART-12-x (KVART-12) KVART-4"])
+    args = js.build_parser("REFAPP").parse_args(["keys", "--text", "feat/REFAPP-12-x (REFAPP-12) REFAPP-4"])
     assert args.offline is True
-    assert js.extract_keys(args.text, args.project) == ["KVART-12", "KVART-4"]
+    assert js.extract_keys(args.text, args.project) == ["REFAPP-12", "REFAPP-4"]
 
 
 def test_keys_command_reads_stdin_for_dash(monkeypatch, capsys):
-    monkeypatch.setattr("sys.stdin", io.StringIO("feat: x (KVART-7)\n\nRefs KVART-4\n"))
+    monkeypatch.setattr("sys.stdin", io.StringIO("feat: x (REFAPP-7)\n\nRefs REFAPP-4\n"))
     assert run(None, "keys", "--text", "-") == 0
-    assert capsys.readouterr().out.split() == ["KVART-7", "KVART-4"]
+    assert capsys.readouterr().out.split() == ["REFAPP-7", "REFAPP-4"]
 
 
 def test_main_treats_empty_project_key_as_default(monkeypatch, capsys):
     """An exported-but-empty JIRA_PROJECT_KEY (unset repository variable) must not
-    yield the empty project, which makes `KVART-12` extract as `-12`."""
+    yield the empty project, which makes `REFAPP-12` extract as `-12`."""
     monkeypatch.setenv("JIRA_PROJECT_KEY", "")
-    assert js.main(["keys", "--text=feat/KVART-12-x"]) == 0
-    assert capsys.readouterr().out.split() == ["KVART-12"]
+    assert js.main(["keys", "--text=feat/REFAPP-12-x"]) == 0
+    assert capsys.readouterr().out.split() == ["REFAPP-12"]
 
 
 @pytest.mark.parametrize("base", ["http://example.atlassian.net", "https://jira.invalid", "https://example.atlassian.net.evil.example"])

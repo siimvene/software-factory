@@ -8,13 +8,13 @@
 
 A green check result is valid only on the base it ran on. With a non-strict ruleset, a PR that
 went green before another PR merged can still merge, and the combined tree is tested for the
-first time on main. On 2026-09-29 that turned kvart's main red within 20 minutes of a
+first time on main. On 2026-09-29 that turned the reference product's main red within 20 minutes of a
 five-PR merge run, and a third PR's CI failed on breaks that were not its own `[measured
-2026-09-29]` ([evidence](../evidence/kvart-stale-green-merges-2026-09-29.md)).
+2026-09-29]` ([evidence](../evidence/reference-stale-green-merges-2026-09-29.md)).
 
 A strict ruleset (the PR must be up to date with main) closes that gap, at a cost: every merge
 puts every other open PR behind, and someone has to update each branch and wait for its CI
-again. A forge merge queue does that bookkeeping, but kvart's forge account has none. Without
+again. A forge merge queue does that bookkeeping, but the reference product's forge account has none. Without
 one, strict means a person runs the queue by hand: update, wait about 20 to 25 minutes of CI,
 merge, next.
 
@@ -97,5 +97,5 @@ promotion window in `docs/11-scaling.md`.
 
 ## Evidence
 
-- `evidence/kvart-stale-green-merges-2026-09-29.md`.
+- `evidence/reference-stale-green-merges-2026-09-29.md`.
 - ADR 0006, delegated merge and the 2026-09-09 incident.

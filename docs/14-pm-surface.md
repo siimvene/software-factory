@@ -95,7 +95,7 @@ anywhere is the sensitivity decision below. `[decided 2026-09-15, not yet measur
 
 ## The skill catalogue
 
-Nineteen skills, in the shape the kvart adoption ran them. Names here are generic: rename freely,
+Nineteen skills, in the shape the reference product adoption ran them. Names here are generic: rename freely,
 but keep the firing conditions in the description, because the description is what decides whether
 the skill fires at all. Inputs are given in read order, and the order is itself a rule from the
 workspace contract: check the spec first, grep the code when the spec is unclear or silent, ask
@@ -295,7 +295,7 @@ Two things the PM writes that the head cannot recover from code:
   or introduces names its view in the prototype (`<file>#<view id>`, one per screen, in the
   acceptance criteria), and every route a card, row or button opens has a named view in this
   ticket or in another Ready ticket. An acceptance criterion of the form "X opens the Y list" with
-  no view named is satisfiable by the old screen and was, on kvart, 2026-09-17: the new hub cards
+  no view named is satisfiable by the old screen and was, on the reference product, 2026-09-17: the new hub cards
   landed on the pre-ramp destination screens and every code gate passed
   ([06-verify-gate](06-verify-gate.md), "Native client QA"). The verifier reads the named view,
   not the ticket prose, when it judges the screenshot.
@@ -385,7 +385,7 @@ Three defences, cheapest first:
    current-state target for anything other than implemented. This is the only one of the three
    that is mechanical, and it is a two-line change.
 
-## What the kvart adoption measured
+## What the reference product adoption measured
 
 Two cycles on 2026-09-07, both PM stage through to production, both in the
 [status ledger](../STATUS.md).

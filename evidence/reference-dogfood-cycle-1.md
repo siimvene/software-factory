@@ -1,20 +1,20 @@
-# kvart dogfood, cycle 1 (2026-09-07)
+# The reference product dogfood, cycle 1 (2026-09-07)
 
 > Source: the cycle-1 report written into the PM workspace's outputs folder at the end of the run, 2026-09-07.
 > Copied near-verbatim, anonymised.
 
-# The group SDLC dogfood on kvart — cycle 1 report (2026-09-07)
+# The group SDLC dogfood on the reference product — cycle 1 report (2026-09-07)
 
-Ticket: the ticket file in the PM workspace, `associations-and-onboarding / 01 - Mandate signing link - admit anonymous visitors`
-Code PR: siimvene/kvart#17 (`966f7d7c`, branch `fix/mandate-sign-public-route`)
-Sister spec PR: siimvene/kvart-team-context#4 (branch `specs/mandate-sign-route-fix`)
+Ticket: the ticket file in the PM workspace, `organisations-and-onboarding / 01 - Mandate signing link - admit anonymous visitors`
+Code PR: <org>/refapp#17 (`966f7d7c`, branch `fix/mandate-sign-public-route`)
+Sister spec PR: <org>/refapp-team-context#4 (branch `specs/mandate-sign-route-fix`)
 Both open, owner merges by hand (ADR 0001 shortcut: no branch protection on the free plan).
 
 ## Wall-clock per stage
 
 | Stage | Start | End | Elapsed | Notes |
 |---|---|---|---|---|
-| PM: pick ticket from findings, verify 3 candidates against code + prod | 02:40 | 02:44 | ~4 min | included a prod check on the auto-pay flag (1 HOA on, 0 payments initiated) |
+| PM: pick ticket from findings, verify 3 candidates against code + prod | 02:40 | 02:44 | ~4 min | included a prod check on the auto-pay flag (1 customer on, 0 payments initiated) |
 | PM: draft ticket (`/jira` by hand), self-score readiness | 02:44 | 02:51 | ~7 min | 94/100 self-scored |
 | Dev: worktree, deps (`pnpm install` 6 s, `uv sync` 1 s) | 02:51:26 | 02:52:30 | ~1 min | shared caches did their job |
 | Dev: tests written first, unit case red on unfixed middleware | 02:52:30 | 02:53:01 | 30 s | exact bounce `/login?redirect=%2Fmandate-sign%2F…` |
@@ -48,16 +48,16 @@ Tokens: only the security side-agent reports its own count (113,435). The princi
 
 1. PM hat and dev hat ran in the same session (the plan said separate sessions). Cost: the dev pass inherited the PM's framing. Mitigated by the non-inheriting reviewers.
 2. `/jira` skill in this copy of the PM template references `references/style-rules.md`, which does not exist. Drafted from `templates/Jira Story.md` only.
-3. `kvart-team-context/specs/` stood in for `Features/` as the pipeline source (no `Features/` folder in this workspace).
+3. `refapp-team-context/specs/` stood in for `Features/` as the pipeline source (no `Features/` folder in this workspace).
 4. Readiness was self-scored against the rubric; the skill's ticket write-back and improver loop did not run (no ticket system).
 5. `update-specs-for-commits` is not installed here; the sister spec delta was hand-edited (agents-core §2 forbids hand edits; recorded as a cycle-1 shortcut in the PR body).
 6. `check-specs.py` from the Day 1 bootstrap lived in a scratchpad that is gone; its three checks were done by hand.
-7. Memspec promote PR into the team store: not done this cycle. The cycle's fact goes to local scratch (scope kvart) only.
+7. Memspec promote PR into the team store: not done this cycle. The cycle's fact goes to local scratch (the product's own scope) only.
 8. Chrome extension not connected; QA ran on the skill's headless fallback with a throwaway script under `frontend/e2e/.runtime/`.
 9. No multi-agent workflow: one-line fix, the standing ultracode opt-in carves out trivial edits.
 10. macOS tooling gaps hit twice: no `timeout` (use the tool's cap or install coreutils), and `git stash` refuses intent-to-add files (use a file copy for negative test runs).
-11. e2e from a worktree needs `COMPOSE_PROJECT_NAME=kvart` to reuse the primary postgres on :5432 and a copy of `frontend/e2e/.runtime/encryption.key`; neither is documented in `frontend/e2e/README.md`.
+11. e2e from a worktree needs `COMPOSE_PROJECT_NAME=refapp` to reuse the primary postgres on :5432 and a copy of `frontend/e2e/.runtime/encryption.key`; neither is documented in `frontend/e2e/README.md`.
 
 ## Candidate ticket 2
 
-Auto-pay label vs timers (MONEY): the settings hint says vendor auto-pay is not live while the daily timer acts on the stored flag; prod has one HOA with the flag on (0 payments so far). Needs an owner decision (label or behaviour; oldest-vs-newest settlement) before it becomes a ticket.
+Auto-pay label vs timers (MONEY): the settings hint says vendor auto-pay is not live while the daily timer acts on the stored flag; prod has one customer with the flag on (0 payments so far). Needs an owner decision (label or behaviour; oldest-vs-newest settlement) before it becomes a ticket.

@@ -42,8 +42,8 @@
   ],
   "workflows": [
     {
-      "name": "KVART flywheel",
-      "description": "Kvart flywheel ladder: Backlog -> Ready -> In Progress -> In Test -> Ready for LIVE -> Done, with test-failed and rejected-at-acceptance loopbacks to In Progress and a Ready -> Backlog demotion.",
+      "name": "REFAPP flywheel",
+      "description": "The reference product flywheel ladder: Backlog -> Ready -> In Progress -> In Test -> Ready for LIVE -> Done, with test-failed and rejected-at-acceptance loopbacks to In Progress and a Ready -> Backlog demotion.",
       "startPointLayout": {
         "x": -160.0,
         "y": 0.0

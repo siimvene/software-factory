@@ -35,15 +35,15 @@ whose input is blank.
 
 | Input | Example from the reference implementation | Used by |
 |---|---|---|
-| Code repository (org/repo, default branch); one run per repo, design-system repos included | `siimvene/kvart`, `main` | everything |
-| Team-context repository name (org/repo); create it, or it exists | `siimvene/kvart-team-context` | D0.1, D0.3, D0.5 |
+| Code repository (org/repo, default branch); one run per repo, design-system repos included | `<org>/refapp`, `main` | everything |
+| Team-context repository name (org/repo); create it, or it exists | `<org>/refapp-team-context` | D0.1, D0.3, D0.5 |
 | Code owner (GitHub handle or team) for `specs/**` and `.memspec/**` | the owner | D0.1, D0.2 |
 | Business-truth reviewer for the spec and ADR candidate tables | the owner, in the PM role | D1 (docs/17) |
-| Ticket tracker: Jira site URL and project key, or "none" (a named shortcut) | a Jira Cloud site, `KVART` | M4, G6 |
+| Ticket tracker: Jira site URL and project key, or "none" (a named shortcut) | a Jira Cloud site, `REFAPP` | M4, G6 |
 | The stack's test command, coverage report path, and the module layers outermost-first | pytest with `coverage.xml`; entry, service, domain, models, foundation | G4, CI |
 | Money or otherwise high-consequence paths, if any | billing engine, payment rails | P2 (a surface file) |
 | PM workspace location and the PM's machine | `~/git/<product>-pm` | M0 |
-| Bot identity: may a GitHub App be created on the org (needs an admin)? | `kvart-factory`, contents + pull-requests write | G6, S2 |
+| Bot identity: may a GitHub App be created on the org (needs an admin)? | `refapp-factory`, contents + pull-requests write | G6, S2 |
 | Supervision level for the first cycles | interactive on the operator's machine | P5 |
 | Reviewer route | reference Vertex, existing local Pi with explicit provider and model ids, or Codex-only (named in ADR 0001) | G1 to G3, factory-reviewer-setup |
 | Consort root the caller will invoke | `~/git/consort` at `5f68ef6`, or the installed plugin scripts directory | G1 to G3 |
@@ -68,7 +68,7 @@ Fill `CLAUDE.md` from the interview (the template's example file shows what good
 `CODEOWNERS`; a placeholder there plus branch protection makes the gated paths unmergeable.
 Write `docs/adr/0001-<shortcuts>.md` from `$SF/templates/adr.md`: every leg this run skips goes
 in there the day it is skipped, and the reference implementation's first ADR is the model
-(kvart-team-context ADR 0001: self-review as code-owner review, no Jira at first, specs per
+(refapp-team-context ADR 0001: self-review as code-owner review, no Jira at first, specs per
 subdomain when first touched; two of the three were closed within a day and the ADR says so).
 
 Check: `ls CLAUDE.md CODEOWNERS docs/adr/0000-template.md docs/adr/0001-*.md .memspec/config.yaml`
@@ -97,7 +97,7 @@ in the call above), so a client that still merges on open is refused and the PR
 waits for a code owner. Review stays requested, not required, for the reasons above.
 
 Check: the same endpoint with GET returns `required_pull_request_reviews: null` on the context repo. Where the plan
-refuses (HTTP 403 on a free private repo, as kvart hit on 2026-09-07), write the refusal into
+refuses (HTTP 403 on a free private repo, as the reference product hit on 2026-09-07), write the refusal into
 ADR 0001 with the date and move on: the gate is a habit until the plan changes.
 
 ### D0.3 Adopt the context standard in the code repo (Agent)
@@ -137,11 +137,11 @@ Check: `adopt.sh --check .` exits 0; `memspec stores` run in the repo lists the 
 own store; a repo that did follows [docs/17 §4](../docs/17-onboarding.md) and subtrees it into
 the team repo first). The seeded `docs-lint` workflow calls a reusable workflow in the group's
 private repository; if this repo cannot reach it, disable the workflow and record that in the
-code repo's ADR 0001, as kvart did.
+code repo's ADR 0001, as the reference product did.
 
 ### D0.4 Split the instructions file (Agent, owner reads)
 
-Only if `CLAUDE.md` is one large block. Procedure and the kvart numbers:
+Only if `CLAUDE.md` is one large block. Procedure and the reference product numbers:
 [docs/17 §3](../docs/17-onboarding.md). Check: every rule file's `paths:` globs match at least
 one file (`git ls-files | grep -E '<glob as regex>'` per rule), and one stale rule found and
 fixed is the expected result, not a surprise.
@@ -175,7 +175,7 @@ repos). Then:
   into `$PM/.claude/skills/`. Version 1.6.0 of the plugin, vendored here, carries all five.
 
 Check: run the ticket skill once against a real spec before trusting anything else
-(`/ticket <features file>`), and read the draft. kvart's first run found the skill citing a
+(`/ticket <features file>`), and read the draft. The reference product's first run found the skill citing a
 style file the copy did not have; that class of defect only shows on a run.
 
 ## G. Gate wiring, in the code repo
@@ -194,9 +194,9 @@ python3 ~/git/cleat/quality/bin/attach.py --into .
 
 Attach writes `quality/`, `quality.json`, the baselines and a block into the instructions file.
 Then edit `quality.json` by hand, with [templates/sensor-config-examples.md](../templates/sensor-config-examples.md)
-open: add `skip_dirs` for the runtime clutter (`.claude`, `.enola`, `.nodeterm`, `tmp`, the
+open: add `skip_dirs` for the runtime clutter (`.claude`, `.enola`, `tmp`, the
 build outputs), because cleat's walkers prune by name and read nested worktrees otherwise
-(kvart went 3 of 6 gates red in the primary checkout until this was done); set the
+(the reference product went 3 of 6 gates red in the primary checkout until this was done); set the
 `complexity.tool` to `lizard` with the `exclude` list and a `_note` per exclusion; set
 `changed_coverage.report` to the stack's report path and `base_ref` to `origin/main`; give the
 documents an agent reads a token ceiling. Do not pass `--git-hooks`: this repo uses
@@ -227,7 +227,7 @@ outside source (the install itself is user scope and switched off there; a proje
 would bind to this directory and miss every worktree). A repo scaffolded earlier that still names
 `chisle@chisle` or an `extraKnownMarketplaces` entry `chisle` fails the check until it switches. Every entry is PATH-guarded so it is a no-op where a binary is absent. Make sure
 `.gitignore` tracks `.claude/settings.json`, `.claude/rules/` and any skill you want every
-worktree to have, and ignores the rest of `.claude/` (kvart's pattern: `.claude/*` then
+worktree to have, and ignores the rest of `.claude/` (the reference product's pattern: `.claude/*` then
 `!.claude/rules/`, `!.claude/settings.json`).
 
 Then the git hooks:
@@ -339,7 +339,7 @@ write the request with the exact permission list and stop.
 
 Check, after the first PR exists: a direct push to main by the owner is refused; a direct push
 by the App is refused; a PR opened by the App triggers the required checks (a PR opened with the
-workflow token would not). kvart's ruleset refused both on 2026-09-08; that refusal is the
+workflow token would not). The reference product's ruleset refused both on 2026-09-08; that refusal is the
 evidence line.
 
 ### M4 The ticket ledger (Agent, **Human** for the tracker admin steps)
@@ -356,7 +356,7 @@ status references inside it are UUIDs the site issues, so create the statuses fi
 a workflow scheme, the project, and reassign the scheme to the project. Two things the API does
 not do and a person does in the UI: the board's column mapping, and the **Resolution** field on
 the Done transition (a post-function `update-field Resolution=Done`; without it every Done
-ticket reads Unresolved, as kvart's did until 2026-09-09).
+ticket reads Unresolved, as the reference product's did until 2026-09-09).
 
 Repo side:
 
@@ -366,7 +366,7 @@ cp $SF/deploy/templates/ci/jira_sync.py scripts/ci/ && cp $SF/deploy/templates/c
 cp $SF/deploy/templates/github/workflows/{jira-sync.yml,pr-ticket-key.yml} .github/workflows/
 gh variable set JIRA_BASE_URL --body https://<site>.atlassian.net
 gh secret set JIRA_USER_EMAIL && gh secret set JIRA_API_TOKEN          # a service account's token, not a person's, where one exists
-gh variable set JIRA_PROJECT_KEY --body <KEY>                          # both workflows pass it to jira_sync.py; default KVART
+gh variable set JIRA_PROJECT_KEY --body <KEY>                          # both workflows pass it to jira_sync.py; default REFAPP
 ```
 
 `jira_sync.py` is stdlib-only and unit-tested; its docstring is the contract (pickup stamps the
@@ -387,7 +387,7 @@ This one is a whole document rather than a leg. Run [docs/17](../docs/17-onboard
 8 with the skills in `$SF/templates/skills/` (or the `spec-repos` plugin from the marketplace,
 which is where they came from): feature maps, the candidate table, the **human** review for
 business truth, the spec pairs, `check-specs.py` exit 0, the findings file, the ADR candidate
-table, the records. Record the wall-clock; kvart's was one long session for about 250 features.
+table, the records. Record the wall-clock; the reference product's was one long session for about 250 features.
 
 ## T. Test the test, then verify on arrival
 

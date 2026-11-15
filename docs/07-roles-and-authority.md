@@ -12,7 +12,7 @@ roles only (no names, ever, in any committed artifact).
 | **Dev (operator)** | operating the agents, reading evidence, technical assurance, exceptions, service ownership | drive BUILD and VERIFY; adjudicate findings; own the exception queue | hand-write features (an incident, see below); merge own proposals |
 | **Owner** (code owner, release owner) | merge and release authority | read the PR for business truth and merge; run the pre-deploy gate and press release | approve without reading; author |
 
-A solo founder wears all three and records every shortcut in a decision record. kvart's named
+A solo founder wears all three and records every shortcut in a decision record. The reference product's named
 shortcuts: self-review as code owner (branch protection refused on the plan, so the merge gate
 is a habit); no ticket tracker (tickets are files with a stage line); PM and dev hat in one
 session (the dev inherits the PM's framing; mitigated by the non-inheriting reviewers)

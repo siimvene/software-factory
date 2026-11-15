@@ -8,7 +8,7 @@ Most of this document is `[proposed]`; the rungs that exist are marked.
 
 Not the agents. Model capability is exogenous and arrives for free. The compounding asset is
 the verification net, the team knowledge plane and the gates: every turn that makes the net
-tighter makes the next feature cheaper and safer. Existence proof: one operator on kvart at
+tighter makes the next feature cheaper and safer. Existence proof: one operator on the reference product at
 roughly the monthly output of a 15 to 25 person organisation `[measured 2026-09-07]`. Counter-
 evidence in the same data: the cost curve has not yet bent even for the expert operator
 (non-review fixes rising, cost per commit flat). The flywheel is real; its payoff on cost is
@@ -32,12 +32,12 @@ the L6 release owner.
 | Rung | What | State |
 |---|---|---|
 | L0 | sandbox with egress allowlist and scoped identity | measured (booted; identity blocked) |
-| L1 | verification net: ratchets, characterization, mutation kill rate baselined per module and ratcheted on the touched ones, async paths, YAGNI ladder | measured on kvart (kill-rate gate proposed, baseline measured 2026-09-15); partial on the legacy core |
+| L1 | verification net: ratchets, characterization, mutation kill rate baselined per module and ratcheted on the touched ones, async paths, YAGNI ladder | measured on the reference product (kill-rate gate proposed, baseline measured 2026-09-15); partial on the legacy core |
 | L2 | parity replay against an oracle (the mature system): same input, diff the outputs, money cent-exact | proposed |
 | L3 | adversarial review loop, cross-vendor, bounded to 3 to 4 cycles | measured |
 | L4 | contract tests at module boundaries plus the architecture gate: a boundary violation fails the build | designed (the architecture diff's provable explainers plus scope spillover = 0 are the gate; no agent needed) |
 | L5 | acceptance on evidence with acceptance identity (approver, content hash, invalidation) | proposed |
-| L6 | staged release: flag → shadow → canary → prod, automated revert on SLO breach | proposed; kvart runs flag → deploy → probe |
+| L6 | staged release: flag → shadow → canary → prod, automated revert on SLO breach | proposed; the reference product runs flag → deploy → probe |
 
 The architecture gate at L4 is the delegation of the single architect: at more than about 10
 streams one head cannot hold coherence, and an ADR-backed mechanical boundary check is what
@@ -51,7 +51,7 @@ incumbent being replaced) are executable specifications. Harvest three things pe
 1. behaviour specs into the team-context repo (the pattern already used);
 2. recorded fixtures: real request/response, event and database-state samples, anonymised;
 3. differential parity: replay the same input against the mature system and the new
-   implementation, compare. kvart's billing engine is held to cent-for-cent parity with the
+   implementation, compare. The reference product's billing engine is held to cent-for-cent parity with the
    incumbent it replaces; that is the template.
 
 Parity replay catches "works but wrong", which unit tests and review cannot. Build the rig once
@@ -95,7 +95,7 @@ Promotion criteria between phases, each with its instrument
 - merge-conflict rate per stream below threshold (dry-run merges);
 - red-main-after-green-merge count at zero: a dry-run merge sees only textual conflicts, and
   the semantic ones pass it (`[measured 2026-09-29]`: 2 in 20 minutes at a width of 5 open
-  PRs, [evidence](../evidence/kvart-stale-green-merges-2026-09-29.md));
+  PRs, [evidence](../evidence/reference-stale-green-merges-2026-09-29.md));
 - parity replay pass rate per flow;
 - defect escape flat.
 

@@ -95,11 +95,11 @@ if [ "$_pushing_head" = 1 ] && git diff --quiet 2>/dev/null && git diff --cached
   fi
 fi
 
-# The receipt gates BEFORE the PR: the browser pass (scripts/e2e-gate.sh, KVART-15)
-# and the SonarQube analysis (scripts/sonar-gate.sh, KVART-16). Every ref being
+# The receipt gates BEFORE the PR: the browser pass (scripts/e2e-gate.sh, REFAPP-15)
+# and the SonarQube analysis (scripts/sonar-gate.sh, REFAPP-16). Every ref being
 # pushed is judged on ITS OWN commit (never HEAD: `git push origin other:main` must
 # not ride on HEAD's receipt): each gate decides from that commit's diff whether it
-# applies (pages and API modules for the browser; src/kvart, tests and the frontend
+# applies (pages and API modules for the browser; src/refapp, tests and the frontend
 # app for Sonar) and, if so, demands a passing receipt for exactly that commit's
 # tree. Neither check runs anything itself. Deletions (all-zero local sha) have
 # nothing to judge.
