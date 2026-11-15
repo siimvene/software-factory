@@ -7,8 +7,11 @@ can be published without a scrub pass.
 
 ## Anonymization (non-negotiable)
 
-- The only named product is **the reference product**, the reference implementation. It is the author's own
-  product and its numbers are the author's own data.
+- No product is named. The reference implementation is **"the reference product"**: the
+  author's own product, and its numbers are the author's own data. Its name, its repository
+  names and its ticket keys never appear, and neither does the vocabulary that identifies its
+  market: customers are "organisations", roles are "admin" and "manager", feature names are
+  in English. Ticket keys are written `REFAPP-N`, repositories `<org>/refapp`.
 - The employer and its systems are never named. Say **"the group"** for the organisation,
   **"the legacy core"** for its ticketing monolith (a Java/Gradle system of 75 modules), and
   **"the group standard"** for its published agent standards. No repo names, no wiki page

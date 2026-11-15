@@ -16,10 +16,10 @@ change is the last rung of a ladder
 the measured state of the line: today every code merge is a named human's click, and the ledger
 records who.
 
-The design was derived from running the loop on a real product (a multi-tenant SaaS with money paths and a 4-locale UI) and from bootstrapping the same loop onto a
-legacy Java core of 75 modules inside a group of companies. Every mechanism here was either
-measured in one of those two places or is labelled as designed or proposed. `STATUS.md` is the
-ledger.
+The design was derived from running the loop on a real product (a multi-tenant SaaS with money
+paths and a 4-locale UI) and from bootstrapping the same loop onto a legacy Java core of 75
+modules inside a group of companies. Every mechanism here was either measured in one of those
+two places or is labelled as designed or proposed. `STATUS.md` is the ledger.
 
 ![The factory as components: intent from the CEO, PMs and engineers becomes a spec, the agent builds it in a worktree with tests red first, gates (ratchets, architecture diff, cross-vendor review, scanners, CI) verify it, the pull request arrives reviewed and the owner merges, release is separate from merge, and complaints, feature requests and incidents from users and monitoring feed the next spec. Human hours go into writing the ticket and accepting the behaviour; machine time goes into building, verifying and preparing the evidence.](docs/img/factory-components.png)
 

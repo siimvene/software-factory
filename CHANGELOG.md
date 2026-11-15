@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.33 (2026-11-15)
+
+No product is named anywhere in this repository.
+
+- The reference implementation is "the reference product" throughout. Its name, its repository
+  names and the vocabulary of its market are gone: ticket keys read `REFAPP-N`, repositories
+  `<org>/refapp`, customers are "organisations". `WRITING.md` states the rule.
+- The five evidence reports are renamed `evidence/reference-*.md`; links follow.
+- `deploy/templates/ci/jira_sync.py` and the two ledger workflows default the project key to
+  `REFAPP`, a placeholder. An adopter sets `JIRA_PROJECT_KEY`, as before; with it unset the
+  ledger matches no ticket of theirs, which was already the case with the previous default.
+- A compiled `.pyc` that had been committed under `deploy/templates/ci/__pycache__/` is removed.
+- `.gitignore` no longer lists a canvas runtime's directory.
+
 ## 0.2.32 (2026-11-12)
 
 A field guide for the people on the line.
