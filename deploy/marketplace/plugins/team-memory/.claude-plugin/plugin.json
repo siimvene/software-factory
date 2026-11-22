@@ -6,5 +6,6 @@
   "author": {
     "name": "group",
     "email": "dev@example.com"
-  }
+  },
+  "license": "MIT"
 }

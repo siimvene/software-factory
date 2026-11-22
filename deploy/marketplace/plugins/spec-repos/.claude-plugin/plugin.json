@@ -6,5 +6,6 @@
   "author": {
     "name": "the group plugin catalog maintainer",
     "email": "dev@example.com"
-  }
+  },
+  "license": "MIT"
 }

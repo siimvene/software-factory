@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.35 (2026-11-22)
+
+The repository has a licence.
+
+- `LICENSE`: MIT. It covers everything here except `deploy/marketplace/plugins/chisle`, which is a
+  copy of a third-party project and keeps its own MIT licence and copyright notice.
+- The five plugins that did not declare a licence in their manifest now say `MIT`, like the other
+  three.
+
 ## 0.2.34 (2026-11-22)
 
 The PM workspace can use GitHub issues as its tracker.
