@@ -1,7 +1,7 @@
 ---
 name: readiness-evaluator
 description: Evaluate a ticket against a 7-criterion readiness rubric and output a score (0-100) with per-criterion feedback. Use whenever the user asks to score, evaluate, assess, or review a ticket's quality or readiness - e.g. "evaluate this ticket", "score this ticket", "is this ticket ready", "how good is this ticket", "check ticket quality". Do not use it to write or refine a ticket's content (that is `task-improver`), to break a ticket into sub-tasks (that is `task-splitter`), or to apply anything to Jira - this skill never writes to Jira, only to a staged file already under `Jira/`.
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Readiness evaluator
@@ -33,7 +33,7 @@ explicit approval at 85 or above, `status: ready`) into a file already staged un
 | A staged file with `status: applied` | Read it directly | Score in chat only. Never change `status` on an applied file: it records what was sent to the tracker. Improvements to an applied issue go through a new `action: update` file (offer the `ticket` skill) |
 | A `Features/` document | Read it directly | Score in chat only. There is no front matter to persist a score into until the ticket is staged; offer to run the `ticket` skill first, then re-run this evaluator against the staged file |
 | Pasted text | Use it directly | Score in chat only. Same offer as above, once the owner stages it |
-| A tracker key (e.g. `ABC-123`) with no accompanying text | Fetch the issue once via the tracker connector (read-only), reuse it, do not re-fetch mid-session | Score in chat only. Note that a live Jira issue is not a staged file: offer to draft an `action: update` staged file under `Jira/` (via the `ticket` skill) so the score has somewhere to live |
+| A tracker key (e.g. `ABC-123`, or `org/repo#123` on GitHub) with no accompanying text | Fetch the issue once via the tracker connector (read-only), reuse it, do not re-fetch mid-session | Score in chat only. Note that a live Jira issue is not a staged file: offer to draft an `action: update` staged file under `Jira/` (via the `ticket` skill) so the score has somewhere to live |
 
 Never call the tracker connector when local content (staged file, `Features/` document, pasted
 text) is already present in the conversation.

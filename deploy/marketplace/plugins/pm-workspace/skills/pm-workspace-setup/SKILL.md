@@ -1,7 +1,7 @@
 ---
 name: pm-workspace-setup
 description: Use this skill when the user wants to create, bootstrap, or upgrade a Product Manager workspace - e.g. "set up a PM workspace here", "bootstrap a product manager workspace in ./my-vault", "update this workspace to the latest PM conventions", "check whether my workspace follows the current conventions". Creates the _Inbox / Meetings / Discovery / Features / Jira / Reference structure plus CLAUDE.md, CONVENTIONS.md, POINTERS.md, SENSITIVITY.md and the tracking registers, or upgrades an existing workspace to the current convention version. Do not use it to write feature documents or to ingest sources - that is the `ingest` skill.
-version: 1.4.1
+version: 1.5.0
 ---
 
 # Set up or upgrade a PM Workspace
@@ -124,6 +124,8 @@ separately only when:
 - an `Ingest Log.md` (old name) is about to be renamed to `Ingest-Log.md`, or
 - the target already holds files but no `CONVENTIONS.md` (see step 2), or
 - the TRACKER.md 2.7.0 migration applies (see step 4c) - the rewrite is shown before it is written.
+- the tracker kind column is added to `TRACKER.md` (see step 4d) - the edit is shown before it is
+  written.
 
 ### 4. Apply
 
@@ -241,21 +243,37 @@ Run this when `TRACKER.md` was just created from the template, or exists with `{
 still in it (the connector was not available last time). Fill placeholders only; never change a
 filled row. Read-only discovery, as in 4a; nothing leaves the workspace.
 
-1. **Check the Atlassian connector.** If its tools are not available in this session, still do
-   step 5 (no connector needed), leave the other placeholders in place, say so plainly, and offer to
-   re-run once it is connected: the re-run fills only what is still a placeholder.
-2. **Project.** Ask the owner which Jira project is their team's (list what the connector returns for
-   their account; confirm even a single match). Fill the key, site and board rows.
-3. **Issue types.** Read the project's issue types through the connector and keep only the rows in the
+1. **Tracker kind.** When the Site table's `Kind` cell still holds `{{TRACKER_KIND}}`, settle it
+   first, with one question: Jira or GitHub issues. Propose `github` when `POINTERS.md` names GitHub
+   repositories and no Atlassian connector is available in this session, and `jira` when an
+   Atlassian connector is; the owner confirms either way. Fill `Kind`, and the Connector cell with
+   `Atlassian MCP connector` or `GitHub MCP connector`. For `jira`, fill the Note with
+   `REST only where the connector has no call (attachments)`. For `github`, the Note records how a
+   new issue reaches the board (section 13.2): ask once, and write `hand` when the owner does not
+   know.
+2. **Check that kind's connector.** If its tools are not available in this session, still do
+   steps 1 and 6 (no connector needed), leave the other placeholders in place, say so plainly, and
+   offer to re-run once it is connected: the re-run fills only what is still a placeholder.
+3. **Project.** On Jira: ask the owner which project is their team's (list what the connector
+   returns for their account; confirm even a single match), and fill the key, site and board rows.
+   On GitHub: list the code repositories `POINTERS.md` names and ask which one holds the team's
+   issues (confirm even a single match). Fill the block heading and the Key with its `org/repo`
+   slug and the Site with `https://github.com/<org>`. For Board, list the organisation's Projects
+   when the connector can and ask which one the team works from; write it as
+   `<owner>/projects/<number>`, or `none`. Never guess a Project number.
+4. **Issue types.** Read the project's issue types through the connector and keep only the rows in the
    template's type table that the project actually has; note whether Technical Development exists or
-   Task stands in for it.
-4. **Labels in use.** Read the labels present on the project's open issues. Do not put them in the
-   table unfilled: list them to the owner and add only the ones the owner gives a meaning and an
-   owner for. The rest stay out until a ticket preview brings them back.
-5. **Working language.** One question to the owner: the language tickets are written in. If
+   Task stands in for it. On GitHub: read the organisation's issue types and write in each row's Note
+   what it maps to; where the organisation has none, say so and propose one label per type
+   (section 13.2).
+5. **Labels in use.** Read the labels present on the project's open issues (on GitHub, the
+   repository's labels). Do not put them in the table unfilled: list them to the owner and add only
+   the ones the owner gives a meaning and an owner for. The rest stay out until a ticket preview
+   brings them back.
+6. **Working language.** One question to the owner: the language tickets are written in. If
    `CLAUDE.md`'s personal preferences already name a conversation or ticket language, propose that
    and confirm. Replace `{{LANGUAGE}}` with the answer; this step needs no connector.
-6. **Epic mapping.** Leave blank. Folders under `Jira/` and their epic keys are added by the `ticket`
+7. **Epic mapping.** Leave blank. Folders under `Jira/` and their epic keys are added by the `ticket`
    skill the first time a story is staged under each folder.
 
 Required fields at create and Workflow stay empty here in every project block. The first `apply` for
@@ -282,6 +300,14 @@ shape; skip this step for it. Section 13.1 defines the 2.7.0 shape.
 3. Show the rewritten file to the owner. Write it only on confirmation - this migration touches
    filled rows, unlike the placeholder fills in step 4b, so it is never silent.
 
+### 4d. Add the tracker kind (2.9.0)
+
+Run this when `TRACKER.md` has a `## Site` table with no `Kind` column. Add the column after `Site`
+with the value `jira`: every workspace written before 2.9.0 used Jira. Change nothing else. Show the
+edited table and write it on confirmation, with the rest of the plan. An owner whose team has moved
+to GitHub issues says so here. Then the Site row is rewritten as step 4b describes for `github`, and
+each project block is the owner's to re-point at a repository, one block at a time, never guessed.
+
 ### 5. Report
 
 State the resolved target directory, the convention version the workspace is now on, and three
@@ -290,7 +316,7 @@ lists: created, updated, left unchanged. State the conventions delta shown in st
 `CLAUDE.md` was extended, quote the section that was appended. State what discovery wrote into
 `POINTERS.md` (the context repositories, any code repositories resolved, the product-context decline
 marker when the owner declined, and any `development remote:` line offered or `write remote` line
-reported), or that it fell back to a placeholder and why. State whether `TRACKER.md` was created, migrated to the 2.7.0 shape (step 4c), and which rows
+reported), or that it fell back to a placeholder and why. State whether `TRACKER.md` was created, migrated to the 2.7.0 shape (step 4c), given its `Kind` column (step 4d), which tracker kind it now names, and which rows
 were filled from the tracker. Close with the one thing worth doing next: fill in `SENSITIVITY.md`,
 confirm the discovered repositories, or the personal preferences section of `CLAUDE.md`.
 

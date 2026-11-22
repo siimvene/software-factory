@@ -1,7 +1,7 @@
 ---
 name: apply
-description: Use this skill when the owner wants a staged Jira/ file sent to the tracker, or an applied ticket moved forward because its review is open - e.g. "apply this ticket", "send the staged tickets to Jira", "create these in Jira", "apply everything ready", "the MR is open, move the ticket", "move ABC-12 to code review", "PR's up for ABC-12". It is the only path from Jira/ into the tracker - it enforces the readiness gate, discovers or reuses a project's required fields and workflow from TRACKER.md, previews every write, and writes an applied status plus the new key back into the staged file. Do not use it to draft or refine a ticket's content (that is `ticket`), to score or mark a ticket ready (that is `readiness-evaluator`), or to promote a Features/ document into a context repository (that is `graduate`).
-version: 1.0.1
+description: Use this skill when the owner wants a staged Jira/ file sent to the tracker, or an applied ticket moved forward because its review is open - e.g. "apply this ticket", "send the staged tickets to Jira", "create these in Jira", "open these as GitHub issues", "apply everything ready", "the MR is open, move the ticket", "move ABC-12 to code review", "PR's up for ABC-12". It is the only path from Jira/ into the tracker - it enforces the readiness gate, discovers or reuses a project's required fields and workflow from TRACKER.md, previews every write, and writes an applied status plus the new key back into the staged file. Do not use it to draft or refine a ticket's content (that is `ticket`), to score or mark a ticket ready (that is `readiness-evaluator`), or to promote a Features/ document into a context repository (that is `graduate`).
+version: 1.1.0
 ---
 
 # Apply a staged ticket
@@ -19,6 +19,10 @@ plugin's copy. Read section 9 (staged file format and the applying rule), sectio
 the workspace root. Refuse below conventions 2.7.0: say the workspace needs `pm-workspace-setup`
 and stop; this skill depends on the per-project `TRACKER.md` blocks and the `project:` front
 matter field that version introduces.
+
+Read `TRACKER.md`'s Site table for the tracker kind before anything else. A table with no `Kind`
+column is `jira`. When the kind is `github`, read section 13.2 as well and apply "On a GitHub
+tracker" below on top of both modes.
 
 Two rules that hold for every read in this skill:
 
@@ -196,6 +200,49 @@ no `key:` cannot be resolved and is refused with a note to check the file by han
 
 Never change assignee, priority, sprint or story points in this mode - it moves status and posts
 one link, nothing else.
+
+## On a GitHub tracker
+
+Both modes run as written, with these differences. Every call goes through the GitHub connector as
+the owner's own identity. A call the connector does not have is a hand step named in the report:
+never reach for a command-line tool, a token or a web request to make up for it.
+
+**Mode 1.**
+
+- *Step 2, project.* The `project:` line is a repository slug and must match a `### org/repo`
+  block.
+- *Step 4, required fields.* GitHub enforces none, so nothing is read from create metadata. When
+  the block's Board is not `none` and the table has no rows for the file's type, read the
+  Project's field list, propose `Status` with the option new work starts in, list the other fields
+  with their shapes and options, ask the owner once which to set on every new item and to what, and
+  offer the rows as the `TRACKER.md` edit. Later applies reuse them and ask nothing.
+- *Step 5, sensitivity.* Read the repository's visibility first. A public repository takes
+  public-tier content only: a file with anything above that tier is refused with the lines that
+  caused it, and the rest of the batch continues. If the visibility cannot be read, treat the
+  repository as public.
+- *Step 6, preview.* Each block shows the repository and its visibility, the issue type and what it
+  maps to (an organisation type or a label), the parent issue, the labels with any the repository
+  lacks marked `to be created`, each link with how it will be expressed, the Project and the field
+  values, and how the issue reaches the board (the Site note).
+- *Step 7, execute.* Per file, in this order: create the issue; write `status: applied` and
+  `key: org/repo#N` back before anything else; link it under its parent as a sub-issue; create the
+  dependency links; add it to the Project and set the fields. A parent written `pending` waits for
+  the epic's key, as on Jira. If a step after the create fails, or the connector lacks the call, do
+  not undo the create: stop that file there, and report exactly what landed and what is left as a
+  hand step. An issue is never created a second time to repair a later step.
+- *Step 8, workflow.* Read from the Project's `Status` options in board order, with the option ids.
+  No issue has to exist for it. It is still its own confirmation, after the batch.
+
+**Mode 2, review-opened.**
+
+- There is nothing to walk. Read the item's current `Status`. If it is earlier in the recorded
+  order than `Review status`, the preview is one line, `org/repo#N: <current> -> <Review status>`,
+  and the write is one field update. At or past it: a no-op, as on Jira. A status that is not in
+  the recorded table stops that issue.
+- The comment is skipped, and the preview says so, when the issue already shows that pull request
+  as linked.
+- An issue that is not on the Project is reported as such. It is not added in this mode.
+- Never close or reopen an issue. The merge does that.
 
 ## What this skill does NOT do
 

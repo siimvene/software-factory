@@ -6,9 +6,13 @@ the required-fields and workflow tables below. Nothing here is asked for again o
 
 ## Site
 
-| Site | Connector | Note |
-|---|---|---|
-| `{{SITE_URL}}` | Atlassian MCP connector (read and write, the owner's own identity) | REST only where the connector has no call (attachments) |
+| Site | Kind | Connector | Note |
+|---|---|---|---|
+| `{{SITE_URL}}` | {{TRACKER_KIND}} | {{CONNECTOR}} (read and write, the owner's own identity) | {{SITE_NOTE}} |
+
+`Kind` is `jira` or `github`. With `github`, a project below is a repository (`org/repo`), the board
+is the GitHub Project the team works from, and `CONVENTIONS.md` section 13.2 says how each table
+reads.
 
 ## Projects
 
