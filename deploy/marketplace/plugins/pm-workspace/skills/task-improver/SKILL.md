@@ -1,7 +1,7 @@
 ---
 name: task-improver
 description: Conversational refinement loop that takes a weak ticket and improves it to a readiness score of 85+ through targeted one-at-a-time questions. Use when the user wants to improve, refine, or work on a ticket - e.g. "improve this ticket", "refine this story", "make this ticket better", "help me write a better ticket", "work on this task with me", or when the user pastes a ticket and asks for help. Do not use it to score a ticket without refining it (that is `readiness-evaluator`), to break a ticket into sub-tasks (that is `task-splitter`), or to apply anything to Jira - this skill never writes to Jira, only to a staged file already under `Jira/`.
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Task improver
@@ -34,7 +34,7 @@ tracker key.
 **Ticket sourcing, local content takes priority:**
 - If a staged file, a `Features/` document, or pasted text is already in the conversation: use it
   directly. Do **not** call the tracker connector.
-- If only a tracker key is given (e.g. `ABC-123`) with no text: fetch it once via the tracker
+- If only a tracker key is given (e.g. `ABC-123`, or `org/repo#123` on GitHub) with no text: fetch it once via the tracker
   connector (read-only), reuse it, do not re-fetch mid-session.
 
 **Output form depends on the input:**

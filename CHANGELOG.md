@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.34 (2026-11-22)
+
+The PM workspace can use GitHub issues as its tracker.
+
+- `pm-workspace` is `1.9.1+sf.1`: the vendored 1.9.1 plus one change made here, recorded in the
+  plugin's `VENDORED.md`. Conventions 2.9.0 add a tracker kind to `TRACKER.md` (`jira` or `github`)
+  and a section that maps the staged ticket format onto a repository's issues and a GitHub
+  Project: the repository slug as the project, `org/repo#N` as the key, organisation issue types
+  or type labels, sub-issues for the epic parent, Project fields in place of required create
+  fields, the `Status` options as the workflow. `ticket`, `apply` and `pm-workspace-setup` follow
+  it. `[designed]`
+- Three rules exist only for GitHub: an issue in a public repository takes public-tier content
+  only; a connector without Project calls leaves a named hand step, never a workaround; the skills
+  never close an issue.
+- An existing workspace keeps working: a `TRACKER.md` without the `Kind` column is read as `jira`,
+  and setup offers the one-column edit on upgrade.
+
 ## 0.2.33 (2026-11-15)
 
 No product is named anywhere in this repository.

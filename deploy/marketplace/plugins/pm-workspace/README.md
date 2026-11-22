@@ -1,7 +1,7 @@
 # PM Workspace Plugin
 
 Skills for running a **Product Manager Workspace** - a markdown workspace where a PM gathers
-requirements, analyses them, and turns them into Jira issues.
+requirements, analyses them, and turns them into tracker issues, in Jira or in GitHub.
 
 ## Overview
 
@@ -17,7 +17,8 @@ The conventions define the workspace folders and root files:
 - `Discovery/` - one document or folder per feature being designed, each with Scope, Requirements,
   References and Open questions
 - `Features/` - matured, spec-ready features, staged for graduation
-- `Jira/` - new issues and issue modifications staged before they are applied to Jira
+- `Jira/` - new issues and issue modifications staged before they are applied to the tracker (Jira or
+  GitHub issues; the folder keeps its name either way, and `TRACKER.md` names the tracker kind)
 - `Reference/` - markdown dump of external information: wiki pages, articles, content from
   spreadsheets and documents received from colleagues
 - `Todo.md`, `Waiting-On.md`, `Action-Points.md`, `Decisions.md`, `Ingest-Log.md` - the tracking layer
@@ -49,7 +50,7 @@ Skills:
 - **ticket** - drafts a story, epic, task or bug from a `Features/` document (single stories also
   from chat), works out issue type, project, epic parent, labels and links from the source, the code
   and `TRACKER.md`, shows each with its reason, and stages the approved file under `Jira/`. It never
-  applies anything to Jira, never asks for a tracker value `TRACKER.md` holds, and never proposes
+  applies anything to the tracker, never asks for a tracker value `TRACKER.md` holds, and never proposes
   assignee, priority, sprint or points. On a bigger ticket (money, identity, new stored data,
   another consumer, a removal) it asks one extra question, in a fixed order, that the build's own
   design will otherwise have to come back for.

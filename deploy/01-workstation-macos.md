@@ -244,12 +244,12 @@ claude plugin marketplace add "$HOME/git/software-factory/deploy/marketplace"   
 ```
 
 The `software-factory` marketplace is a directory source, so it points at your clone of this
-repository; `git pull` is the update. It holds the eight plugins the loop uses from the group's
+repository; `git pull` brings the new files, and a plugin whose version changed has to be updated on the machine as well (`claude plugin update <plugin>@software-factory`), because an install is cached under its version. It holds the eight plugins the loop uses from the group's
 catalog at pinned versions, plus a copy of chisle at a pinned commit ([README.md](README.md) has the pins). Install per role:
 
 | Role | Install | Why |
 |---|---|---|
-| PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, apply and graduate skills (pm-workspace 1.9.1: setup offers the product context repositories; apply since 1.8.0) |
+| PM | `claude plugin install pm-workspace@software-factory` | the workspace setup, ingest, ticket, readiness, improver, splitter, apply and graduate skills (pm-workspace 1.9.1+sf.1: setup offers the product context repositories; apply since 1.8.0; GitHub issues as a tracker since 1.9.1+sf.1) |
 | PM | `claude plugin install secret-guard@software-factory` | a pre-tool hook that refuses reads of credential files; a deterrent, not a boundary (it fails open without `jq`, and a renamed file passes) |
 | Engineer | `secret-guard`, `spec-repos`, `team-memory`, `rule-packs`, `dev-hygiene` from the same marketplace | the spec chain, the promote PR, the rule packs the reviewer loads, the pre-completion pass |
 | Engineer, optional | `solo-review`, `ux-qa` | the single-model fallback (never the gate) and the browser QA prompt |

@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 This is a **Product Manager Workspace**: a markdown workspace used to gather requirements, analyse
-them, and turn them into Jira issues, and to mature ideas until they are ready to be shared with a
+them, and turn them into tracker issues (Jira or GitHub), and to mature ideas until they are ready to be shared with a
 team. There is no source code here and nothing to build.
 
 This file is the **canonical rule file** for the workspace. If an `AGENTS.md` also exists here, it is
@@ -22,7 +22,7 @@ Short version:
 - `Discovery/` - one document or folder per feature being designed, each with Scope, Requirements,
   References and Open questions
 - `Features/` - matured, spec-ready features, staged for graduation
-- `Jira/` - new issues and issue modifications staged before they are applied to Jira
+- `Jira/` - new issues and issue modifications staged before they are applied to the tracker
 - `Reference/` - markdown dump of external information: wiki pages, articles, content from
   spreadsheets and documents received from colleagues
 - `Todo.md`, `Waiting-On.md`, `Action-Points.md`, `Decisions.md`, `Ingest-Log.md` - the tracking layer
@@ -40,7 +40,7 @@ version of the conventions, run the `pm-workspace-setup` skill; do not edit that
 - Save produced documents into the folder the conventions point to, and say in your reply where they
   were saved.
 - Ask before anything destructive: deleting or overwriting a document, restructuring folders, or
-  sending content outside this workspace. Applying staged changes to Jira, and graduating a feature
+  sending content outside this workspace. Applying staged changes to the tracker, and graduating a feature
   into a context repository, always need an explicit go-ahead.
 - Ground claims about current system behaviour in the code the `POINTERS.md` repositories point to,
   and cite where you looked. If something was not verified, say so instead of presenting it as a fact.
@@ -51,4 +51,4 @@ version of the conventions, run the `pm-workspace-setup` skill; do not edit that
 ## Personal preferences
 
 <!-- Add your own preferences below: conversation language, tone, words to avoid, product context,
-     which repositories or Jira projects matter. These take precedence over CONVENTIONS.md. -->
+     which repositories or tracker projects matter. These take precedence over CONVENTIONS.md. -->

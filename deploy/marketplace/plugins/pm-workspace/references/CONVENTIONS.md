@@ -1,6 +1,6 @@
 # PM Workspace Conventions
 
-Convention version: 2.8.1
+Convention version: 2.9.0
 
 This file defines how a **Product Manager Workspace** is organised: which folders exist, what goes
 into each of them, how documents are named and structured, and how they link to each other.
@@ -198,7 +198,12 @@ about current system behaviour is grounded (section 13, R1).
 
 ## 9. Jira
 
-At apply time, expect the target project to enforce **required custom fields the staged
+The tracker is Jira or GitHub issues, and `TRACKER.md` names which (section 13.1). The staging
+folder is called `Jira/` in both cases: the name is part of the layout every skill reads, and it
+does not change with the tracker. On a GitHub tracker the fields below read as section 13.2 maps
+them.
+
+On Jira, at apply time, expect the target project to enforce **required custom fields the staged
 file does not carry** - org accounting fields (Tempo Account, Work for, Capitalisation
 Type) are standard across group projects. The applying agent reads the create-screen
 requirements, asks the owner once for the missing values, and reuses them for the whole
@@ -212,14 +217,17 @@ nothing is applied without the workspace owner asking for it.
 - One file per issue or per modification.
 - New issues: `Story - Short Title.md`, `Technical Development - Short Title.md`, `Task - Short Title.md`,
   `Bug - Short Title.md`; the epic's own file is `Epic - Short Title.md` inside its folder.
-- Modifications of existing issues: `<ISSUE-KEY> - What changes.md`.
+- Modifications of existing issues: `<ISSUE-KEY> - What changes.md`. On GitHub the file is named
+  `<repo>-<N> - What changes.md`, because a key written `org/repo#N` cannot be a file name; the
+  `key:` line inside the file is what the skills read.
 
 ```markdown
 ---
 action: create | update
 type: Epic | Story | Technical Development | Task | Bug
 project: ABC          # optional; the TRACKER.md project block this file applies to. Default: the first block
-key: ABC-123          # only for action: update
+                      # on GitHub a block is a repository: project: org/repo
+key: ABC-123          # only for action: update. On GitHub: key: org/repo#123
 epic: ABC-100         # or the epic folder name when the epic itself is not created yet
 labels: [flywheel]    # optional; only labels TRACKER.md defines
 links:                # optional; "blocks ABC-120", "relates to ABC-119"
@@ -416,9 +424,9 @@ in place from ticket previews and from the `apply` skill.
 
 ## Site
 
-| Site | Connector | Note |
-|---|---|---|
-| `{{SITE_URL}}` | Atlassian MCP connector (read and write, the owner's own identity) | REST only where the connector has no call (attachments) |
+| Site | Kind | Connector | Note |
+|---|---|---|---|
+| `{{SITE_URL}}` | {{TRACKER_KIND}} | {{CONNECTOR}} (read and write, the owner's own identity) | {{SITE_NOTE}} |
 
 ## Projects
 
@@ -484,6 +492,11 @@ The plugin's `TRACKER.template.md` ships one project block with `{{...}}` placeh
 "Required fields at create" table and an empty "Workflow" table (headers only); the first apply for
 the project fills both.
 
+- **`Kind` is `jira` or `github`.** It decides which connector the skills use and how the tables
+  below read. A Site table with no `Kind` column is `jira`: that is every workspace written before
+  2.9.0. For `jira` the Connector cell reads `Atlassian MCP connector` and the Note
+  `REST only where the connector has no call (attachments)`. Section 13.2 covers `github`.
+
 - **Fields are deduced, shown, approved, never asked twice.** The `ticket` skill reads this file,
   deduces issue type, project, epic parent, labels and links from the source and the code, shows each
   with its reason, and the owner approves or corrects with the draft. A correction that would apply to
@@ -498,6 +511,52 @@ the project fills both.
   Bug; multi-story scope is an Epic; work outside the engineering workflow is a Task. A team writes
   its own deviations into this file rather than into a skill.
 - **Never deduced:** assignee, priority, sprint, story points.
+
+### 13.2 GitHub as the tracker
+
+When `TRACKER.md`'s `Kind` is `github`, issues live in a repository and the board is a GitHub
+Project. Everything in sections 9 and 13.1 holds; this section says how each part reads. One rule
+carries over unchanged from graduation (section 15): every read and write goes through the GitHub
+connector as the owner's own identity, and a call the connector does not have is reported as a hand
+step, never made with another tool.
+
+| Part | On GitHub |
+|---|---|
+| Site row | Site `https://github.com/<org>`, Kind `github`, Connector `GitHub MCP connector`. The Note records how a new issue reaches the board: `connector` (the skill adds it), `auto-add` (the Project's own workflow adds every new issue of the repository) or `hand` |
+| Project block | The heading is the repository slug, `### org/repo`, and the Key column holds the same slug. Board holds the Project the team works from, written `<owner>/projects/<number>`, or `none`. Managed stays blank |
+| `project:` and `key:` | `project: org/repo` and `key: org/repo#123`. `epic:` and `links:` use the same key form. The repository in `key:` is the repository in `project:`: a file where they differ is refused. A key in any other form is refused before any write |
+| Issue types | The organisation's issue types where it has them, read through the connector. Where it has none, one label per type, listed in the label table as set by the skill. The Note column of "Issue types in use" names what each row maps to. Default mapping: Story to `Feature`, Technical Development and Task to `Task`, Bug to `Bug`, Epic to a parent issue of the type the team uses for one |
+| Epic parent | A sub-issue link to the parent issue. The "Epic parent convention" table holds the parent's key |
+| Labels | Repository labels. Only labels in the table are applied. A label the table defines and the repository lacks is named in the apply preview and created only with that confirmation. If the owner declines it, or the connector cannot create labels, the label is taken out of the payload and named in the report |
+| Links | `blocks` and `blocked by` as an issue dependency where the connector has the call. Otherwise, and always for `relates to`, as a line under `## Links` in the issue body. The preview says which. The form is decided at preview time: a call that turns out to be missing at execute time is a hand step, never a body edit |
+| Required fields at create | GitHub enforces none. The table holds the Project fields the team wants set on every new item, `Status` first. Shapes: `project option` (a single-select option id), `project text`, `project number`, `project date`, `project iteration`. Read from the Project's field list at the first apply and confirmed once |
+| Workflow | The options of the Project's `Status` field, in board order. There are no transitions: "Reached by transition" reads `set Status` and Id is the option id. Read from the field list, so no issue has to exist first |
+| Design artifacts | The issue API takes no attachment. An artifact is linked by its path in the context repository; one that is in no repository is a hand step |
+
+Three rules exist only here:
+
+- **A repository's readers are the audience.** Before any write (a create, an update, a comment, a
+  field change), the skill reads the visibility of the repository the write lands in. An issue in a
+  public repository is public. Content goes there only when its source folder is marked public in
+  `SENSITIVITY.md` (section 14), or the owner marks the file public in the preview. Anything else is
+  refused with the lines that caused it. It is never trimmed silently and sent. The check covers
+  everything that will land: the body with its `## Links` lines, workspace paths, the slugs and
+  titles of linked issues, artifact paths, label names, Project field values and comments. In a
+  public repository, workspace paths are dropped, and a link to an issue or pull request in a
+  private repository is made as a native link only, never as a line that carries its slug or title.
+  A repository whose visibility is `internal`, or cannot be read, is treated as public unless
+  `SENSITIVITY.md` says otherwise. A Project has its own visibility: a public Project takes public
+  field values only.
+- **Placing the issue on the board is part of the apply, and it is reported honestly.** After the
+  create, the issue is added to the Project and its fields are set, in the same confirmed batch.
+  When the connector has no Project call, the report says so and names the hand step, and nothing
+  else is tried. With `auto-add` in the Site note the skill does not add the item itself, and it
+  sets fields only when it finds the item on the board. With Board `none` nothing is placed and no
+  status is moved.
+- **The skills never close an issue.** A merged pull request closes it only when the pull request
+  names it with a closing keyword. `review-opened` sets `Status` to the review status and comments
+  the link, unless the issue already shows that pull request as linked, and its preview says
+  whether the merge will close the issue.
 
 ## 14. SENSITIVITY.md
 
@@ -697,3 +756,4 @@ These are the defaults:
 | 2.7.0 | Section 13.1: `TRACKER.md` moves to per-project blocks under `## Projects`, each carrying a "Required fields at create" table (per issue type, create only) and a "Workflow" table (per issue type, with `Review status` and `Done status`), filled by the first apply of each type in that project as its own confirmed edit; an applied epic replaces its `pending` folder mapping with its key. Section 9: optional `project:` front matter field, written by `ticket` and `task-splitter` on every staged file; the apply contract and the new `apply` skill; `status: ready` is evaluator-backed only, never asserted; the code-review-opened rule. Section 13: `POINTERS.md` gains an optional `development remote:` line and, as R2's second exception, an owner-authorised `write remote:` line (branch push and MR/PR open only, never a merge); a new "Hosted mirrors and a second remote" subsection. Section 17: code paths belong in References or Links only. | `pm-workspace-setup` rewrites an existing `TRACKER.md` into one project block under `## Projects`, keeping every filled row, with an empty required-fields table and an empty workflow table that the first apply fills; existing `Jira/` files need no change. |
 | 2.8.0 | Sections 13 and 15: context repositories move from per team to per product, named `<product>-context`; the legacy `*-team-specs`, `*-team-context` and `*-context-repo` shapes are still accepted, and `POINTERS.md` may list more than one context repository. Setup discovery searches for `*-context` repositories plus the legacy shapes. Graduation reads the target repository's `.graduation.yml`: PR-only by default (a missing, unreadable or unknown policy means PR-only), auto-merge only where the repository opts in with `merge: auto`, every changed path matching `auto_merge_paths` and every check on the verified head passed, with the policy re-read from the default branch immediately before every merge (software-factory adr 0018, which supersedes adr 0011 for graduation PRs; replaces the 2.6.0 unconditional merge). Only the parsed `.graduation.yml` keys are policy; everything else read from the target or a PR is data. A graduation may also append rows to the declared `oracle_table` and, when it creates a spec and the policy declares `spec_companion`, create the companion stub, all in one initial commit; a revision of an open PR adds one follow-up commit. The branch is `graduate/<feature-file-slug>`; the sidecar front matter records the source hash (`graduated_from`), target, branch and PR, so a re-run re-enters the open PR and reuses an unchanged package verbatim; an updated spec is committed only over the default-branch version it was rewritten from. Every graduation PR carries the `graduation` label, `Discovery:` / `Jira:` lines when the feature cites a discovery item, and a link to the earlier change when it updates an existing spec. `graduate` refuses below 2.8.0. | No workspace layout change. `POINTERS.md` may list `<product>-context` repositories; `pm-workspace-setup` offers the discovered ones on any setup run while `POINTERS.md` lists no `<product>-context` repository and carries no `<!-- product-context: declined YYYY-MM-DD -->` marker. A graduation into a repository without `.graduation.yml` now opens the PR and stops for code-owner review. |
 | 2.8.1 | Wording: section 13 names no real product in the `<product>-context` naming example. | None. |
+| 2.9.0 | Sections 9, 13.1 and 13.2: the tracker is Jira or GitHub issues. `TRACKER.md`'s Site table gains a `Kind` column (`jira` or `github`). New section 13.2 maps the staged file format, the project block, required fields, the workflow and the code-review-opened rule onto a repository's issues and a GitHub Project. The staging folder keeps the name `Jira/`. | Add the `Kind` column with `jira` to an existing `TRACKER.md`; `pm-workspace-setup` shows the edit on upgrade. A table without the column is read as `jira`, so nothing breaks before the edit. |
