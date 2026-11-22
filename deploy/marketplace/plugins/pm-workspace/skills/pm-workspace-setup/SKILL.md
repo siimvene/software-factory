@@ -165,7 +165,8 @@ separately only when:
 - `TRACKER.md`: when missing, copy `$CLAUDE_PLUGIN_ROOT/references/TRACKER.template.md` and fill what
   the tracker connector can tell you (step 4b). When present with the current per-project shape, the
   only edit allowed is replacing a `{{...}}` template placeholder that is still there (step 4b on a
-  re-run); every filled row stays as it is. When present with the pre-2.7.0 shape (a root `##
+  re-run); every filled row stays as it is. One exception: a Site table with no `Kind`
+  column gets the column (step 4d), shown before it is written. When present with the pre-2.7.0 shape (a root `##
   Project` table, no `## Projects`), run the 2.7.0 migration (step 4c) instead: show the rewritten
   file, write it only on confirmation. The `ticket` skill corrects filled rows from previews, setup
   does not.
@@ -256,8 +257,11 @@ filled row. Read-only discovery, as in 4a; nothing leaves the workspace.
    offer to re-run once it is connected: the re-run fills only what is still a placeholder.
 3. **Project.** On Jira: ask the owner which project is their team's (list what the connector
    returns for their account; confirm even a single match), and fill the key, site and board rows.
-   On GitHub: list the code repositories `POINTERS.md` names and ask which one holds the team's
-   issues (confirm even a single match). Fill the block heading and the Key with its `org/repo`
+   On GitHub: list the code repositories `POINTERS.md` names; when it names none, list the
+   repositories the connector returns for the owner's organisation, or ask for the `org/repo` slug.
+   Show each candidate's owner and visibility and ask which one holds the team's issues (confirm
+   even a single match). A repository outside the Site's organisation, or a public one, is named as
+   such and confirmed by name. Clear the block's Managed cell: it has no meaning on GitHub. Fill the block heading and the Key with its `org/repo`
    slug and the Site with `https://github.com/<org>`. For Board, list the organisation's Projects
    when the connector can and ask which one the team works from; write it as
    `<owner>/projects/<number>`, or `none`. Never guess a Project number.
@@ -289,8 +293,7 @@ shape; skip this step for it. Section 13.1 defines the 2.7.0 shape.
 
 1. Rewrite the file into `## Site` + `## Projects`, with one `### <KEY>` block for the project the
    old root table named. Every value moves to its named column, not its old position: the old
-   `Key | Site | Board | Note` row becomes the `Site` row (Site; Connector left as the template's
-   default text) plus the block's `Key | Board | Managed | Note` row (Key, Board; Managed filled
+   `Key | Site | Board | Note` row becomes the `Site` row (Site; Kind `jira`; Connector `Atlassian MCP connector`; Note `REST only where the connector has no call (attachments)`) plus the block's `Key | Board | Managed | Note` row (Key, Board; Managed filled
    only when the old Note said company-managed or team-managed, otherwise left blank; the rest of
    the old Note carried over). The issue-type, epic-parent, label and working-language tables move
    unchanged. Nothing discovered here, nothing guessed.

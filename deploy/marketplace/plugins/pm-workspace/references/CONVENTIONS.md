@@ -524,29 +524,39 @@ step, never made with another tool.
 |---|---|
 | Site row | Site `https://github.com/<org>`, Kind `github`, Connector `GitHub MCP connector`. The Note records how a new issue reaches the board: `connector` (the skill adds it), `auto-add` (the Project's own workflow adds every new issue of the repository) or `hand` |
 | Project block | The heading is the repository slug, `### org/repo`, and the Key column holds the same slug. Board holds the Project the team works from, written `<owner>/projects/<number>`, or `none`. Managed stays blank |
-| `project:` and `key:` | `project: org/repo` and `key: org/repo#123`. `epic:` and `links:` use the same key form |
+| `project:` and `key:` | `project: org/repo` and `key: org/repo#123`. `epic:` and `links:` use the same key form. The repository in `key:` is the repository in `project:`: a file where they differ is refused. A key in any other form is refused before any write |
 | Issue types | The organisation's issue types where it has them, read through the connector. Where it has none, one label per type, listed in the label table as set by the skill. The Note column of "Issue types in use" names what each row maps to. Default mapping: Story to `Feature`, Technical Development and Task to `Task`, Bug to `Bug`, Epic to a parent issue of the type the team uses for one |
 | Epic parent | A sub-issue link to the parent issue. The "Epic parent convention" table holds the parent's key |
-| Labels | Repository labels. Only labels in the table are applied. A label the table defines and the repository lacks is named in the apply preview and created only with that confirmation |
-| Links | `blocks` and `blocked by` as an issue dependency where the connector has the call. Otherwise, and always for `relates to`, as a line under `## Links` in the issue body. The preview says which |
+| Labels | Repository labels. Only labels in the table are applied. A label the table defines and the repository lacks is named in the apply preview and created only with that confirmation. If the owner declines it, or the connector cannot create labels, the label is taken out of the payload and named in the report |
+| Links | `blocks` and `blocked by` as an issue dependency where the connector has the call. Otherwise, and always for `relates to`, as a line under `## Links` in the issue body. The preview says which. The form is decided at preview time: a call that turns out to be missing at execute time is a hand step, never a body edit |
 | Required fields at create | GitHub enforces none. The table holds the Project fields the team wants set on every new item, `Status` first. Shapes: `project option` (a single-select option id), `project text`, `project number`, `project date`, `project iteration`. Read from the Project's field list at the first apply and confirmed once |
 | Workflow | The options of the Project's `Status` field, in board order. There are no transitions: "Reached by transition" reads `set Status` and Id is the option id. Read from the field list, so no issue has to exist first |
 | Design artifacts | The issue API takes no attachment. An artifact is linked by its path in the context repository; one that is in no repository is a hand step |
 
 Three rules exist only here:
 
-- **A repository's readers are the audience.** Before any create or update, the skill reads the
-  repository's visibility. An issue in a public repository is public: only content at the public
-  tier of `SENSITIVITY.md` (section 14) goes into it. A file that carries anything above that tier
-  is refused with the lines that caused it. It is never trimmed silently and sent.
+- **A repository's readers are the audience.** Before any write (a create, an update, a comment, a
+  field change), the skill reads the visibility of the repository the write lands in. An issue in a
+  public repository is public. Content goes there only when its source folder is marked public in
+  `SENSITIVITY.md` (section 14), or the owner marks the file public in the preview. Anything else is
+  refused with the lines that caused it. It is never trimmed silently and sent. The check covers
+  everything that will land: the body with its `## Links` lines, workspace paths, the slugs and
+  titles of linked issues, artifact paths, label names, Project field values and comments. In a
+  public repository, workspace paths are dropped, and a link to an issue or pull request in a
+  private repository is made as a native link only, never as a line that carries its slug or title.
+  A repository whose visibility is `internal`, or cannot be read, is treated as public unless
+  `SENSITIVITY.md` says otherwise. A Project has its own visibility: a public Project takes public
+  field values only.
 - **Placing the issue on the board is part of the apply, and it is reported honestly.** After the
   create, the issue is added to the Project and its fields are set, in the same confirmed batch.
   When the connector has no Project call, the report says so and names the hand step, and nothing
   else is tried. With `auto-add` in the Site note the skill does not add the item itself, and it
-  sets fields only when it finds the item on the board.
-- **The skills never close an issue.** A merged pull request that names the issue closes it.
-  `review-opened` sets `Status` to the review status and comments the link, unless the issue
-  already shows that pull request as linked.
+  sets fields only when it finds the item on the board. With Board `none` nothing is placed and no
+  status is moved.
+- **The skills never close an issue.** A merged pull request closes it only when the pull request
+  names it with a closing keyword. `review-opened` sets `Status` to the review status and comments
+  the link, unless the issue already shows that pull request as linked, and its preview says
+  whether the merge will close the issue.
 
 ## 14. SENSITIVITY.md
 

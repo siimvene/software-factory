@@ -149,7 +149,7 @@ the repository uses: the issue type as the organisation's type or the type label
 to; the project as the `org/repo` slug; the epic parent as the parent issue's key; labels from the
 table only; each link with the way it will be expressed, a dependency or a line in the body. Read
 the repository's visibility here and show it above the draft. A draft for a public repository
-carries public-tier content only (section 14): what the source holds above that tier is left out
+carries only what section 13.2's public-repository rule allows: what the source holds beyond that is left out
 and named, the same as any other sensitivity cut.
 
 A correction that would apply to every future ticket (a type rule, a label meaning, a folder's epic

@@ -205,7 +205,20 @@ one link, nothing else.
 
 Both modes run as written, with these differences. Every call goes through the GitHub connector as
 the owner's own identity. A call the connector does not have is a hand step named in the report:
-never reach for a command-line tool, a token or a web request to make up for it.
+never reach for a command-line tool, a token or a web request to make up for it. That covers the
+attachment sentence of step 7, which does not apply here: artifacts are links by path or hand steps,
+and nothing is uploaded.
+
+**Before any write, in both modes.**
+
+- Every `key:`, `epic:` and `links:` value has the form `org/repo#N`; an epic may still be the
+  pending folder form. A file with a key in another form is refused.
+- The repository in `key:` is the repository in `project:`. A file where they differ is refused. In
+  review-opened, a key whose repository has no `### org/repo` block in `TRACKER.md` is refused.
+- Read the visibility of the repository the write lands in, and of the Project when one is written
+  to. Apply section 13.2's public-repository rule to everything that will land, with every line this
+  skill adds: body, links, paths, slugs, titles, labels, field values, comments. If a visibility
+  cannot be read, treat it as public.
 
 **Mode 1.**
 
@@ -216,33 +229,50 @@ never reach for a command-line tool, a token or a web request to make up for it.
   Project's field list, propose `Status` with the option new work starts in, list the other fields
   with their shapes and options, ask the owner once which to set on every new item and to what, and
   offer the rows as the `TRACKER.md` edit. Later applies reuse them and ask nothing.
-- *Step 5, sensitivity.* Read the repository's visibility first. A public repository takes
-  public-tier content only: a file with anything above that tier is refused with the lines that
-  caused it, and the rest of the batch continues. If the visibility cannot be read, treat the
-  repository as public.
-- *Step 6, preview.* Each block shows the repository and its visibility, the issue type and what it
-  maps to (an organisation type or a label), the parent issue, the labels with any the repository
-  lacks marked `to be created`, each link with how it will be expressed, the Project and the field
-  values, and how the issue reaches the board (the Site note).
-- *Step 7, execute.* Per file, in this order: create the issue; write `status: applied` and
-  `key: org/repo#N` back before anything else; link it under its parent as a sub-issue; create the
-  dependency links; add it to the Project and set the fields. A parent written `pending` waits for
-  the epic's key, as on Jira. If a step after the create fails, or the connector lacks the call, do
-  not undo the create: stop that file there, and report exactly what landed and what is left as a
-  hand step. An issue is never created a second time to repair a later step.
-- *Step 8, workflow.* Read from the Project's `Status` options in board order, with the option ids.
-  No issue has to exist for it. It is still its own confirmation, after the batch.
+- *Step 5, sensitivity.* The check above, per file. A file that fails is refused with the lines
+  that caused it, and the rest of the batch continues.
+- *Step 6, preview.* Each block shows the repository and its visibility, the action, the issue type
+  and what it maps to (an organisation type or a label), the parent issue, the labels with any the
+  repository lacks marked `to be created`, each link with how it will be expressed, and the body as
+  it will land. When the block has a board: the Project, the field values, and how the issue reaches
+  the board (the Site note).
+- *Step 7, execute.*
+  - Labels first. A label marked `to be created` is created now, with its meaning from the label
+    table as its description, because the preview was confirmed. If the owner struck it out, or the
+    connector cannot create labels, it is taken out of the payload and named in the report.
+  - An `action: create` file: create the issue, then write `status: applied` and `key: org/repo#N`
+    back before anything else. A failed write-back stops the whole batch, as on Jira. A create whose
+    result is unknown is never retried: search the repository for an issue with that exact title
+    opened by the owner in the last hour, and report what was found.
+  - An `action: update` file: send exactly the fields in its delta to the issue in `key:`, then
+    write `status: applied`. Nothing is created.
+  - Then three steps for a created issue, each tried on its own: link it under its parent as a
+    sub-issue; create the dependency links; place it on the board. A missing call or a failure in
+    one is reported as that step's hand step and does not stop the other two. The create is never
+    undone and never repeated.
+  - Board placement follows the block and the Site note. Board `none`: nothing is added and no field
+    is set. Note `connector`: add the issue to the Project and set the recorded fields. Note
+    `auto-add`: do not add it, and set the fields only if the item is found on the board. Note
+    `hand`: name the hand step.
+  - A parent written `pending` waits for the epic's key, as on Jira.
+- *Step 8, workflow.* Skipped when the block's Board is `none`. Otherwise read from the Project's
+  `Status` options in board order, with the option ids. No issue has to exist for it. It is still
+  its own confirmation, after the batch.
 
 **Mode 2, review-opened.**
 
-- There is nothing to walk. Read the item's current `Status`. If it is earlier in the recorded
-  order than `Review status`, the preview is one line, `org/repo#N: <current> -> <Review status>`,
-  and the write is one field update. At or past it: a no-op, as on Jira. A status that is not in
-  the recorded table stops that issue.
+- Board `none`: there is no status to move, and only the comment is offered.
+- Otherwise there is nothing to walk. Read the item's current `Status`. If it is earlier in the
+  recorded order than `Review status`, the preview is one line,
+  `org/repo#N: <current> -> <Review status>`, and the write is one field update. At or past it: a
+  no-op, as on Jira. A status that is not in the recorded table stops that issue.
 - The comment is skipped, and the preview says so, when the issue already shows that pull request
-  as linked.
+  as linked. In a public repository, a link to a pull request in a private repository is shown as
+  withheld, and only the `Status` change is offered.
+- The preview says whether the pull request names the issue with a closing keyword. When it does
+  not, the preview says that the merge will leave the issue open. This skill does not close it.
 - An issue that is not on the Project is reported as such. It is not added in this mode.
-- Never close or reopen an issue. The merge does that.
+- Never close or reopen an issue.
 
 ## What this skill does NOT do
 
