@@ -195,6 +195,12 @@ design's own [decision records](adr/).
   diffs to reading evidence, and from every change to the changes that carry risk.
 - Not finished. `STATUS.md` says which rungs are measured and which are still a drawing.
 
+## Licence
+
+MIT, see [LICENSE](LICENSE). It covers everything in this repository except
+`deploy/marketplace/plugins/chisle`, a copy of a third-party project that keeps its own MIT
+licence and copyright notice in that directory.
+
 ## Provenance
 
 Derived 2026-09-07 from the reference product dogfood (Day 1 bootstrap, cycles 1 and 2, the sensor-stack

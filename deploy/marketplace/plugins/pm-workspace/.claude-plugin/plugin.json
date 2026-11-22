@@ -6,5 +6,6 @@
   "author": {
     "name": "Siim Vene",
     "email": "dev@example.com"
-  }
+  },
+  "license": "MIT"
 }
