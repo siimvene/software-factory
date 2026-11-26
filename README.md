@@ -96,10 +96,10 @@ before a pull request exists. Two run after it. The order is an economic argumen
 the reviewer is the most expensive resource on the line, so a review of code that a ratchet
 would have failed is waste.
 
-![The line, end to end. Before the code: the ticket, approved Ready by a person (measured). Off the critical path, ergonomics and not gates: the orientation map, sensor 1, ripwire (designed), and the YAGNI ladder, sensor 2, chisle (designed). Gates inside the agent's loop before a pull request exists: the net, tests and mutation (measured); quality ratchets, sensor 3, cleat (measured); architecture diff, sensor 4, enola (designed); adversarial review, sensor 5, consort, cross-vendor (measured); scanners (measured). After the pull request exists: CI, mechanical only (measured), and the human gate, a named person who signs off, merges and releases (measured).](docs/img/the-line.png)
+![The line, end to end. Before the code: the ticket, approved Ready by a person (measured). Off the critical path, ergonomics and not gates: the orientation map, sensor 1, ripwire (index measured, effect designed), and the YAGNI ladder, sensor 2, chisle (elision measured, effect designed). Gates inside the agent's loop before a pull request exists: the net, tests red first and mutation (measured); quality ratchets, sensor 3, cleat (measured); architecture diff, sensor 4, enola (gate measured, no real catch yet); scanners, Trivy, SonarQube, dependencies and secrets (measured); adversarial review, sensor 5, consort, two vendors and a security pass (measured). After the pull request exists, CI as required checks: tests and end-to-end, provenance trailer, test integrity (a pull request that weakens tests or edits the gates waits for a second person), CI scanners with a SonarQube issue ratchet (all measured), and mutation on changed code (run measured, gate proposed). Merge and release: merge on the current base through a merge queue and the human gate (measured). After release: SBOM tracking and a dynamic scan (designed), production feedback into the next spec (proposed).](docs/img/the-line.png)
 
 Colour is the evidence class, never the severity: green is **measured**, amber is **designed**
-(wired, not yet exercised end to end), and a dashed card is ergonomics rather than a gate.
+(wired, not yet exercised end to end), grey is **proposed** (not built), and a dashed card is ergonomics rather than a gate.
 `STATUS.md` is the ledger and wins any disagreement with this picture. The picture is rendered
 from [docs/img/src/the-line.html](docs/img/src/the-line.html) by `docs/img/src/render.sh`;
 edit the HTML and re-render, never the PNG.
@@ -107,15 +107,23 @@ edit the HTML and re-render, never the PNG.
 | Layer | Tool | When | Refuses | Class |
 |---|---|---|---|---|
 | Ticket | the PM workspace skills above | before any build | a ticket below 85, an open business decision without an owner | `measured` (ticket, readiness) / `designed` (the rest of the catalogue) |
-| Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `designed` |
-| YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `designed` |
+| Orientation map (sensor 1) | ripwire | pre-write | nothing, it is not a gate | `measured` (index) / `designed` (effect on a build) |
+| YAGNI ladder (sensor 2) | chisle | during write | over-building, advisory only | `measured` (elision) / `designed` (effect) |
 | The net | tests, coverage, mutation kill rate, fail-on-base | post-write | silent behaviour change, tests that notice nothing, tests that prove nothing new | `measured` (kill-rate ratchet and fail-on-base `proposed`) |
 | Quality ratchets (sensor 3) | cleat | Stop hook | decay against a pinned baseline | `measured` |
-| Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `designed` |
+| Architecture diff (sensor 4) | enola | Stop hook | layer violations, cycles, scope spillover | `measured` (gate) / `designed` (no real catch yet) |
 | Adversarial review (sensor 5) | consort | pre-push | judgement failures | `measured` |
-| Scanners | dependency, secret, static analysis | pre-push | known-bad | `measured` |
+| Scanners | Trivy, SonarQube, dependency, secret | pre-push | known-bad | `measured` |
 | CI | the project's workflows | post-PR | a local pass nobody can reproduce | `measured` |
+| Provenance | commit trailer, required check | post-PR | a commit that does not say person or agent | `measured` |
+| Test integrity | second-person approval, required check | post-PR | a pull request that removes or weakens tests, or edits the gates, without a second person's approval | `measured` |
+| CI scanners | Trivy, SonarQube issue ratchet | post-PR | a new vulnerability, a rule whose open-issue count rises | `measured` |
+| Mutation on changed code | cargo-mutants, Stryker | post-PR | nothing yet: lists surviving mutants on the pull request | `measured` (run) / `proposed` (gate) |
+| Merge on the current base | merge queue | pre-merge | a batch that is red on current main | `measured` |
 | Human gate | a named person | pre-merge, pre-release | an outcome nobody accepted | `measured` |
+| SBOM tracking | Syft, Dependency-Track | post-release | a new vulnerability in what shipped | `designed` |
+| Dynamic scan | OWASP ZAP baseline | post-release | known-bad behaviour of the running environment | `designed` |
+| Production feedback | monitoring into the next spec | post-release | a live regression nobody turned into a proposal | `proposed` |
 
 The five sensors keep the numbering they carry in [05-sensor-stack](docs/05-sensor-stack.md);
 the other layers are not sensors and are deliberately unnumbered, so there is one numbering
