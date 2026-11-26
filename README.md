@@ -118,7 +118,7 @@ edit the HTML and re-render, never the PNG.
 | Provenance | commit trailer, required check | post-PR | a commit that does not say person or agent | `measured` |
 | Test integrity | second-person approval, required check | post-PR | a pull request that removes or weakens tests, or edits the gates, without a second person's approval | `measured` |
 | CI scanners | Trivy, SonarQube issue ratchet | post-PR | a new vulnerability, a rule whose open-issue count rises | `measured` |
-| Mutation on changed code | cargo-mutants, Stryker | post-PR | nothing yet: lists surviving mutants on the pull request | `measured` (run) / `proposed` (gate) |
+| Mutation on changed code | the stack's mutation tool | post-PR | nothing yet: lists surviving mutants on the pull request | `measured` (run) / `proposed` (gate) |
 | Merge on the current base | merge queue | pre-merge | a batch that is red on current main | `measured` |
 | Human gate | a named person | pre-merge, pre-release | an outcome nobody accepted | `measured` |
 | SBOM tracking | Syft, Dependency-Track | post-release | a new vulnerability in what shipped | `designed` |
